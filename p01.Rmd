@@ -52,8 +52,7 @@ This figure displays the mean response times depending on the location of the di
 
 Question: why does adding the ylim get rid of the bar. 
 
-```{r}
-# Create a barplot of the number of fish encounters by species
+```{r - graph 1 - distractor location effect on rt}
 ggplot(data = dist_means, aes(x = relative_hp_dist, y = mean_rts)) +
   ylim(700, 1000)+
   geom_bar(stat = "identity") +
