@@ -12,20 +12,31 @@ library(tidyverse)
 library(tidyr)
 ```
 
-
+The data used is from a visual search task in which participants are searching for a unique item in an array of six items and press a button to indicate whether the item is facing right or left. On 50% of trials, a salient, color distractor is present in the array. On 67% of distractor present trials, the distractor appears in the same location in the array with an equal number of trials in the other 5 locations. This study is testing whether adults can learn to suppress their attention to the high-probabilty location of the distractor. 
 
 ```{r import data}
 
 pilot <- read_csv("p01/data/pilot_final.csv", show_col_types = FALSE)
   
 ```
+Question: is there an easier/simpler way to change the column?
+
+```{r add new column for distractor location}
+pilot$relative_hp_dist[pilot$relative_hp_dist == 10] <- "no dist"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 0] <- "0 dist"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 1] <- "1 dist"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 2] <- "2 dist"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 3] <- "3 dist"
+
+```
+
 
 
 ```{r}
 # Create a barplot of the number of fish encounters by species
-ggplot(data = fish_encounters, aes(x = species, y = count)) +
+ggplot(data = pilot, aes(x = relative_hp_dist, y = RT)) +
   geom_bar(stat = "identity") +
-  labs(x = "Species", y = "Number of Fish Encounters")
+  labs(x = "Distractor Location", y = "Response Time (ms)")
   
 ```
 
