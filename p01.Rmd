@@ -20,7 +20,7 @@ The data used is from a visual search task in which participants are searching f
 pilot <- read_csv("p01/data/pilot_final.csv", show_col_types = FALSE)
   
 ```
-Question: is there an easier/simpler way to change the column? -- rename; as factor
+Question: is there an easier/simpler way to change the column? -- rename; as factor?
 
 ```{r add new column for distractor location}
 pilot$relative_hp_dist[pilot$relative_hp_dist == 10] <- "no dist"
@@ -38,6 +38,7 @@ Create new data frame with the mean response times grouped by distractor locatio
 
 dist_means <- pilot %>%
   group_by(relative_hp_dist) %>%
+  filter(acc==100) %>%
   summarize(mean_rts=mean(RT),
             sd_rt=sd(RT),
             n_rt=21,
@@ -55,17 +56,24 @@ Question: why does adding the ylim get rid of the bar.
 
 ```{r - graph 1 - distractor location effect on rt}
 ggplot(data = dist_means, aes(x = relative_hp_dist, y = mean_rts)) +
-  geom_bar(stat = "identity", fill="#9E7E38") +
-  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit))+
-  coord_cartesian(ylim = c(700,1000))+
+  geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(700,1050))+
+  theme_classic()+
   labs(x = "Distractor Location", y = "Response Time (ms)")+
   labs(title = "Distractor Location Effect on RT")
   
 ```
-Create a new data frame with the average RT for each relative distractor location per participant. 
+Create a new data frame with the average RT for each relative distractor location per participant, so we can do a repeated measures ANOVA. 
 
-```{r}
+```{r smaller df for 1 line per condition per participant}
 
+space <- pilot %>%
+  group_by(ID, relative_hp_dist) %>%
+  filter(acc==100) %>%
+  summarize(rts = mean(RT),
+            )
+space
   
 ```
 
