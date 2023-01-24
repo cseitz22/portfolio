@@ -22,6 +22,8 @@ pilot <- read_csv("p01/data/pilot_final.csv", show_col_types = FALSE)
 ```
 Question: is there an easier/simpler way to change the column? -- rename; as factor?
 
+Changed the value of column relative_hp_dist. Tried mutate and transform functions to no avail. 
+
 ```{r add new column for distractor location}
 pilot$relative_hp_dist[pilot$relative_hp_dist == 10] <- "no dist"
 pilot$relative_hp_dist[pilot$relative_hp_dist == 0] <- "0 dist"
@@ -50,9 +52,8 @@ dist_means
 
 ```
 
-This figure displays the mean response times depending on the location of the distractor relative to the high probability location.
+This figure displays the mean response times depending on the location of the distractor relative to the high probability location. Choose those particular colors based on Wake Forest's color scheme. 
 
-Question: why does adding the ylim get rid of the bar. 
 
 ```{r - graph 1 - distractor location effect on rt}
 ggplot(data = dist_means, aes(x = relative_hp_dist, y = mean_rts)) +
