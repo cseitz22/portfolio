@@ -28,15 +28,38 @@ pilot$relative_hp_dist[pilot$relative_hp_dist == 1] <- "1 dist"
 pilot$relative_hp_dist[pilot$relative_hp_dist == 2] <- "2 dist"
 pilot$relative_hp_dist[pilot$relative_hp_dist == 3] <- "3 dist"
 
+pilot$RT <- pilot$RT *1000
 ```
 
+Create new data frame with the mean response times grouped by distractor location relative to the high-probability location and change RT column to milliseconds. 
 
+```{r create new df with mean rts}
+
+dist_means <- pilot %>%
+  group_by(relative_hp_dist) %>%
+  summarize(mean_rts=mean(RT),
+            sd_rt=sd(RT),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+dist_means
+
+```
+
+This figure displays the mean response times depending on the location of the distractor relative to the high probability location.
+
+Question: why does adding the ylim get rid of the bar. 
 
 ```{r}
 # Create a barplot of the number of fish encounters by species
-ggplot(data = pilot, aes(x = relative_hp_dist, y = RT)) +
+ggplot(data = dist_means, aes(x = relative_hp_dist, y = mean_rts)) +
+  ylim(700, 1000)+
   geom_bar(stat = "identity") +
-  labs(x = "Distractor Location", y = "Response Time (ms)")
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit))+
+  labs(x = "Distractor Location", y = "Response Time (ms)")+
+  labs(title = "Distractor Location Effect on RT")
   
 ```
 
