@@ -11,6 +11,7 @@ data: "Distractor Suppression Pilot Study"
 library(tidyverse) 
 library(tidyr)
 library(rstatix)
+library(data.table)
 ```
 
 The data used is from a visual search task in which participants are searching for a unique item in an array of six items and press a button to indicate whether the item is facing right or left. On 50% of trials, a salient, color distractor is present in the array. On 67% of distractor present trials, the distractor appears in the same location in the array with an equal number of trials in the other 5 locations. This study is testing whether adults can learn to suppress their attention to the high-probabilty location of the distractor. 
@@ -25,11 +26,11 @@ Question: is there an easier/simpler way to change the column? -- rename; as fac
 Changed the value of column relative_hp_dist. Tried mutate and transform functions to no avail. 
 
 ```{r add new column for distractor location}
-pilot$relative_hp_dist[pilot$relative_hp_dist == 10] <- "no dist"
-pilot$relative_hp_dist[pilot$relative_hp_dist == 0] <- "0 dist"
-pilot$relative_hp_dist[pilot$relative_hp_dist == 1] <- "1 dist"
-pilot$relative_hp_dist[pilot$relative_hp_dist == 2] <- "2 dist"
-pilot$relative_hp_dist[pilot$relative_hp_dist == 3] <- "3 dist"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 10] <- "no_dist"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 0] <- "dist_0"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 1] <- "dist_1"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 2] <- "dist_2"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 3] <- "dist_3"
 
 pilot$RT <- pilot$RT *1000
 ```
@@ -77,4 +78,69 @@ space <- pilot %>%
 space
   
 ```
+
+Need to reformat the above df to have a column for each relative_hp_dist/ID.
+
+```{r}
+
+space_anova <- setDT(space)
+dcast(space_anova,ID~relative_hp_dist,value.var='rts')
+
+```
+
+``` {r testing assumptions}
+
+#first identify outliers - not sure what to do with them anyway so overall just ignore? maybe reason enough to get rid of ppt 11?
+space %>%
+  group_by(relative_hp_dist) %>%
+  identify_outliers(rts)
+
+
+#testing the normality assumption -- data is not normally distributed because some conditions have a p-value less than .05
+space %>%
+  group_by(relative_hp_dist) %>%
+  shapiro_test(rts)
+
+```
+
+Assumption of sphericity is automatically checked during the ANOVA test. Next, we'll do the ANOVA test. The ANOVA shows a significant difference among distractor locations, F(4,80)=32.621, p<.001.
+
+
+```{r ANOVA test}
+
+res.aov <- anova_test(data = space, dv = rts, wid = ID, within = relative_hp_dist)
+get_anova_table(res.aov)
+
+```
+
+Test whether the high-prob location and the average across low-prob locations were significantly different. 
+
+```{r t-test for high and low conditions only}
+
+
+#space_anova$
+ # group_by(relative_hp_dist) %>%
+ # mutate(low_prob = (dist_1+dist_2+dist_3)/3)
+
+
+space_anova$low_prob <- rowMeans(as.numeric(space_anova, na.rm=TRUE))
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
