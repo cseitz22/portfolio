@@ -10,6 +10,7 @@ data: "Distractor Suppression Pilot Study"
 ```{r load-packages, message=FALSE}
 library(tidyverse) 
 library(tidyr)
+library(rstatix)
 ```
 
 The data used is from a visual search task in which participants are searching for a unique item in an array of six items and press a button to indicate whether the item is facing right or left. On 50% of trials, a salient, color distractor is present in the array. On 67% of distractor present trials, the distractor appears in the same location in the array with an equal number of trials in the other 5 locations. This study is testing whether adults can learn to suppress their attention to the high-probabilty location of the distractor. 
@@ -19,7 +20,7 @@ The data used is from a visual search task in which participants are searching f
 pilot <- read_csv("p01/data/pilot_final.csv", show_col_types = FALSE)
   
 ```
-Question: is there an easier/simpler way to change the column?
+Question: is there an easier/simpler way to change the column? -- rename; as factor
 
 ```{r add new column for distractor location}
 pilot$relative_hp_dist[pilot$relative_hp_dist == 10] <- "no dist"
@@ -39,7 +40,7 @@ dist_means <- pilot %>%
   group_by(relative_hp_dist) %>%
   summarize(mean_rts=mean(RT),
             sd_rt=sd(RT),
-            n_rt=n(),
+            n_rt=21,
             se=sd_rt/sqrt(n_rt),
             upper_limit=mean_rts+se,
             lower_limit=mean_rts-se
@@ -54,20 +55,17 @@ Question: why does adding the ylim get rid of the bar.
 
 ```{r - graph 1 - distractor location effect on rt}
 ggplot(data = dist_means, aes(x = relative_hp_dist, y = mean_rts)) +
-  ylim(700, 1000)+
-  geom_bar(stat = "identity") +
+  geom_bar(stat = "identity", fill="#9E7E38") +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit))+
+  coord_cartesian(ylim = c(700,1000))+
   labs(x = "Distractor Location", y = "Response Time (ms)")+
   labs(title = "Distractor Location Effect on RT")
   
 ```
-
+Create a new data frame with the average RT for each relative distractor location per participant. 
 
 ```{r}
-# Create a barplot of the number of fish encounters by species
-ggplot(data = fish_encounters, aes(x = species, y = count)) +
-  geom_bar(stat = "identity") +
-  labs(x = "Species", y = "Number of Fish Encounters")
+
   
 ```
 
