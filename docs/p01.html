@@ -11,7 +11,7 @@
 
 
 
-<title>Portfolio 1</title>
+<title>Portfolio 1 - Distractor Suppression Pilot Study</title>
 
 <script src="site_libs/header-attrs-2.19/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -290,19 +290,13 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Portfolio 1</h1>
+<h1 class="title toc-ignore">Portfolio 1 - Distractor Suppression Pilot
+Study</h1>
 <h4 class="date">1.21.2023</h4>
 
 </div>
 
 
-<blockquote>
-<p>The projects should be numbered consecutively (i.e., in the order in
-which you began them), and should include for each project a description
-of the goal, the product (computer program, hand graph, computer graph,
-etc.), the data, and some interpretation. Reports must be reproducible
-and of high quality in terms of writing, grammar, presentation, etc.</p>
-</blockquote>
 <pre class="r"><code>library(tidyverse) 
 library(tidyr)
 library(rstatix)
@@ -318,8 +312,10 @@ attention to the high-probabilty location of the distractor.</p>
 <pre class="r"><code>pilot &lt;- read_csv(&quot;p01/data/pilot_final.csv&quot;, show_col_types = FALSE)</code></pre>
 <pre><code>## New names:
 ## • `` -&gt; `...1`</code></pre>
-<p>Question: is there an easier/simpler way to change the column? –
-rename; as factor?</p>
+<pre class="r"><code>system2(&#39;open&#39;, args = &#39;figure_1.pdf&#39;, wait = FALSE)</code></pre>
+<div id="distractor-location-effects-on-response-times"
+class="section level3">
+<h3>Distractor Location Effects on Response Times</h3>
 <p>Changed the value of column relative_hp_dist. Tried mutate and
 transform functions to no avail.</p>
 <pre class="r"><code>pilot$relative_hp_dist[pilot$relative_hp_dist == 10] &lt;- &quot;no_dist&quot;
@@ -445,6 +441,7 @@ p&lt;.001).</p>
 ## sample estimates:
 ## mean difference 
 ##         47.5214</code></pre>
+</div>
 
 
 

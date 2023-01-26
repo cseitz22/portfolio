@@ -1,11 +1,10 @@
 ---
-title: "Portfolio 1"
+title: "Portfolio 1 - Distractor Suppression Pilot Study"
 name: "Cat Seitz"
 date: "1.21.2023"
 data: "Distractor Suppression Pilot Study"
 ---
 
-> The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
 
 ```{r load-packages, message=FALSE}
 library(tidyverse) 
@@ -21,7 +20,9 @@ The data used is from a visual search task in which participants are searching f
 pilot <- read_csv("p01/data/pilot_final.csv", show_col_types = FALSE)
   
 ```
-Question: is there an easier/simpler way to change the column? -- rename; as factor?
+
+
+### Distractor Location Effects on Response Times
 
 Changed the value of column relative_hp_dist. Tried mutate and transform functions to no avail. 
 
@@ -130,7 +131,7 @@ space_anova %>%
 ```
 
 
-
+### Target Location Effect on Response Times
 
 
 
