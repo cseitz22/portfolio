@@ -84,7 +84,7 @@ Need to reformat the above df to have a column for each relative_hp_dist/ID.
 ```{r}
 
 space_anova <- setDT(space)
-dcast(space_anova,ID~relative_hp_dist,value.var='rts')
+space_anova <- dcast(space_anova,ID~relative_hp_dist,value.var='rts')
 
 ```
 
@@ -113,19 +113,22 @@ get_anova_table(res.aov)
 
 ```
 
-Test whether the high-prob location and the average across low-prob locations were significantly different. 
+Test whether the high-prob location and the average across low-prob locations were significantly different. Using a paired samples t-test, I found that the response times for when the distractor was present in the high-probability location compared to the average response time across the low-probability locations was significantly different (t(20)=4.24, p<.001).
 
-```{r t-test for high and low conditions only}
+```{r set up data for t-test for high and low conditions only}
 
-
-#space_anova$
- # group_by(relative_hp_dist) %>%
- # mutate(low_prob = (dist_1+dist_2+dist_3)/3)
-
-
-space_anova$low_prob <- rowMeans(as.numeric(space_anova, na.rm=TRUE))
+space_anova <- space_anova %>%
+  mutate(low_prob = (dist_1+dist_2+dist_3)/3)
 
 ```
+
+```{r t-test}
+
+space_anova %>%
+  t.test(x=space_anova$low_prob, y=space_anova$dist_0, alternative="greater", mu=0,paired = TRUE, conf.level = .95)
+
+```
+
 
 
 
