@@ -24,39 +24,51 @@ pilot <- read_csv("p01/data/pilot_final.csv", show_col_types = FALSE)
 
 ```{r add_column_for_trial_block}
 
+
+pilot$relative_hp_dist[pilot$relative_hp_dist == 10] <- "no_dist"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 0] <- "dist_0"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 1] <- "dist_1"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 2] <- "dist_2"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 3] <- "dist_3"
+
 block_num <- rep(c(1,2,3,4,5,6,7,8), each=60, times=21)
 pilot <- cbind(pilot, block_num)
 
 ```
 
-```{r add_avg_col_and_difference_col}
+```{r create_new_df_to_transform}
+space <- pilot %>%
+  group_by(ID, block_num, relative_hp_dist) %>%
+  filter(acc==100) %>%
+  summarize(rts = mean(RT),
+            )
 
-pilot$RT <- pilot$RT *1000
+space$rts <- space$rts *1000
+
+```
+
+```{r transform_df}
 
 space_anova <- setDT(space)
-space_anova <- dcast(space_anova,ID~relative_hp_dist,value.var='rts')
+space_anova <- dcast(space_anova,ID+block_num~relative_hp_dist,value.var='rts')
 
-pilot <- pilot %>%
+```
+
+```{r add_avg_col}
+
+space_anova <- space_anova %>%
   mutate(low_prob = (dist_1+dist_2+dist_3)/3) %>%
-  mutate(difference = (low_prob-))
+  mutate(difference = (low_prob-dist_0))
 
 
 
 ```
 
 
-```{r trim_down_df}
-dist_means <- pilot %>%
-  group_by(ID, relative_hp_dist, block_num) %>%
-  filter(acc==100) %>%
-  summarize(mean_rts=mean(RT),
-            sd_rt=sd(RT),
-            n_rt=21,
-            se=sd_rt/sqrt(n_rt),
-            upper_limit=mean_rts+se,
-            lower_limit=mean_rts-se
-  )
-dist_means
+```{r line_plot}
+ggplot(data = space_anova,aes(x=block_num, y=difference, group=ID))+
+  geom_line(aes(color=ID))+
+  geom_point()
 
 ```
 
