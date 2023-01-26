@@ -66,10 +66,48 @@ space_anova <- space_anova %>%
 
 
 ```{r line_plot}
-ggplot(data = space_anova,aes(x=block_num, y=difference, group=ID))+
+r <- ggplot(data = space_anova,aes(x=block_num, y=difference, group=ID))+
   geom_line(aes(color=ID))+
+  geom_point()
+  
+
+```
+
+Need to create line plot of the averages.
+
+```{r create_df_to_transform}
+space2 <- pilot %>%
+  group_by(block_num, relative_hp_dist) %>%
+  filter(acc==100) %>%
+  summarize(rts = mean(RT),
+            )
+
+space2$rts <- space2$rts *1000
+
+```
+```{r transform_again}
+
+space3 <- setDT(space2)
+space3 <- dcast(space3,block_num~relative_hp_dist,value.var='rts')
+
+space3 <- space3 %>%
+  mutate(low_prob = (dist_1+dist_2+dist_3)/3) %>%
+  mutate(difference = (low_prob-dist_0))
+
+```
+
+
+```{r line_plot_avg}
+ggplot(data = space3,aes(x=block_num, y=difference))+
+  geom_line(aes(color="red"))+
   geom_point()
 
 ```
+
+
+
+
+
+
 
 
