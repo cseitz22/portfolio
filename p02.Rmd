@@ -1,5 +1,63 @@
 ---
 title: "Portfolio 2"
+name: "Cat Seitz"
+date: "1.21.2023"
+data: "Distractor Suppression Pilot Study"
 ---
 
-> The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
+```{r load-packages, message=FALSE}
+library(tidyverse) 
+library(tidyr)
+library(rstatix)
+library(data.table)
+```
+
+The data used is from a visual search task in which participants are searching for a unique item in an array of six items and press a button to indicate whether the item is facing right or left. On 50% of trials, a salient, color distractor is present in the array. On 67% of distractor present trials, the distractor appears in the same location in the array with an equal number of trials in the other 5 locations. This study is testing whether adults can learn to suppress their attention to the high-probabilty location of the distractor. 
+
+The goal of this portfolio is to examine individual blocks of trials for learning. I'll be taking the difference between response times when the distractor is presented in the low probability locations and response times when the distractor is presented in the high probability location.
+
+```{r import_data}
+
+pilot <- read_csv("p01/data/pilot_final.csv", show_col_types = FALSE)
+  
+```
+
+```{r add_column_for_trial_block}
+
+block_num <- rep(c(1,2,3,4,5,6,7,8), each=60, times=21)
+pilot <- cbind(pilot, block_num)
+
+```
+
+```{r add_avg_col_and_difference_col}
+
+pilot$RT <- pilot$RT *1000
+
+space_anova <- setDT(space)
+space_anova <- dcast(space_anova,ID~relative_hp_dist,value.var='rts')
+
+pilot <- pilot %>%
+  mutate(low_prob = (dist_1+dist_2+dist_3)/3) %>%
+  mutate(difference = (low_prob-))
+
+
+
+```
+
+
+```{r trim_down_df}
+dist_means <- pilot %>%
+  group_by(ID, relative_hp_dist, block_num) %>%
+  filter(acc==100) %>%
+  summarize(mean_rts=mean(RT),
+            sd_rt=sd(RT),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+dist_means
+
+```
+
+
