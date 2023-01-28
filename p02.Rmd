@@ -14,7 +14,7 @@ library(data.table)
 
 The data used is from a visual search task in which participants are searching for a unique item in an array of six items and press a button to indicate whether the item is facing right or left. On 50% of trials, a salient, color distractor is present in the array. On 67% of distractor present trials, the distractor appears in the same location in the array with an equal number of trials in the other 5 locations. This study is testing whether adults can learn to suppress their attention to the high-probabilty location of the distractor. 
 
-The goal of this portfolio is to examine individual blocks of trials for learning. I'll be taking the difference between response times when the distractor is presented in the low probability locations and response times when the distractor is presented in the high probability location.
+The goal of this portfolio is to examine the 
 
 ```{r import_data}
 
@@ -66,7 +66,7 @@ space_anova <- space_anova %>%
 
 
 ```{r line_plot}
-r <- ggplot(data = space_anova,aes(x=block_num, y=difference, group=ID))+
+ggplot(data = space_anova,aes(x=block_num, y=difference, group=ID))+
   geom_line(aes(color=ID))+
   geom_point()
   
