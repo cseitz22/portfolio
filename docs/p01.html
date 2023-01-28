@@ -312,7 +312,6 @@ attention to the high-probabilty location of the distractor.</p>
 <pre class="r"><code>pilot &lt;- read_csv(&quot;p01/data/pilot_final.csv&quot;, show_col_types = FALSE)</code></pre>
 <pre><code>## New names:
 ## • `` -&gt; `...1`</code></pre>
-<pre class="r"><code>system2(&#39;open&#39;, args = &#39;figure_1.pdf&#39;, wait = FALSE)</code></pre>
 <div id="distractor-location-effects-on-response-times"
 class="section level3">
 <h3>Distractor Location Effects on Response Times</h3>
@@ -441,6 +440,56 @@ p&lt;.001).</p>
 ## sample estimates:
 ## mean difference 
 ##         47.5214</code></pre>
+</div>
+<div id="examine-block-by-block-learning-of-distractor-location"
+class="section level3">
+<h3>Examine block-by-block learning of distractor location</h3>
+<p>The goal of this portfolio is to examine individual blocks of trials
+for learning. I’ll be taking the difference between response times when
+the distractor is presented in the low probability locations and
+response times when the distractor is presented in the high probability
+location.</p>
+<pre class="r"><code>block_num &lt;- rep(c(1,2,3,4,5,6,7,8), each=60, times=21)
+pilot &lt;- cbind(pilot, block_num)</code></pre>
+<pre class="r"><code>space_block &lt;- pilot %&gt;%
+  group_by(ID, block_num, relative_hp_dist) %&gt;%
+  filter(acc==100) %&gt;%
+  summarize(rts = mean(RT),
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;, &#39;block_num&#39;. You can override using
+## the `.groups` argument.</code></pre>
+<pre class="r"><code>space_block &lt;- setDT(space_block)
+space_block &lt;- dcast(space_block,ID+block_num~relative_hp_dist,value.var=&#39;rts&#39;)</code></pre>
+<pre class="r"><code>space_block &lt;- space_block %&gt;%
+  mutate(low_prob = (dist_1+dist_2+dist_3)/3) %&gt;%
+  mutate(difference = (low_prob-dist_0))</code></pre>
+<pre class="r"><code>ggplot(data = space_block,aes(x=block_num, y=difference, group=ID))+
+  geom_line(aes(color=ID))+
+  geom_point()+
+  labs(title = &quot;Difference in Response Times&quot;, subtitle = &quot;for distractor presentation at the low-probability locations and high-probability location by block&quot;)+
+  theme_classic()+
+  labs(x = &quot;Block Number&quot;, y = &quot;Difference in RT (ms)&quot;)+
+  labs(caption = &quot;Larger differences indicate that &quot;)</code></pre>
+<pre><code>## Warning: Removed 1 rows containing missing values (`geom_point()`).</code></pre>
+<p><img src="p01_files/figure-html/line_plot-1.png" width="672" /> One
+participant did not have a value for block 6 due to them not completing
+any trials of a certain type, accurately, during that block.</p>
+<p>Need to create line plot of the averages.</p>
+<pre class="r"><code>space2 &lt;- space_block %&gt;%
+  group_by(block_num) %&gt;%
+  summarize(rts = mean(difference, na.rm = TRUE),
+            sd_rt=sd(difference, na.rm = TRUE),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=rts+se,
+            lower_limit=rts-se
+            )</code></pre>
+<pre class="r"><code>ggplot(data = space2,aes(x=block_num, y=rts))+
+  geom_line()+
+  geom_point()+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  labs(title = &quot;Average Difference in Response Times By Block&quot;, subtitle = &quot;for distractor presentation at the low-probability locations and high-probability location&quot;, x=&quot;Block number&quot;, y=&quot;Difference in RT (ms)&quot;)</code></pre>
+<p><img src="p01_files/figure-html/line_plot_avg-1.png" width="672" /></p>
 </div>
 
 

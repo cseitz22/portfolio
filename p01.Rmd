@@ -171,39 +171,37 @@ space_block <- space_block %>%
 ```{r line_plot}
 ggplot(data = space_block,aes(x=block_num, y=difference, group=ID))+
   geom_line(aes(color=ID))+
-  geom_point()
+  geom_point()+
+  labs(title = "Difference in Response Times", subtitle = "for distractor presentation at the low-probability locations and high-probability location by block")+
+  theme_classic()+
+  labs(x = "Block Number", y = "Difference in RT (ms)")+
+  labs(caption = "Larger differences indicate that ")
   
 
 ```
+One participant did not have a value for block 6 due to them not completing any trials of a certain type, accurately, during that block.
 
 Need to create line plot of the averages.
 
 ```{r create_df_to_transform}
-space2 <- pilot %>%
-  group_by(block_num, relative_hp_dist) %>%
-  filter(acc==100) %>%
-  summarize(rts = mean(RT),
+space2 <- space_block %>%
+  group_by(block_num) %>%
+  summarize(rts = mean(difference, na.rm = TRUE),
+            sd_rt=sd(difference, na.rm = TRUE),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=rts+se,
+            lower_limit=rts-se
             )
 
-space2$rts <- space2$rts *1000
-
 ```
-```{r transform_again}
-
-space3 <- setDT(space2)
-space3 <- dcast(space3,block_num~relative_hp_dist,value.var='rts')
-
-space3 <- space3 %>%
-  mutate(low_prob = (dist_1+dist_2+dist_3)/3) %>%
-  mutate(difference = (low_prob-dist_0))
-
-```
-
 
 ```{r line_plot_avg}
-ggplot(data = space3,aes(x=block_num, y=difference))+
-  geom_line(aes(color="red"))+
-  geom_point()
+ggplot(data = space2,aes(x=block_num, y=rts))+
+  geom_line()+
+  geom_point()+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  labs(title = "Average Difference in Response Times By Block", subtitle = "for distractor presentation at the low-probability locations and high-probability location", x="Block number", y="Difference in RT (ms)")
 
 ```
 
