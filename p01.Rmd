@@ -131,7 +131,81 @@ space_anova %>%
 ```
 
 
-### Target Location Effect on Response Times
+### Examine block-by-block learning of distractor location
+
+The goal of this portfolio is to examine individual blocks of trials for learning. I'll be taking the difference between response times when the distractor is presented in the low probability locations and response times when the distractor is presented in the high probability location.
+
+```{r add block number}
+block_num <- rep(c(1,2,3,4,5,6,7,8), each=60, times=21)
+pilot <- cbind(pilot, block_num)
+
+```
+
+```{r create_new_df_to_transform}
+space_block <- pilot %>%
+  group_by(ID, block_num, relative_hp_dist) %>%
+  filter(acc==100) %>%
+  summarize(rts = mean(RT),
+            )
+
+```
+
+```{r transform_df}
+
+space_block <- setDT(space_block)
+space_block <- dcast(space_block,ID+block_num~relative_hp_dist,value.var='rts')
+
+```
+
+```{r add_avg_col}
+
+space_block <- space_block %>%
+  mutate(low_prob = (dist_1+dist_2+dist_3)/3) %>%
+  mutate(difference = (low_prob-dist_0))
+
+
+
+```
+
+
+```{r line_plot}
+ggplot(data = space_block,aes(x=block_num, y=difference, group=ID))+
+  geom_line(aes(color=ID))+
+  geom_point()
+  
+
+```
+
+Need to create line plot of the averages.
+
+```{r create_df_to_transform}
+space2 <- pilot %>%
+  group_by(block_num, relative_hp_dist) %>%
+  filter(acc==100) %>%
+  summarize(rts = mean(RT),
+            )
+
+space2$rts <- space2$rts *1000
+
+```
+```{r transform_again}
+
+space3 <- setDT(space2)
+space3 <- dcast(space3,block_num~relative_hp_dist,value.var='rts')
+
+space3 <- space3 %>%
+  mutate(low_prob = (dist_1+dist_2+dist_3)/3) %>%
+  mutate(difference = (low_prob-dist_0))
+
+```
+
+
+```{r line_plot_avg}
+ggplot(data = space3,aes(x=block_num, y=difference))+
+  geom_line(aes(color="red"))+
+  geom_point()
+
+```
 
 
 
