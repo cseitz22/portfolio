@@ -3,6 +3,9 @@ title: "Portfolio 1 - Distractor Suppression Pilot Study"
 name: "Cat Seitz"
 date: "1.21.2023"
 data: "Distractor Suppression Pilot Study"
+output: 
+  html_document: 
+    theme: cerulean
 ---
 
 
@@ -15,6 +18,8 @@ library(data.table)
 
 The data used is from a visual search task in which participants are searching for a unique item in an array of six items and press a button to indicate whether the item is facing right or left. On 50% of trials, a salient, color distractor is present in the array. On 67% of distractor present trials, the distractor appears in the same location in the array with an equal number of trials in the other 5 locations. This study is testing whether adults can learn to suppress their attention to the high-probabilty location of the distractor. 
 
+The goal of this portfolio piece was to examine the distractor location effect on response times with regard to the statistical regularity introduced. 
+
 ```{r import data}
 
 pilot <- read_csv("p01/data/pilot_final.csv", show_col_types = FALSE)
@@ -24,7 +29,7 @@ pilot <- read_csv("p01/data/pilot_final.csv", show_col_types = FALSE)
 
 ### Distractor Location Effects on Response Times
 
-Changed the value of column relative_hp_dist. Tried mutate and transform functions to no avail. 
+Changed the value of column relative_hp_dist and changed RT column to milliseconds. Tried mutate and transform functions to no avail. 
 
 ```{r add new column for distractor location}
 pilot$relative_hp_dist[pilot$relative_hp_dist == 10] <- "no_dist"
@@ -36,7 +41,7 @@ pilot$relative_hp_dist[pilot$relative_hp_dist == 3] <- "dist_3"
 pilot$RT <- pilot$RT *1000
 ```
 
-Create new data frame with the mean response times grouped by distractor location relative to the high-probability location and change RT column to milliseconds. 
+Create new data frame with the mean response times grouped by distractor location relative to the high-probability location and add columns for standard error. 
 
 ```{r create new df with mean rts}
 
@@ -54,7 +59,9 @@ dist_means
 
 ```
 
-This figure displays the mean response times depending on the location of the distractor relative to the high probability location. Choose those particular colors based on Wake Forest's color scheme. 
+
+
+This figure displays the mean response times depending on the location of the distractor relative to the high probability location. I chose those particular colors based on Wake Forest's color scheme. 
 
 
 ```{r - graph 1 - distractor location effect on rt}
@@ -64,9 +71,13 @@ ggplot(data = dist_means, aes(x = relative_hp_dist, y = mean_rts)) +
   coord_cartesian(ylim = c(700,1050))+
   theme_classic()+
   labs(x = "Distractor Location", y = "Response Time (ms)")+
-  labs(title = "Distractor Location Effect on RT")
+  labs(title = "Distractor Location Effect on RT")+
+  labs(caption = "An ANOVA test shows a difference in RT depending on distractor location, F(4,80)=32.621, p<.001.")
   
 ```
+
+
+
 Create a new data frame with the average RT for each relative distractor location per participant, so we can do a repeated measures ANOVA. 
 
 ```{r smaller df for 1 line per condition per participant}
@@ -114,7 +125,7 @@ get_anova_table(res.aov)
 
 ```
 
-Test whether the high-prob location and the average across low-prob locations were significantly different. Using a paired samples t-test, I found that the response times for when the distractor was present in the high-probability location compared to the average response time across the low-probability locations was significantly different (t(20)=4.24, p<.001).
+Test whether the high-prob location and the average across low-prob locations were significantly different. Using a paired samples t-test, I found that the response times for when the distractor was presented in the high-probability location compared to the average response time across the low-probability locations was significantly different (t(20)=4.24, p<.001).
 
 ```{r set up data for t-test for high and low conditions only}
 
@@ -133,7 +144,7 @@ space_anova %>%
 
 ### Examine block-by-block learning of distractor location
 
-The goal of this portfolio is to examine individual blocks of trials for learning. I'll be taking the difference between response times when the distractor is presented in the low probability locations and response times when the distractor is presented in the high probability location.
+The goal of this section is to examine individual blocks of trials for learning. I'll be taking the difference between response times when the distractor is presented in the low probability locations and response times when the distractor is presented in the high probability location in each block to see roughly how quickly individuals are learning the regularity.
 
 ```{r add block number}
 block_num <- rep(c(1,2,3,4,5,6,7,8), each=60, times=21)
@@ -174,14 +185,14 @@ ggplot(data = space_block,aes(x=block_num, y=difference, group=ID))+
   geom_point()+
   labs(title = "Difference in Response Times", subtitle = "for distractor presentation at the low-probability locations and high-probability location by block")+
   theme_classic()+
-  labs(x = "Block Number", y = "Difference in RT (ms)")+
-  labs(caption = "Larger differences indicate that ")
-  
+  labs(x = "Block Number", y = "Difference in RT (ms)")
 
 ```
-One participant did not have a value for block 6 due to them not completing any trials of a certain type, accurately, during that block.
 
-Need to create line plot of the averages.
+
+One participant did not have a value for block 6 due to them not completing any trials of a certain type, accurately, during that block. Positive differences indicate that participants were faster when the distractor was presented in the high probability location compared to when it was presented in the low probability locations. The average across all participants is plotted below. These results indicate that the individuals are learning within the first block where the distractor is likely to appear. 
+
+
 
 ```{r create_df_to_transform}
 space2 <- space_block %>%
