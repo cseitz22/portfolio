@@ -34,7 +34,7 @@ pilot <- cbind(pilot, block_num)
 
 Added in a column for how the target related to the high-probability distractor location. Used brute force instead of trying to write a fancy function. 
 
-```{r add_column_for_target's_distance_from_the_high_probability_location}
+```{r add_column_for_target_distance_from_the_high_probability_location}
 
 pilot <- pilot %>%
   mutate(relative_target=
@@ -104,9 +104,9 @@ ggplot(data = target_means, aes(x = relative_target, y = mean_rts)) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(700,1000))+
   theme_classic()+
-  labs(x = "Target Location", y = "Response Time (ms)")+
+  labs(x = "Target Location Relative to High-probability Distractor Location", y = "Response Time (ms)")+
   labs(title = "Target Location Effect on RT")+
-  labs(caption = "An ANOVA test shows a difference in RT depending on target location, F(4,80)=XXX, p<.001.")
+  labs(caption = "An ANOVA test shows a difference in RT depending on target location, F(1.74,34.86)=12.925, p<.001.")
   
 ```
 
@@ -115,7 +115,7 @@ Create a new data frame with the average RT for each relative distractor locatio
 ```{r smaller df for 1 line per condition per participant}
 
 space <- pilot %>%
-  group_by(ID, relative_hp_dist) %>%
+  group_by(ID, relative_target) %>%
   filter(acc==100) %>%
   summarize(rts = mean(RT),
             )
@@ -128,108 +128,32 @@ Need to reformat the above df to have a column for each relative_hp_dist/ID.
 ```{r}
 
 space_anova <- setDT(space)
-space_anova <- dcast(space_anova,ID~relative_hp_dist,value.var='rts')
+space_anova <- dcast(space_anova,ID~relative_target,value.var='rts')
 
 ```
 
 ``` {r testing assumptions}
 
-#first identify outliers - not sure what to do with them anyway so overall just ignore? maybe reason enough to get rid of ppt 11?
+#first identify outliers - not sure what to do with them anyway so overall just ignore? maybe reason enough to get rid of ppt 11? ppt 11 was problematic in most tests
 space %>%
-  group_by(relative_hp_dist) %>%
+  group_by(relative_target) %>%
   identify_outliers(rts)
 
 
-#testing the normality assumption -- data is not normally distributed because some conditions have a p-value less than .05
+#testing the normality assumption -- data is normally distributed enough because no conditions have a p-value less than .05
 space %>%
-  group_by(relative_hp_dist) %>%
+  group_by(relative_target) %>%
   shapiro_test(rts)
 
 ```
 
-Assumption of sphericity is automatically checked during the ANOVA test. Next, we'll do the ANOVA test. The ANOVA shows a significant difference among distractor locations, F(4,80)=32.621, p<.001.
+Assumption of sphericity is automatically checked during the ANOVA test. Next, we'll do the ANOVA test. The ANOVA shows a significant difference among distractor locations, F(1.74,34.86)=12.925, p<.001.
 
 
 ```{r ANOVA test}
 
-res.aov <- anova_test(data = space, dv = rts, wid = ID, within = relative_hp_dist)
+res.aov <- anova_test(data = space, dv = rts, wid = ID, within = relative_target)
 get_anova_table(res.aov)
 
 ```
-
-### By block stuff
-```{r create_new_df_to_transform}
-space <- pilot %>%
-  group_by(ID, block_num, relative_hp_dist) %>%
-  filter(acc==100) %>%
-  summarize(rts = mean(RT),
-            )
-
-space$rts <- space$rts *1000
-
-```
-
-```{r transform_df}
-
-space_anova <- setDT(space)
-space_anova <- dcast(space_anova,ID+block_num~relative_hp_dist,value.var='rts')
-
-```
-
-```{r add_avg_col}
-
-space_anova <- space_anova %>%
-  mutate(low_prob = (dist_1+dist_2+dist_3)/3) %>%
-  mutate(difference = (low_prob-dist_0))
-
-
-
-```
-
-
-```{r line_plot}
-ggplot(data = space_anova,aes(x=block_num, y=difference, group=ID))+
-  geom_line(aes(color=ID))+
-  geom_point()
-  
-
-```
-
-Need to create line plot of the averages.
-
-```{r create_df_to_transform}
-space2 <- pilot %>%
-  group_by(block_num, relative_hp_dist) %>%
-  filter(acc==100) %>%
-  summarize(rts = mean(RT),
-            )
-
-space2$rts <- space2$rts *1000
-
-```
-```{r transform_again}
-
-space3 <- setDT(space2)
-space3 <- dcast(space3,block_num~relative_hp_dist,value.var='rts')
-
-space3 <- space3 %>%
-  mutate(low_prob = (dist_1+dist_2+dist_3)/3) %>%
-  mutate(difference = (low_prob-dist_0))
-
-```
-
-
-```{r line_plot_avg}
-ggplot(data = space3,aes(x=block_num, y=difference))+
-  geom_line(aes(color="red"))+
-  geom_point()
-
-```
-
-
-
-
-
-
-
 
