@@ -216,6 +216,25 @@ ggplot(data = pilot_targacc, aes(x = relative_target, y = accuracy)) +
 
 ```
 
+```{r create_accuracy_df_for_ANOVAs}
 
+pilot_dist <- pilot %>%
+  group_by(ID, relative_hp_dist) %>%
+  summarize(accuracy = mean(acc)
+            )
+pilot_targ <- pilot %>%
+  group_by(ID, relative_target) %>%
+  summarize(accuracy = mean(acc)
+            )
 
+```
+```{r ANOVA tests for accuracy}
+
+res.aov <- anova_test(data = pilot_dist, dv = accuracy, wid = ID, within = relative_hp_dist)
+get_anova_table(res.aov)
+
+res.aov <- anova_test(data = pilot_targ, dv = accuracy, wid = ID, within = relative_target)
+get_anova_table(res.aov)
+
+```
 
