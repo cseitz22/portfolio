@@ -20,9 +20,17 @@ The goal of this portfolio is to examine the effects of distractor location on a
 
 pilot <- read_csv("p02/pilot_final.csv", show_col_types = FALSE)
 
+pilot$relative_hp_dist[pilot$relative_hp_dist == 10] <- "no_dist"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 0] <- "dist_0"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 1] <- "dist_1"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 2] <- "dist_2"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 3] <- "dist_3"
 pilot$RT <- pilot$RT *1000
   
 ```
+
+### Target Location Effects on Response Time
+
 Added in the block column at this point just in case I want to use it in the future. 
 
 ```{r add_column_for_trial_block}
@@ -156,4 +164,58 @@ res.aov <- anova_test(data = space, dv = rts, wid = ID, within = relative_target
 get_anova_table(res.aov)
 
 ```
+
+
+### Distractor and Target Location Effects on Accuracy
+
+
+```{r create_accuracy_df}
+
+pilot_distacc <- pilot %>%
+  group_by(relative_hp_dist) %>%
+  summarize(accuracy = mean(acc),
+            sd_rt=sd(acc),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=accuracy+se,
+            lower_limit=accuracy-se
+            )
+pilot_targacc <- pilot %>%
+  group_by(relative_target) %>%
+  summarize(accuracy = mean(acc),
+            sd_rt=sd(acc),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=accuracy+se,
+            lower_limit=accuracy-se
+            )
+
+
+
+```
+
+```{r - graph distractor location effects on accuracy}
+ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy)) +
+  geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(85,105))+
+  theme_classic()+
+  labs(x = "Distractor Location Relative to High-probability Distractor Location", y = "Accuracy (%)")+
+  labs(title = "Distractor Location Effect on Accuracy")
+
+```
+
+```{r - graph target location effects on accuracy}
+ggplot(data = pilot_targacc, aes(x = relative_target, y = accuracy)) +
+  geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(85,105))+
+  theme_classic()+
+  labs(x = "Target Location Relative to High-probability Distractor Location", y = "Accuracy (%)")+
+  labs(title = "Target Location Effect on Accuracy")
+
+```
+
+
+
 
