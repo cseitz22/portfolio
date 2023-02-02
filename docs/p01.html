@@ -300,7 +300,10 @@ Study</h1>
 <pre class="r"><code>library(tidyverse) 
 library(tidyr)
 library(rstatix)
-library(data.table)</code></pre>
+library(data.table)
+library(afex)
+library(emmeans)
+library(psych)</code></pre>
 <p>The data used is from a visual search task in which participants are
 searching for a unique item in an array of six items and press a button
 to indicate whether the item is facing right or left. On 50% of trials,
@@ -467,6 +470,18 @@ summary(model)</code></pre>
 ## Residuals                80 183990    2300                     
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>model2 &lt;- aov_car(rts ~ relative_hp_dist + Error(ID/relative_hp_dist), data=space)
+
+model2</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: rts
+##             Effect          df     MSE         F  ges p.value
+## 1 relative_hp_dist 3.28, 65.57 2806.06 33.30 *** .120   &lt;.001
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
 <p>Test whether the high-prob location and the average across low-prob
 locations were significantly different. Using a paired samples t-test, I
 found that the response times for when the distractor was presented in
