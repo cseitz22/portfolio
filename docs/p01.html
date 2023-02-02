@@ -315,9 +315,6 @@ regularity introduced.</p>
 <pre class="r"><code>pilot &lt;- read_csv(&quot;p01/p01/data/pilot_final.csv&quot;, show_col_types = FALSE)</code></pre>
 <pre><code>## New names:
 ## • `` -&gt; `...1`</code></pre>
-<div id="distractor-location-effects-on-response-times"
-class="section level3">
-<h3>Distractor Location Effects on Response Times</h3>
 <p>Changed the value of column relative_hp_dist and changed RT column to
 milliseconds. Tried mutate and transform functions to no avail.</p>
 <pre class="r"><code>pilot$relative_hp_dist[pilot$relative_hp_dist == 10] &lt;- &quot;no_dist&quot;
@@ -327,12 +324,40 @@ pilot$relative_hp_dist[pilot$relative_hp_dist == 2] &lt;- &quot;dist_2&quot;
 pilot$relative_hp_dist[pilot$relative_hp_dist == 3] &lt;- &quot;dist_3&quot;
 
 pilot$RT &lt;- pilot$RT *1000</code></pre>
+<pre class="r"><code>block_num &lt;- rep(c(1,2,3,4,5,6,7,8), each=60, times=21)
+pilot &lt;- cbind(pilot, block_num)</code></pre>
+<div id="trim-the-data" class="section level3">
+<h3>Trim the Data</h3>
+<p>Define trimming criteria according to Van Selst and Jolicoeur
+1994</p>
+<pre class="r"><code>xsize &lt;- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
+             25, 30, 35, 50, 100)
+stds &lt;- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173, 
+            2.22, 2.246, 2.274, 2.31, 2.326, 2.391, 2.41, 2.4305, 
+            2.45, 2.48, 2.5)</code></pre>
+<p>Trim the data and compute the percent trimmed</p>
+<pre class="r"><code>trimmed &lt;- pilot[pilot$acc==100, ] %&gt;% group_by(ID, relative_hp_dist) %&gt;%
+           mutate(sdc = ifelse(length(RT)&gt;=100,2.5,approx(xsize,stds,xout=length(RT))$y), avg = mean(RT), stdev = sd(RT)) %&gt;%
+           filter(RT &lt;= sdc*stdev+avg &amp; RT &gt;=avg-(sdc*stdev) &amp; RT &gt;=.200) %&gt;%
+           select(ID, relative_hp_dist, RT, block_num) %&gt;%
+           as.data.frame()
+
+
+statPrep &lt;- trimmed %&gt;% group_by(ID, relative_hp_dist) %&gt;% summarise(measurement=mean(RT)) %&gt;% as.data.frame()</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>100-(nrow(trimmed)/nrow(pilot[pilot$acc==100, ]))*100</code></pre>
+<pre><code>## [1] 2.509732</code></pre>
+<p>2.51% of trials were trimmed.</p>
+</div>
+<div id="distractor-location-effects-on-response-times"
+class="section level3">
+<h3>Distractor Location Effects on Response Times</h3>
 <p>Create new data frame with the mean response times grouped by
 distractor location relative to the high-probability location and add
 columns for standard error.</p>
-<pre class="r"><code>dist_means &lt;- pilot %&gt;%
-  group_by(relative_hp_dist) %&gt;%
-  filter(acc==100) %&gt;%
+<pre class="r"><code>sum_stats &lt;- trimmed%&gt;%
+  group_by(relative_hp_dist)%&gt;%
   summarize(mean_rts=mean(RT),
             sd_rt=sd(RT),
             n_rt=21,
@@ -340,33 +365,32 @@ columns for standard error.</p>
             upper_limit=mean_rts+se,
             lower_limit=mean_rts-se
   )
-dist_means</code></pre>
+sum_stats</code></pre>
 <pre><code>## # A tibble: 5 × 7
 ##   relative_hp_dist mean_rts sd_rt  n_rt    se upper_limit lower_limit
 ##   &lt;chr&gt;               &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
-## 1 dist_0               881.  292.    21  63.8        944.        817.
-## 2 dist_1               932.  286.    21  62.5        995.        870.
-## 3 dist_2               940.  277.    21  60.5       1001.        880.
-## 4 dist_3               920.  259.    21  56.5        977.        864.
-## 5 no_dist              800.  245.    21  53.4        853.        746.</code></pre>
+## 1 dist_0               860.  266.    21  58.1        918.        802.
+## 2 dist_1               923.  277.    21  60.4        983.        862.
+## 3 dist_2               926.  262.    21  57.1        984.        869.
+## 4 dist_3               906.  239.    21  52.1        958.        854.
+## 5 no_dist              781.  215.    21  46.9        828.        734.</code></pre>
 <p>This figure displays the mean response times depending on the
 location of the distractor relative to the high probability location. I
 chose those particular colors based on Wake Forest’s color scheme.</p>
-<pre class="r"><code>ggplot(data = dist_means, aes(x = relative_hp_dist, y = mean_rts)) +
+<pre class="r"><code>ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
   geom_bar(stat = &quot;identity&quot;, fill=&quot;#9E7E38&quot;, color=&#39;#000000&#39;) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(700,1050))+
   theme_classic()+
   labs(x = &quot;Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
   labs(title = &quot;Distractor Location Effect on RT&quot;)+
-  labs(caption = &quot;An ANOVA test shows a difference in RT depending on distractor location, F(4,80)=32.621, p&lt;.001.&quot;)</code></pre>
+  labs(caption = &quot;An ANOVA test shows a difference in RT depending on distractor location, F(4,80)=33.3, p&lt;.001.&quot;)</code></pre>
 <p><img src="p01_files/figure-html/-%20graph%201%20-%20distractor%20location%20effect%20on%20rt-1.png" width="672" /></p>
 <p>Create a new data frame with the average RT for each relative
 distractor location per participant, so we can do a repeated measures
 ANOVA.</p>
-<pre class="r"><code>space &lt;- pilot %&gt;%
+<pre class="r"><code>space &lt;- trimmed %&gt;%
   group_by(ID, relative_hp_dist) %&gt;%
-  filter(acc==100) %&gt;%
   summarize(rts = mean(RT),
             )</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
@@ -380,12 +404,12 @@ ANOVA.</p>
 ##  2    11 dist_1           1324.
 ##  3    11 dist_2           1336.
 ##  4    11 dist_3           1230.
-##  5    11 no_dist          1098.
-##  6    12 dist_0            816.
-##  7    12 dist_1            879.
-##  8    12 dist_2            865.
+##  5    11 no_dist          1081.
+##  6    12 dist_0            799.
+##  7    12 dist_1            841.
+##  8    12 dist_2            849.
 ##  9    12 dist_3            882.
-## 10    12 no_dist           750.
+## 10    12 no_dist           732.
 ## # … with 95 more rows</code></pre>
 <p>Need to reformat the above df to have a column for each
 relative_hp_dist/ID.</p>
@@ -395,14 +419,17 @@ space_anova &lt;- dcast(space_anova,ID~relative_hp_dist,value.var=&#39;rts&#39;)
 space %&gt;%
   group_by(relative_hp_dist) %&gt;%
   identify_outliers(rts)</code></pre>
-<pre><code>## # A tibble: 5 × 5
+<pre><code>## # A tibble: 8 × 5
 ##   relative_hp_dist    ID   rts is.outlier is.extreme
 ##   &lt;chr&gt;            &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;      &lt;lgl&gt;     
 ## 1 dist_0              11 1277. TRUE       FALSE     
 ## 2 dist_1              11 1324. TRUE       FALSE     
-## 3 no_dist             11 1098. TRUE       TRUE      
-## 4 no_dist             20  998. TRUE       FALSE     
-## 5 no_dist             28  972. TRUE       FALSE</code></pre>
+## 3 dist_1              28 1258. TRUE       FALSE     
+## 4 dist_3              11 1230. TRUE       FALSE     
+## 5 no_dist             11 1081. TRUE       TRUE      
+## 6 no_dist             20  986. TRUE       FALSE     
+## 7 no_dist             22  904. TRUE       FALSE     
+## 8 no_dist             28  953. TRUE       FALSE</code></pre>
 <pre class="r"><code>#testing the normality assumption -- data is not normally distributed because some conditions have a p-value less than .05
 space %&gt;%
   group_by(relative_hp_dist) %&gt;%
@@ -410,11 +437,11 @@ space %&gt;%
 <pre><code>## # A tibble: 5 × 4
 ##   relative_hp_dist variable statistic      p
 ##   &lt;chr&gt;            &lt;chr&gt;        &lt;dbl&gt;  &lt;dbl&gt;
-## 1 dist_0           rts          0.917 0.0762
-## 2 dist_1           rts          0.887 0.0200
-## 3 dist_2           rts          0.902 0.0380
-## 4 dist_3           rts          0.952 0.377 
-## 5 no_dist          rts          0.898 0.0320</code></pre>
+## 1 dist_0           rts          0.901 0.0362
+## 2 dist_1           rts          0.876 0.0125
+## 3 dist_2           rts          0.910 0.0557
+## 4 dist_3           rts          0.939 0.205 
+## 5 no_dist          rts          0.887 0.0194</code></pre>
 <p>Assumption of sphericity is automatically checked during the ANOVA
 test. Next, we’ll do the ANOVA test. The ANOVA shows a significant
 difference among distractor locations, F(4,80)=32.621, p&lt;.001. The
@@ -424,20 +451,20 @@ two different methods used to run the ANOVA gave me the same results
 get_anova_table(res.aov)</code></pre>
 <pre><code>## ANOVA Table (type III tests)
 ## 
-##             Effect DFn DFd      F        p p&lt;.05   ges
-## 1 relative_hp_dist   4  80 32.621 4.04e-16     * 0.113</code></pre>
+##             Effect DFn DFd    F        p p&lt;.05  ges
+## 1 relative_hp_dist   4  80 33.3 2.44e-16     * 0.12</code></pre>
 <pre class="r"><code>model = aov(rts~factor(relative_hp_dist)+
                 Error(factor(ID)), data=space)
 summary(model)</code></pre>
 <pre><code>## 
 ## Error: factor(ID)
 ##           Df  Sum Sq Mean Sq F value Pr(&gt;F)
-## Residuals 20 2011777  100589               
+## Residuals 20 2064016  103201               
 ## 
 ## Error: Within
 ##                          Df Sum Sq Mean Sq F value   Pr(&gt;F)    
-## factor(relative_hp_dist)  4 278116   69529   32.62 4.04e-16 ***
-## Residuals                80 170515    2131                     
+## factor(relative_hp_dist)  4 306342   76586    33.3 2.44e-16 ***
+## Residuals                80 183990    2300                     
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>Test whether the high-prob location and the average across low-prob
@@ -445,7 +472,7 @@ locations were significantly different. Using a paired samples t-test, I
 found that the response times for when the distractor was presented in
 the high-probability location compared to the average response time
 across the low-probability locations was significantly different
-(t(20)=4.24, p&lt;.001).</p>
+(t(20)=4.95, p&lt;.001).</p>
 <pre class="r"><code>space_anova &lt;- space_anova %&gt;%
   mutate(low_prob = (dist_1+dist_2+dist_3)/3)</code></pre>
 <pre class="r"><code>space_anova %&gt;%
@@ -454,13 +481,13 @@ across the low-probability locations was significantly different
 ##  Paired t-test
 ## 
 ## data:  space_anova$low_prob and space_anova$dist_0
-## t = 4.2356, df = 20, p-value = 0.0002028
+## t = 4.9458, df = 20, p-value = 3.893e-05
 ## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
-##  28.17099      Inf
+##  36.23139      Inf
 ## sample estimates:
 ## mean difference 
-##         47.5214</code></pre>
+##        55.63165</code></pre>
 </div>
 <div id="examine-block-by-block-learning-of-distractor-location"
 class="section level3">
@@ -471,19 +498,35 @@ the distractor is presented in the low probability locations and
 response times when the distractor is presented in the high probability
 location in each block to see roughly how quickly individuals are
 learning the regularity.</p>
-<pre class="r"><code>block_num &lt;- rep(c(1,2,3,4,5,6,7,8), each=60, times=21)
-pilot &lt;- cbind(pilot, block_num)</code></pre>
-<pre class="r"><code>space_block &lt;- pilot %&gt;%
+<pre class="r"><code>space_block &lt;- trimmed %&gt;%
   group_by(ID, block_num, relative_hp_dist) %&gt;%
-  filter(acc==100) %&gt;%
   summarize(rts = mean(RT),
             )</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;ID&#39;, &#39;block_num&#39;. You can override using
 ## the `.groups` argument.</code></pre>
+<pre class="r"><code>space_block</code></pre>
+<pre><code>## # A tibble: 837 × 4
+## # Groups:   ID, block_num [168]
+##       ID block_num relative_hp_dist   rts
+##    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;
+##  1    11         1 dist_0           1552.
+##  2    11         1 dist_1           1361.
+##  3    11         1 dist_2           1557.
+##  4    11         1 dist_3           1113.
+##  5    11         1 no_dist          1317.
+##  6    11         2 dist_0           1405.
+##  7    11         2 dist_1           1400.
+##  8    11         2 dist_2           1555.
+##  9    11         2 dist_3           1329.
+## 10    11         2 no_dist          1127.
+## # … with 827 more rows</code></pre>
 <pre class="r"><code>space_block &lt;- setDT(space_block)
 space_block &lt;- dcast(space_block,ID+block_num~relative_hp_dist,value.var=&#39;rts&#39;)</code></pre>
+<p>Below, I added the average rt for the low probability locations and
+the difference between the low probability and high probability
+locations ignoring na values.</p>
 <pre class="r"><code>space_block &lt;- space_block %&gt;%
-  mutate(low_prob = (dist_1+dist_2+dist_3)/3) %&gt;%
+  mutate(low_prob = rowMeans(select(space_block, c(dist_1,dist_2,dist_3)),na.rm=TRUE)) %&gt;%
   mutate(difference = (low_prob-dist_0))</code></pre>
 <pre class="r"><code>ggplot(data = space_block,aes(x=block_num, y=difference, group=ID))+
   geom_line(aes(color=ID))+
@@ -491,7 +534,6 @@ space_block &lt;- dcast(space_block,ID+block_num~relative_hp_dist,value.var=&#39
   labs(title = &quot;Difference in Response Times&quot;, subtitle = &quot;for distractor presentation at the low-probability locations and high-probability location by block&quot;)+
   theme_classic()+
   labs(x = &quot;Block Number&quot;, y = &quot;Difference in RT (ms)&quot;)</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (`geom_point()`).</code></pre>
 <p><img src="p01_files/figure-html/line_plot-1.png" width="672" /></p>
 <p>One participant did not have a value for block 6 due to them not
 completing any trials of a certain type, accurately, during that block.

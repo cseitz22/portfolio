@@ -199,12 +199,13 @@ space_block <- dcast(space_block,ID+block_num~relative_hp_dist,value.var='rts')
 
 ```
 
+Below, I added the average rt for the low probability locations and the difference between the low probability and high probability locations ignoring na values. 
+
 ```{r add_avg_col}
 
 space_block <- space_block %>%
-  mutate(low_prob = (dist_1+dist_2+dist_3)/3) %>%
+  mutate(low_prob = rowMeans(select(space_block, c(dist_1,dist_2,dist_3)),na.rm=TRUE)) %>%
   mutate(difference = (low_prob-dist_0))
-
 
 
 ```
