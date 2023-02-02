@@ -417,13 +417,29 @@ space %&gt;%
 ## 5 no_dist          rts          0.898 0.0320</code></pre>
 <p>Assumption of sphericity is automatically checked during the ANOVA
 test. Next, we’ll do the ANOVA test. The ANOVA shows a significant
-difference among distractor locations, F(4,80)=32.621, p&lt;.001.</p>
+difference among distractor locations, F(4,80)=32.621, p&lt;.001. The
+two different methods used to run the ANOVA gave me the same results
+(YAY)!</p>
 <pre class="r"><code>res.aov &lt;- anova_test(data = space, dv = rts, wid = ID, within = relative_hp_dist)
 get_anova_table(res.aov)</code></pre>
 <pre><code>## ANOVA Table (type III tests)
 ## 
 ##             Effect DFn DFd      F        p p&lt;.05   ges
 ## 1 relative_hp_dist   4  80 32.621 4.04e-16     * 0.113</code></pre>
+<pre class="r"><code>model = aov(rts~factor(relative_hp_dist)+
+                Error(factor(ID)), data=space)
+summary(model)</code></pre>
+<pre><code>## 
+## Error: factor(ID)
+##           Df  Sum Sq Mean Sq F value Pr(&gt;F)
+## Residuals 20 2011777  100589               
+## 
+## Error: Within
+##                          Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## factor(relative_hp_dist)  4 278116   69529   32.62 4.04e-16 ***
+## Residuals                80 170515    2131                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>Test whether the high-prob location and the average across low-prob
 locations were significantly different. Using a paired samples t-test, I
 found that the response times for when the distractor was presented in

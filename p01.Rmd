@@ -115,13 +115,21 @@ space %>%
 
 ```
 
-Assumption of sphericity is automatically checked during the ANOVA test. Next, we'll do the ANOVA test. The ANOVA shows a significant difference among distractor locations, F(4,80)=32.621, p<.001.
+Assumption of sphericity is automatically checked during the ANOVA test. Next, we'll do the ANOVA test. The ANOVA shows a significant difference among distractor locations, F(4,80)=32.621, p<.001. The two different methods used to run the ANOVA gave me the same results (YAY)!
 
 
 ```{r ANOVA test}
 
 res.aov <- anova_test(data = space, dv = rts, wid = ID, within = relative_hp_dist)
 get_anova_table(res.aov)
+
+```
+
+```{r anova_distractor_rts}
+
+model = aov(rts~factor(relative_hp_dist)+
+                Error(factor(ID)), data=space)
+summary(model)
 
 ```
 
