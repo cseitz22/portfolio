@@ -26,9 +26,6 @@ pilot <- read_csv("p01/p01/data/pilot_final.csv", show_col_types = FALSE)
   
 ```
 
-
-### Distractor Location Effects on Response Times
-
 Changed the value of column relative_hp_dist and changed RT column to milliseconds. Tried mutate and transform functions to no avail. 
 
 ```{r add new column for distractor location}
@@ -41,13 +38,41 @@ pilot$relative_hp_dist[pilot$relative_hp_dist == 3] <- "dist_3"
 pilot$RT <- pilot$RT *1000
 ```
 
+
+### Trim the Data
+
+Define trimming criteria according to Van Selst and Jolicoeur 1994
+```{r set_stds_depending_on_set_size}
+xsize <- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
+             25, 30, 35, 50, 100)
+stds <- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173, 
+            2.22, 2.246, 2.274, 2.31, 2.326, 2.391, 2.41, 2.4305, 
+            2.45, 2.48, 2.5)
+```
+
+Trim the data and compute the percent trimmed
+```{r trimming}
+trimmed <- pilot[pilot$acc==100, ] %>% group_by(ID, relative_hp_dist) %>%
+           mutate(sdc = ifelse(length(RT)>=100,2.5,approx(xsize,stds,xout=length(RT))$y), avg = mean(RT), stdev = sd(RT)) %>%
+           filter(RT <= sdc*stdev+avg & RT >=avg-(sdc*stdev) & RT >=.200) %>%
+           select(ID, relative_hp_dist, RT) %>%
+           as.data.frame()
+
+
+statPrep <- trimmed %>% group_by(ID, relative_hp_dist) %>% summarise(measurement=mean(RT)) %>% as.data.frame()
+100-(nrow(trimmed)/nrow(pilot[pilot$acc==100, ]))*100
+```
+2.51% of trials were trimmed. 
+
+### Distractor Location Effects on Response Times
+
+
 Create new data frame with the mean response times grouped by distractor location relative to the high-probability location and add columns for standard error. 
 
 ```{r create new df with mean rts}
 
-dist_means <- pilot %>%
-  group_by(relative_hp_dist) %>%
-  filter(acc==100) %>%
+sum_stats <- trimmed%>%
+  group_by(relative_hp_dist)%>%
   summarize(mean_rts=mean(RT),
             sd_rt=sd(RT),
             n_rt=21,
@@ -55,7 +80,7 @@ dist_means <- pilot %>%
             upper_limit=mean_rts+se,
             lower_limit=mean_rts-se
   )
-dist_means
+sum_stats
 
 ```
 
@@ -65,14 +90,14 @@ This figure displays the mean response times depending on the location of the di
 
 
 ```{r - graph 1 - distractor location effect on rt}
-ggplot(data = dist_means, aes(x = relative_hp_dist, y = mean_rts)) +
+ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
   geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(700,1050))+
   theme_classic()+
   labs(x = "Distractor Location", y = "Response Time (ms)")+
   labs(title = "Distractor Location Effect on RT")+
-  labs(caption = "An ANOVA test shows a difference in RT depending on distractor location, F(4,80)=32.621, p<.001.")
+  labs(caption = "An ANOVA test shows a difference in RT depending on distractor location, F(4,80)=33.3, p<.001.")
   
 ```
 
@@ -82,9 +107,8 @@ Create a new data frame with the average RT for each relative distractor locatio
 
 ```{r smaller df for 1 line per condition per participant}
 
-space <- pilot %>%
+space <- trimmed %>%
   group_by(ID, relative_hp_dist) %>%
-  filter(acc==100) %>%
   summarize(rts = mean(RT),
             )
 space

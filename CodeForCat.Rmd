@@ -1,0 +1,38 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Import the needed R packages.
+```{r}
+library(tidyverse)
+library(afex)
+```
+
+
+Define trimming criteria according to Van Selst and Jolicoeur 1994
+```{r}
+xsize <- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
+             25, 30, 35, 50, 100)
+stds <- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173, 
+            2.22, 2.246, 2.274, 2.31, 2.326, 2.391, 2.41, 2.4305, 
+            2.45, 2.48, 2.5)
+```
+
+Trim the data and compute the percent trimmed
+```{r}
+trimmed <- df[df$Accuracy==1, ] %>% group_by(SubID, Shift_v_Hold) %>%
+           mutate(sdc = ifelse(length(ResponseTime)>=100,2.5,approx(xsize,stds,xout=length(ResponseTime))$y), avg = mean(ResponseTime), stdev = sd(ResponseTime)) %>%
+           filter(ResponseTime <= sdc*stdev+avg & ResponseTime >=avg-(sdc*stdev) & ResponseTime >=.200) %>%
+           select(SubID, Shift_v_Hold, ResponseTime) %>%
+           as.data.frame()
+
+
+statPrep <- trimmed %>% group_by(SubID, Shift_v_Hold) %>% summarise(measurement=mean(ResponseTime)) %>% as.data.frame()
+100-(nrow(trimmed)/nrow(df[df$Accuracy==1, ]))*100
+```
+
+
+
+
+
