@@ -114,7 +114,7 @@ ggplot(data = target_means, aes(x = relative_target, y = mean_rts)) +
   theme_classic()+
   labs(x = "Target Location Relative to High-probability Distractor Location", y = "Response Time (ms)")+
   labs(title = "Target Location Effect on RT")+
-  labs(caption = "An ANOVA test shows a difference in RT depending on target location, F(1.74,34.86)=12.925, p<.001.")
+  labs(caption = "An ANOVA test shows a difference in RT depending on target location, F(3,60)=12.93, p<.001.")
   
 ```
 
@@ -210,7 +210,8 @@ ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy)) +
   coord_cartesian(ylim = c(85,105))+
   theme_classic()+
   labs(x = "Distractor Location Relative to High-probability Distractor Location", y = "Accuracy (%)")+
-  labs(title = "Distractor Location Effect on Accuracy")
+  labs(title = "Distractor Location Effect on Accuracy")+
+  labs(caption = "An ANOVA test shows a difference in accuracy depending on distractor location, F(4,80)=3.24, p=.016.")
 
 ```
 
@@ -221,7 +222,8 @@ ggplot(data = pilot_targacc, aes(x = relative_target, y = accuracy)) +
   coord_cartesian(ylim = c(85,105))+
   theme_classic()+
   labs(x = "Target Location Relative to High-probability Distractor Location", y = "Accuracy (%)")+
-  labs(title = "Target Location Effect on Accuracy")
+  labs(title = "Target Location Effect on Accuracy")+
+  labs(caption = "An ANOVA test shows a difference in accuracy depending on target location, F(3,60)=4.55, p=.006.")
 
 ```
 
