@@ -10,6 +10,9 @@ library(tidyverse)
 library(tidyr)
 library(rstatix)
 library(data.table)
+library(afex)
+library(emmeans)
+library(psych)
 ```
 
 The data used is from a visual search task in which participants are searching for a unique item in an array of six items and press a button to indicate whether the item is facing right or left. On 50% of trials, a salient, color distractor is present in the array. On 67% of distractor present trials, the distractor appears in the same location in the array with an equal number of trials in the other 5 locations. This study is testing whether adults can learn to suppress their attention to the high-probabilty location of the distractor. 
@@ -200,6 +203,14 @@ summary(model)
 
 ```
 
+```{r last_anova_test}
+
+model2 <- aov_car(rts ~ relative_target + Error(ID/relative_target), data=space)
+
+model2
+
+
+```
 ### Distractor and Target Location Effects on Accuracy
 
 
@@ -279,7 +290,14 @@ model = aov(accuracy~factor(relative_hp_dist)+
 summary(model)
 
 ```
+```{r last_anova_dist}
 
+model2 <- aov_car(accuracy ~ relative_hp_dist + Error(ID/relative_hp_dist), data=pilot_dist)
+
+model2
+
+
+```
 
 ```{r anova_target_accuracy}
 
@@ -288,4 +306,14 @@ model = aov(accuracy~factor(relative_target)+
 summary(model)
 
 ```
+
+```{r last_anova_target}
+
+model2 <- aov_car(accuracy ~ relative_target + Error(ID/relative_target), data=pilot_targ)
+
+model2
+
+
+```
+
 

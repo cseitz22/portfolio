@@ -299,7 +299,10 @@ $(document).ready(function () {
 <pre class="r"><code>library(tidyverse) 
 library(tidyr)
 library(rstatix)
-library(data.table)</code></pre>
+library(data.table)
+library(afex)
+library(emmeans)
+library(psych)</code></pre>
 <p>The data used is from a visual search task in which participants are
 searching for a unique item in an array of six items and press a button
 to indicate whether the item is facing right or left. On 50% of trials,
@@ -506,6 +509,18 @@ summary(model)</code></pre>
 ## Residuals               60  51729     862                     
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>model2 &lt;- aov_car(rts ~ relative_target + Error(ID/relative_target), data=space)
+
+model2</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: rts
+##            Effect          df     MSE         F  ges p.value
+## 1 relative_target 1.72, 34.48 1500.47 13.29 *** .023   &lt;.001
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
 </div>
 <div id="distractor-and-target-location-effects-on-accuracy"
 class="section level3">
@@ -604,6 +619,18 @@ summary(model)</code></pre>
 ## Residuals                80 1407.3   17.59                 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>model2 &lt;- aov_car(accuracy ~ relative_hp_dist + Error(ID/relative_hp_dist), data=pilot_dist)
+
+model2</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: accuracy
+##             Effect          df   MSE      F  ges p.value
+## 1 relative_hp_dist 1.32, 26.40 53.31 3.24 + .083    .073
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
 <pre class="r"><code>model = aov(accuracy~factor(relative_target)+
                 Error(factor(ID)), data=pilot_targ)
 summary(model)</code></pre>
@@ -618,6 +645,18 @@ summary(model)</code></pre>
 ## Residuals               60 152.75   2.546                   
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>model2 &lt;- aov_car(accuracy ~ relative_target + Error(ID/relative_target), data=pilot_targ)
+
+model2</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: accuracy
+##            Effect          df  MSE       F  ges p.value
+## 1 relative_target 2.51, 50.18 3.04 4.55 ** .073    .010
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
 </div>
 
 
