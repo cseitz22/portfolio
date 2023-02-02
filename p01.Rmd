@@ -38,6 +38,11 @@ pilot$relative_hp_dist[pilot$relative_hp_dist == 3] <- "dist_3"
 pilot$RT <- pilot$RT *1000
 ```
 
+```{r add block number}
+block_num <- rep(c(1,2,3,4,5,6,7,8), each=60, times=21)
+pilot <- cbind(pilot, block_num)
+
+```
 
 ### Trim the Data
 
@@ -55,7 +60,7 @@ Trim the data and compute the percent trimmed
 trimmed <- pilot[pilot$acc==100, ] %>% group_by(ID, relative_hp_dist) %>%
            mutate(sdc = ifelse(length(RT)>=100,2.5,approx(xsize,stds,xout=length(RT))$y), avg = mean(RT), stdev = sd(RT)) %>%
            filter(RT <= sdc*stdev+avg & RT >=avg-(sdc*stdev) & RT >=.200) %>%
-           select(ID, relative_hp_dist, RT) %>%
+           select(ID, relative_hp_dist, RT, block_num) %>%
            as.data.frame()
 
 
@@ -157,7 +162,7 @@ summary(model)
 
 ```
 
-Test whether the high-prob location and the average across low-prob locations were significantly different. Using a paired samples t-test, I found that the response times for when the distractor was presented in the high-probability location compared to the average response time across the low-probability locations was significantly different (t(20)=4.24, p<.001).
+Test whether the high-prob location and the average across low-prob locations were significantly different. Using a paired samples t-test, I found that the response times for when the distractor was presented in the high-probability location compared to the average response time across the low-probability locations was significantly different (t(20)=4.95, p<.001).
 
 ```{r set up data for t-test for high and low conditions only}
 
@@ -178,19 +183,13 @@ space_anova %>%
 
 The goal of this section is to examine individual blocks of trials for learning. I'll be taking the difference between response times when the distractor is presented in the low probability locations and response times when the distractor is presented in the high probability location in each block to see roughly how quickly individuals are learning the regularity.
 
-```{r add block number}
-block_num <- rep(c(1,2,3,4,5,6,7,8), each=60, times=21)
-pilot <- cbind(pilot, block_num)
-
-```
 
 ```{r create_new_df_to_transform}
-space_block <- pilot %>%
+space_block <- trimmed %>%
   group_by(ID, block_num, relative_hp_dist) %>%
-  filter(acc==100) %>%
   summarize(rts = mean(RT),
             )
-
+space_block
 ```
 
 ```{r transform_df}
