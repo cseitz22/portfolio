@@ -165,6 +165,15 @@ get_anova_table(res.aov)
 
 ```
 
+I ran the ANOVA using base R as well because the rstatix package was giving me errors when running for accuracy data later on. The rstatix packages has a lot of requests and hasn't been updated in years so I switched to a different route to get the same results. 
+
+```{r anova_target_rt}
+
+model = aov(rts~factor(relative_target)+
+                Error(factor(ID)), data=space)
+summary(model)
+
+```
 
 ### Distractor and Target Location Effects on Accuracy
 
@@ -222,19 +231,34 @@ pilot_dist <- pilot %>%
   group_by(ID, relative_hp_dist) %>%
   summarize(accuracy = mean(acc)
             )
+pilot_dist
+```
+
+```{r accuracy_target}
+
 pilot_targ <- pilot %>%
   group_by(ID, relative_target) %>%
   summarize(accuracy = mean(acc)
             )
 
+pilot_targ
+
 ```
-```{r ANOVA tests for accuracy}
 
-res.aov <- anova_test(data = pilot_dist, dv = accuracy, wid = ID, within = relative_hp_dist)
-get_anova_table(res.aov)
+```{r anova_distractor_accuracy}
 
-res.aov <- anova_test(data = pilot_targ, dv = accuracy, wid = ID, within = relative_target)
-get_anova_table(res.aov)
+model = aov(accuracy~factor(relative_hp_dist)+
+                Error(factor(ID)), data=pilot_dist)
+summary(model)
+
+```
+
+
+```{r anova_target_accuracy}
+
+model = aov(accuracy~factor(relative_target)+
+                Error(factor(ID)), data=pilot_targ)
+summary(model)
 
 ```
 
