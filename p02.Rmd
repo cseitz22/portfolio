@@ -85,13 +85,39 @@ pilot <- pilot %>%
 
 ```
 
+### Trim the Data
+
+Define trimming criteria according to Van Selst and Jolicoeur 1994
+```{r set_stds_depending_on_set_size}
+xsize <- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
+             25, 30, 35, 50, 100)
+stds <- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173, 
+            2.22, 2.246, 2.274, 2.31, 2.326, 2.391, 2.41, 2.4305, 
+            2.45, 2.48, 2.5)
+```
+
+Trim the data and compute the percent trimmed
+```{r trimming}
+trimmed <- pilot[pilot$acc==100, ] %>% group_by(ID, relative_hp_dist) %>%
+           mutate(sdc = ifelse(length(RT)>=100,2.5,approx(xsize,stds,xout=length(RT))$y), avg = mean(RT), stdev = sd(RT)) %>%
+           filter(RT <= sdc*stdev+avg & RT >=avg-(sdc*stdev) & RT >=.200) %>%
+           select(ID, relative_hp_dist, RT, block_num, relative_target) %>%
+           as.data.frame()
+
+
+statPrep <- trimmed %>% group_by(ID, relative_hp_dist) %>% summarise(measurement=mean(RT)) %>% as.data.frame()
+100-(nrow(trimmed)/nrow(pilot[pilot$acc==100, ]))*100
+```
+Again, trimmed 2.51% of trials. 
+
+###Target Location Effects
+
 Create new data frame with the mean response times grouped by distractor location relative to the high-probability location and add columns for standard error. 
 
 ```{r create new df with mean rts}
 
-target_means <- pilot %>%
+target_means <- trimmed %>%
   group_by(relative_target) %>%
-  filter(acc==100) %>%
   summarize(mean_rts=mean(RT),
             sd_rt=sd(RT),
             n_rt=21,
@@ -114,7 +140,7 @@ ggplot(data = target_means, aes(x = relative_target, y = mean_rts)) +
   theme_classic()+
   labs(x = "Target Location Relative to High-probability Distractor Location", y = "Response Time (ms)")+
   labs(title = "Target Location Effect on RT")+
-  labs(caption = "An ANOVA test shows a difference in RT depending on target location, F(3,60)=12.93, p<.001.")
+  labs(caption = "An ANOVA test shows a difference in RT depending on target location, F(3,60)=13.29, p<.001.")
   
 ```
 
@@ -122,9 +148,8 @@ Create a new data frame with the average RT for each relative distractor locatio
 
 ```{r smaller df for 1 line per condition per participant}
 
-space <- pilot %>%
+space <- trimmed %>%
   group_by(ID, relative_target) %>%
-  filter(acc==100) %>%
   summarize(rts = mean(RT),
             )
 space
