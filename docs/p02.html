@@ -429,6 +429,43 @@ scheme.</p>
   labs(title = &quot;Target Location Effect on RT&quot;)+
   labs(caption = &quot;An ANOVA test shows a difference in RT depending on target location, F(3,60)=13.29, p&lt;.001.&quot;)</code></pre>
 <p><img src="p02_files/figure-html/-%20graph%201%20-%20distractor%20location%20effect%20on%20rt-1.png" width="672" /></p>
+<pre class="r"><code>df2 &lt;- subset(trimmed,block_num!=&#39;7&#39; )
+df2 &lt;- subset(df2,block_num!=&#39;8&#39;)
+#df2 &lt;- subset(df2,block_num!=&#39;5&#39;)
+#df2 &lt;- subset(df2,block_num!=&#39;6&#39;)
+
+space2&lt;- df2 %&gt;%
+  group_by(ID, relative_target) %&gt;%
+  summarize(rts = mean(RT)
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>space2</code></pre>
+<pre><code>## # A tibble: 84 × 3
+## # Groups:   ID [21]
+##       ID relative_target   rts
+##    &lt;dbl&gt;           &lt;dbl&gt; &lt;dbl&gt;
+##  1    11               0 1232.
+##  2    11               1 1195.
+##  3    11               2 1204.
+##  4    11               3 1237.
+##  5    12               0  840.
+##  6    12               1  818.
+##  7    12               2  764.
+##  8    12               3  786.
+##  9    13               0  819.
+## 10    13               1  792.
+## # … with 74 more rows</code></pre>
+<pre class="r"><code>aov_car(rts ~ relative_target + Error(ID/relative_target), data=space2)</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: rts
+##            Effect          df     MSE         F  ges p.value
+## 1 relative_target 1.84, 36.83 1342.99 12.49 *** .019   &lt;.001
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
 <p>Create a new data frame with the average RT for each relative
 distractor location per participant, so we can do a repeated measures
 ANOVA.</p>
@@ -653,6 +690,42 @@ model2</code></pre>
 ## Response: accuracy
 ##            Effect          df  MSE       F  ges p.value
 ## 1 relative_target 2.51, 50.18 3.04 4.55 ** .073    .010
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
+<pre class="r"><code>df3 &lt;- subset(pilot,block_num!=&#39;7&#39; )
+df3 &lt;- subset(df3,block_num!=&#39;8&#39;)
+#df3 &lt;- subset(df3,block_num!=&#39;5&#39;)
+#df3 &lt;- subset(df3,block_num!=&#39;6&#39;)</code></pre>
+<pre class="r"><code>pilot_dist3 &lt;- df3 %&gt;%
+  group_by(ID, relative_hp_dist) %&gt;%
+  summarize(accuracy = mean(acc)
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>pilot_targ3 &lt;- df3 %&gt;%
+  group_by(ID, relative_target) %&gt;%
+  summarize(accuracy = mean(acc)
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>aov_car(accuracy ~ relative_hp_dist + Error(ID/relative_hp_dist), data=pilot_dist3)</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: accuracy
+##             Effect          df   MSE      F  ges p.value
+## 1 relative_hp_dist 1.40, 28.09 74.89 2.73 + .080    .098
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
+<pre class="r"><code>aov_car(accuracy ~ relative_target + Error(ID/relative_target), data=pilot_targ3)</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: accuracy
+##            Effect          df  MSE      F  ges p.value
+## 1 relative_target 2.16, 43.11 5.00 3.74 * .071    .029
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 

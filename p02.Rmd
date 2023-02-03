@@ -147,6 +147,28 @@ ggplot(data = target_means, aes(x = relative_target, y = mean_rts)) +
   
 ```
 
+
+```{r cut out blocks 7 and 8}
+
+df2 <- subset(trimmed,block_num!='7' )
+df2 <- subset(df2,block_num!='8')
+#df2 <- subset(df2,block_num!='5')
+#df2 <- subset(df2,block_num!='6')
+
+space2<- df2 %>%
+  group_by(ID, relative_target) %>%
+  summarize(rts = mean(RT)
+            )
+space2
+
+```
+
+```{r anove_trimmed_df}
+
+aov_car(rts ~ relative_target + Error(ID/relative_target), data=space2)
+
+```
+
 Create a new data frame with the average RT for each relative distractor location per participant, so we can do a repeated measures ANOVA. 
 
 ```{r smaller df for 1 line per condition per participant}
@@ -316,4 +338,49 @@ model2
 
 ```
 
+
+```{r half_data}
+df3 <- subset(pilot,block_num!='7' )
+df3 <- subset(df3,block_num!='8')
+#df3 <- subset(df3,block_num!='5')
+#df3 <- subset(df3,block_num!='6')
+
+
+
+```
+
+```{r create_accuracy_df_for_ANOVAs_half}
+
+pilot_dist3 <- df3 %>%
+  group_by(ID, relative_hp_dist) %>%
+  summarize(accuracy = mean(acc)
+            )
+
+```
+
+```{r accuracy_target_half}
+
+pilot_targ3 <- df3 %>%
+  group_by(ID, relative_target) %>%
+  summarize(accuracy = mean(acc)
+            )
+
+
+```
+
+```{r anova_dist_half}
+
+aov_car(accuracy ~ relative_hp_dist + Error(ID/relative_hp_dist), data=pilot_dist3)
+
+
+
+```
+
+```{r anova_target_half}
+
+aov_car(accuracy ~ relative_target + Error(ID/relative_target), data=pilot_targ3)
+
+
+
+```
 
