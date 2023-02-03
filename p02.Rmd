@@ -120,6 +120,7 @@ Create new data frame with the mean response times grouped by distractor locatio
 ```{r create new df with mean rts}
 
 target_means <- trimmed %>%
+  filter(relative_hp_dist=="no_dist") %>%
   group_by(relative_target) %>%
   summarize(mean_rts=mean(RT),
             sd_rt=sd(RT),
@@ -139,7 +140,7 @@ This figure displays the mean response times depending on the location of the ta
 ggplot(data = target_means, aes(x = relative_target, y = mean_rts)) +
   geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(700,1000))+
+  coord_cartesian(ylim = c(700,900))+
   theme_classic()+
   labs(x = "Target Location Relative to High-probability Distractor Location", y = "Response Time (ms)")+
   labs(title = "Target Location Effect on RT")+
