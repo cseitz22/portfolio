@@ -40,6 +40,8 @@ pilot$relative_hp_dist[pilot$relative_hp_dist == 3] <- "dist_3"
 pilot$RT <- pilot$RT *1000
 ```
 
+Add the block number to each trial because later I'll examine the block by block differences. 
+
 ```{r add block number}
 block_num <- rep(c(1,2,3,4,5,6,7,8), each=60, times=21)
 pilot <- cbind(pilot, block_num)
@@ -48,7 +50,7 @@ pilot <- cbind(pilot, block_num)
 
 ### Trim the Data
 
-Define trimming criteria according to Van Selst and Jolicoeur 1994
+Define trimming criteria according to Van Selst and Jolicoeur 1994.
 ```{r set_stds_depending_on_set_size}
 xsize <- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
              25, 30, 35, 50, 100)
@@ -62,7 +64,7 @@ Trim the data and compute the percent trimmed
 trimmed <- pilot[pilot$acc==100, ] %>% group_by(ID, relative_hp_dist) %>%
            mutate(sdc = ifelse(length(RT)>=100,2.5,approx(xsize,stds,xout=length(RT))$y), avg = mean(RT), stdev = sd(RT)) %>%
            filter(RT <= sdc*stdev+avg & RT >=avg-(sdc*stdev) & RT >=.200) %>%
-           select(ID, relative_hp_dist, RT, block_num) %>%
+           select(ID, relative_hp_dist, RT, block_num) %>%  #keep these columns in the new data frame
            as.data.frame()
 
 
@@ -74,7 +76,7 @@ statPrep <- trimmed %>% group_by(ID, relative_hp_dist) %>% summarise(measurement
 ### Distractor Location Effects on Response Times
 
 
-Create new data frame with the mean response times grouped by distractor location relative to the high-probability location and add columns for standard error. 
+Create new data frame with the mean response times grouped by distractor location relative to the high-probability location and add columns for standard error. Use this data frame for figure 1. 
 
 ```{r create new df with mean rts}
 
@@ -122,11 +124,14 @@ space
   
 ```
 
+Create new data frame for only the first half of trials to test whether the differences between groups is significant when we cut the trials down. We want to do this because we are running this experiment with children ages 6-12 and want to make the experiment as short as possible. 
 
-```{r cut out blocks 7 and 8}
+```{r cut out blocks 5-8}
 
 df2 <- subset(trimmed,block_num!='7' )
 df2 <- subset(df2,block_num!='8')
+df2 <- subset(df2,block_num!='5' )
+df2 <- subset(df2,block_num!='6')
 
 space2<- df2 %>%
   group_by(ID, relative_hp_dist) %>%
@@ -136,15 +141,15 @@ space2
 
 ```
 
+Test whether there is a difference between conditions for the first 4 blocks using a repeated measures ANOVA -- it is significant F(2.7,54)=25.06, p<.001. 
+
 ```{r subset_anova_test}
 
 aov_car(rts ~ relative_hp_dist + Error(ID/relative_hp_dist), data=space2)
 
-
-
 ```
 
-Need to reformat the above df to have a column for each relative_hp_dist/ID.
+Need to reformat the above df to have a column for each relative_hp_dist/ID so we can run tests on the assumptions of ANOVAs. 
 
 ```{r}
 
@@ -168,7 +173,7 @@ space %>%
 
 ```
 
-Assumption of sphericity is automatically checked during the ANOVA test. Next, we'll do the ANOVA test. The ANOVA shows a significant difference among distractor locations, F(4,80)=32.621, p<.001. The two different methods used to run the ANOVA gave me the same results (YAY)!
+Assumption of sphericity is automatically checked during the ANOVA test. Next, we using 3 different ways to run an ANOVA test -- . The ANOVA shows a significant difference among distractor locations, F(3.28,65.57)=33.3, p<.001. The 3 different methods used to run the ANOVA all gave significant results, but we'll go with the last test because it best takes into account the type of data we are using. 
 
 
 ```{r ANOVA test}
@@ -233,7 +238,7 @@ space_block <- dcast(space_block,ID+block_num~relative_hp_dist,value.var='rts')
 
 ```
 
-Below, I added the average rt for the low probability locations and the difference between the low probability and high probability locations ignoring na values. 
+Below, I added the average rt for the low probability locations and the difference between the low probability and high probability locations ignoring n/a values. 
 
 ```{r add_avg_col}
 
@@ -256,7 +261,7 @@ ggplot(data = space_block,aes(x=block_num, y=difference, group=ID))+
 ```
 
 
-One participant did not have a value for block 6 due to them not completing any trials of a certain type, accurately, during that block. Positive differences indicate that participants were faster when the distractor was presented in the high probability location compared to when it was presented in the low probability locations. The average across all participants is plotted below. These results indicate that the individuals are learning within the first block where the distractor is likely to appear. 
+Positive differences indicate that participants were faster when the distractor was presented in the high probability location compared to when it was presented in the low probability locations. The average across all participants is plotted below. These results indicate that the individuals are learning within the first block where the distractor is likely to appear. 
 
 
 

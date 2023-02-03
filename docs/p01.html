@@ -11,12 +11,12 @@
 
 
 
-<title>Portfolio 1 - Distractor Suppression Pilot Study</title>
+<title>p01.knit</title>
 
 <script src="site_libs/header-attrs-2.19/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -290,13 +290,13 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Portfolio 1 - Distractor Suppression Pilot
-Study</h1>
-<h4 class="date">1.21.2023</h4>
 
 </div>
 
 
+<p>title: “Portfolio 1 - Distractor Suppression Pilot Study” name: “Cat
+Seitz” date: “1.21.2023” data: “Distractor Suppression Pilot Study”
+output: html_document: theme: cerulean —</p>
 <pre class="r"><code>library(tidyverse) 
 library(tidyr)
 library(rstatix)
@@ -327,12 +327,14 @@ pilot$relative_hp_dist[pilot$relative_hp_dist == 2] &lt;- &quot;dist_2&quot;
 pilot$relative_hp_dist[pilot$relative_hp_dist == 3] &lt;- &quot;dist_3&quot;
 
 pilot$RT &lt;- pilot$RT *1000</code></pre>
+<p>Add the block number to each trial because later I’ll examine the
+block by block differences.</p>
 <pre class="r"><code>block_num &lt;- rep(c(1,2,3,4,5,6,7,8), each=60, times=21)
 pilot &lt;- cbind(pilot, block_num)</code></pre>
 <div id="trim-the-data" class="section level3">
 <h3>Trim the Data</h3>
 <p>Define trimming criteria according to Van Selst and Jolicoeur
-1994</p>
+1994.</p>
 <pre class="r"><code>xsize &lt;- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
              25, 30, 35, 50, 100)
 stds &lt;- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173, 
@@ -342,7 +344,7 @@ stds &lt;- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173,
 <pre class="r"><code>trimmed &lt;- pilot[pilot$acc==100, ] %&gt;% group_by(ID, relative_hp_dist) %&gt;%
            mutate(sdc = ifelse(length(RT)&gt;=100,2.5,approx(xsize,stds,xout=length(RT))$y), avg = mean(RT), stdev = sd(RT)) %&gt;%
            filter(RT &lt;= sdc*stdev+avg &amp; RT &gt;=avg-(sdc*stdev) &amp; RT &gt;=.200) %&gt;%
-           select(ID, relative_hp_dist, RT, block_num) %&gt;%
+           select(ID, relative_hp_dist, RT, block_num) %&gt;%  #keep these columns in the new data frame
            as.data.frame()
 
 
@@ -358,7 +360,7 @@ class="section level3">
 <h3>Distractor Location Effects on Response Times</h3>
 <p>Create new data frame with the mean response times grouped by
 distractor location relative to the high-probability location and add
-columns for standard error.</p>
+columns for standard error. Use this data frame for figure 1.</p>
 <pre class="r"><code>sum_stats &lt;- trimmed%&gt;%
   group_by(relative_hp_dist)%&gt;%
   summarize(mean_rts=mean(RT),
@@ -394,7 +396,7 @@ distractor location per participant, so we can do a repeated measures
 ANOVA.</p>
 <pre class="r"><code>space &lt;- trimmed %&gt;%
   group_by(ID, relative_hp_dist) %&gt;%
-  summarize(rts = mean(RT),
+  summarize(rts = mean(RT)
             )</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
 ## argument.</code></pre>
@@ -414,8 +416,54 @@ ANOVA.</p>
 ##  9    12 dist_3            882.
 ## 10    12 no_dist           732.
 ## # … with 95 more rows</code></pre>
+<p>Create new data frame for only the first half of trials to test
+whether the differences between groups is significant when we cut the
+trials down. We want to do this because we are running this experiment
+with children ages 6-12 and want to make the experiment as short as
+possible.</p>
+<pre class="r"><code>df2 &lt;- subset(trimmed,block_num!=&#39;7&#39; )
+df2 &lt;- subset(df2,block_num!=&#39;8&#39;)
+df2 &lt;- subset(df2,block_num!=&#39;5&#39; )
+df2 &lt;- subset(df2,block_num!=&#39;6&#39;)
+
+space2&lt;- df2 %&gt;%
+  group_by(ID, relative_hp_dist) %&gt;%
+  summarize(rts = mean(RT)
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>space2</code></pre>
+<pre><code>## # A tibble: 105 × 3
+## # Groups:   ID [21]
+##       ID relative_hp_dist   rts
+##    &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;
+##  1    11 dist_0           1367.
+##  2    11 dist_1           1373.
+##  3    11 dist_2           1463.
+##  4    11 dist_3           1228.
+##  5    11 no_dist          1184.
+##  6    12 dist_0            856.
+##  7    12 dist_1            873.
+##  8    12 dist_2            889.
+##  9    12 dist_3            929.
+## 10    12 no_dist           788.
+## # … with 95 more rows</code></pre>
+<p>Test whether there is a difference between conditions for the first 4
+blocks using a repeated measures ANOVA – it is significant
+F(2.7,54)=25.06, p&lt;.001.</p>
+<pre class="r"><code>aov_car(rts ~ relative_hp_dist + Error(ID/relative_hp_dist), data=space2)</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: rts
+##             Effect          df     MSE         F  ges p.value
+## 1 relative_hp_dist 2.70, 54.00 5151.56 25.06 *** .112   &lt;.001
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
 <p>Need to reformat the above df to have a column for each
-relative_hp_dist/ID.</p>
+relative_hp_dist/ID so we can run tests on the assumptions of
+ANOVAs.</p>
 <pre class="r"><code>space_anova &lt;- setDT(space)
 space_anova &lt;- dcast(space_anova,ID~relative_hp_dist,value.var=&#39;rts&#39;)</code></pre>
 <pre class="r"><code>#first identify outliers - not sure what to do with them anyway so overall just ignore? maybe reason enough to get rid of ppt 11?
@@ -446,10 +494,11 @@ space %&gt;%
 ## 4 dist_3           rts          0.939 0.205 
 ## 5 no_dist          rts          0.887 0.0194</code></pre>
 <p>Assumption of sphericity is automatically checked during the ANOVA
-test. Next, we’ll do the ANOVA test. The ANOVA shows a significant
-difference among distractor locations, F(4,80)=32.621, p&lt;.001. The
-two different methods used to run the ANOVA gave me the same results
-(YAY)!</p>
+test. Next, we using 3 different ways to run an ANOVA test – . The ANOVA
+shows a significant difference among distractor locations,
+F(3.28,65.57)=33.3, p&lt;.001. The 3 different methods used to run the
+ANOVA all gave significant results, but we’ll go with the last test
+because it best takes into account the type of data we are using.</p>
 <pre class="r"><code>res.aov &lt;- anova_test(data = space, dv = rts, wid = ID, within = relative_hp_dist)
 get_anova_table(res.aov)</code></pre>
 <pre><code>## ANOVA Table (type III tests)
@@ -539,7 +588,7 @@ learning the regularity.</p>
 space_block &lt;- dcast(space_block,ID+block_num~relative_hp_dist,value.var=&#39;rts&#39;)</code></pre>
 <p>Below, I added the average rt for the low probability locations and
 the difference between the low probability and high probability
-locations ignoring na values.</p>
+locations ignoring n/a values.</p>
 <pre class="r"><code>space_block &lt;- space_block %&gt;%
   mutate(low_prob = rowMeans(select(space_block, c(dist_1,dist_2,dist_3)),na.rm=TRUE)) %&gt;%
   mutate(difference = (low_prob-dist_0))</code></pre>
@@ -550,9 +599,7 @@ locations ignoring na values.</p>
   theme_classic()+
   labs(x = &quot;Block Number&quot;, y = &quot;Difference in RT (ms)&quot;)</code></pre>
 <p><img src="p01_files/figure-html/line_plot-1.png" width="672" /></p>
-<p>One participant did not have a value for block 6 due to them not
-completing any trials of a certain type, accurately, during that block.
-Positive differences indicate that participants were faster when the
+<p>Positive differences indicate that participants were faster when the
 distractor was presented in the high probability location compared to
 when it was presented in the low probability locations. The average
 across all participants is plotted below. These results indicate that
