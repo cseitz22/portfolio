@@ -1,0 +1,283 @@
+title: "Portfolio 1 - Distractor Suppression Pilot Study"
+name: "Cat Seitz"
+date: "1.21.2023"
+data: "Distractor Suppression Pilot Study"
+output: 
+  html_document: 
+    theme: cerulean
+---
+
+
+```{r load-packages, message=FALSE}
+library(tidyverse) 
+library(tidyr)
+library(rstatix)
+library(data.table)
+library(afex)
+library(emmeans)
+library(psych)
+```
+
+The data used is from a visual search task in which participants are searching for a unique item in an array of six items and press a button to indicate whether the item is facing right or left. On 50% of trials, a salient, color distractor is present in the array. On 67% of distractor present trials, the distractor appears in the same location in the array with an equal number of trials in the other 5 locations. This study is testing whether adults can learn to suppress their attention to the high-probabilty location of the distractor. 
+
+The goal of this portfolio piece was to examine the distractor location effect on response times with regard to the statistical regularity introduced. 
+
+```{r import data}
+
+pilot <- read_csv("p01/p01/data/pilot_final.csv", show_col_types = FALSE)
+  
+```
+
+Changed the value of column relative_hp_dist and changed RT column to milliseconds. Tried mutate and transform functions to no avail. 
+
+```{r add new column for distractor location}
+pilot$relative_hp_dist[pilot$relative_hp_dist == 10] <- "no_dist"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 0] <- "dist_0"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 1] <- "dist_1"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 2] <- "dist_2"
+pilot$relative_hp_dist[pilot$relative_hp_dist == 3] <- "dist_3"
+
+pilot$RT <- pilot$RT *1000
+```
+
+```{r add block number}
+block_num <- rep(c(1,2,3,4,5,6,7,8), each=60, times=21)
+pilot <- cbind(pilot, block_num)
+
+```
+
+### Trim the Data
+
+Define trimming criteria according to Van Selst and Jolicoeur 1994
+```{r set_stds_depending_on_set_size}
+xsize <- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
+             25, 30, 35, 50, 100)
+stds <- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173, 
+            2.22, 2.246, 2.274, 2.31, 2.326, 2.391, 2.41, 2.4305, 
+            2.45, 2.48, 2.5)
+```
+
+Trim the data and compute the percent trimmed
+```{r trimming}
+trimmed <- pilot[pilot$acc==100, ] %>% group_by(ID, relative_hp_dist) %>%
+           mutate(sdc = ifelse(length(RT)>=100,2.5,approx(xsize,stds,xout=length(RT))$y), avg = mean(RT), stdev = sd(RT)) %>%
+           filter(RT <= sdc*stdev+avg & RT >=avg-(sdc*stdev) & RT >=.200) %>%
+           select(ID, relative_hp_dist, RT, block_num) %>%
+           as.data.frame()
+
+
+statPrep <- trimmed %>% group_by(ID, relative_hp_dist) %>% summarise(measurement=mean(RT)) %>% as.data.frame()
+100-(nrow(trimmed)/nrow(pilot[pilot$acc==100, ]))*100
+```
+2.51% of trials were trimmed. 
+
+### Distractor Location Effects on Response Times
+
+
+Create new data frame with the mean response times grouped by distractor location relative to the high-probability location and add columns for standard error. 
+
+```{r create new df with mean rts}
+
+sum_stats <- trimmed%>%
+  group_by(relative_hp_dist)%>%
+  summarize(mean_rts=mean(RT),
+            sd_rt=sd(RT),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+sum_stats
+
+```
+
+
+
+This figure displays the mean response times depending on the location of the distractor relative to the high probability location. I chose those particular colors based on Wake Forest's color scheme. 
+
+
+```{r - graph 1 - distractor location effect on rt}
+ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
+  geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(700,1050))+
+  theme_classic()+
+  labs(x = "Distractor Location", y = "Response Time (ms)")+
+  labs(title = "Distractor Location Effect on RT")+
+  labs(caption = "An ANOVA test shows a difference in RT depending on distractor location, F(4,80)=33.3, p<.001.")
+  
+```
+
+
+
+Create a new data frame with the average RT for each relative distractor location per participant, so we can do a repeated measures ANOVA. 
+
+```{r smaller df for 1 line per condition per participant}
+
+space <- trimmed %>%
+  group_by(ID, relative_hp_dist) %>%
+  summarize(rts = mean(RT)
+            )
+space
+  
+```
+
+
+```{r cut out blocks 7 and 8}
+
+df2 <- subset(trimmed,block_num!='7' )
+df2 <- subset(df2,block_num!='8')
+
+space2<- df2 %>%
+  group_by(ID, relative_hp_dist) %>%
+  summarize(rts = mean(RT)
+            )
+space2
+
+```
+
+```{r subset_anova_test}
+
+aov_car(rts ~ relative_hp_dist + Error(ID/relative_hp_dist), data=space2)
+
+
+
+```
+
+Need to reformat the above df to have a column for each relative_hp_dist/ID.
+
+```{r}
+
+space_anova <- setDT(space)
+space_anova <- dcast(space_anova,ID~relative_hp_dist,value.var='rts')
+
+```
+
+``` {r testing assumptions}
+
+#first identify outliers - not sure what to do with them anyway so overall just ignore? maybe reason enough to get rid of ppt 11?
+space %>%
+  group_by(relative_hp_dist) %>%
+  identify_outliers(rts)
+
+
+#testing the normality assumption -- data is not normally distributed because some conditions have a p-value less than .05
+space %>%
+  group_by(relative_hp_dist) %>%
+  shapiro_test(rts)
+
+```
+
+Assumption of sphericity is automatically checked during the ANOVA test. Next, we'll do the ANOVA test. The ANOVA shows a significant difference among distractor locations, F(4,80)=32.621, p<.001. The two different methods used to run the ANOVA gave me the same results (YAY)!
+
+
+```{r ANOVA test}
+
+res.aov <- anova_test(data = space, dv = rts, wid = ID, within = relative_hp_dist)
+get_anova_table(res.aov)
+
+```
+
+```{r anova_distractor_rts}
+
+model = aov(rts~factor(relative_hp_dist)+
+                Error(factor(ID)), data=space)
+summary(model)
+
+```
+
+```{r last_anova_test}
+
+model2 <- aov_car(rts ~ relative_hp_dist + Error(ID/relative_hp_dist), data=space)
+
+model2
+
+
+```
+
+
+Test whether the high-prob location and the average across low-prob locations were significantly different. Using a paired samples t-test, I found that the response times for when the distractor was presented in the high-probability location compared to the average response time across the low-probability locations was significantly different (t(20)=4.95, p<.001).
+
+```{r set up data for t-test for high and low conditions only}
+
+space_anova <- space_anova %>%
+  mutate(low_prob = (dist_1+dist_2+dist_3)/3)
+
+```
+
+```{r t-test}
+
+space_anova %>%
+  t.test(x=space_anova$low_prob, y=space_anova$dist_0, alternative="greater", mu=0,paired = TRUE, conf.level = .95)
+
+```
+
+
+### Examine block-by-block learning of distractor location
+
+The goal of this section is to examine individual blocks of trials for learning. I'll be taking the difference between response times when the distractor is presented in the low probability locations and response times when the distractor is presented in the high probability location in each block to see roughly how quickly individuals are learning the regularity.
+
+
+```{r create_new_df_to_transform}
+space_block <- trimmed %>%
+  group_by(ID, block_num, relative_hp_dist) %>%
+  summarize(rts = mean(RT),
+            )
+space_block
+```
+
+```{r transform_df}
+
+space_block <- setDT(space_block)
+space_block <- dcast(space_block,ID+block_num~relative_hp_dist,value.var='rts')
+
+```
+
+Below, I added the average rt for the low probability locations and the difference between the low probability and high probability locations ignoring na values. 
+
+```{r add_avg_col}
+
+space_block <- space_block %>%
+  mutate(low_prob = rowMeans(select(space_block, c(dist_1,dist_2,dist_3)),na.rm=TRUE)) %>%
+  mutate(difference = (low_prob-dist_0))
+
+
+```
+
+
+```{r line_plot}
+ggplot(data = space_block,aes(x=block_num, y=difference, group=ID))+
+  geom_line(aes(color=ID))+
+  geom_point()+
+  labs(title = "Difference in Response Times", subtitle = "for distractor presentation at the low-probability locations and high-probability location by block")+
+  theme_classic()+
+  labs(x = "Block Number", y = "Difference in RT (ms)")
+
+```
+
+
+One participant did not have a value for block 6 due to them not completing any trials of a certain type, accurately, during that block. Positive differences indicate that participants were faster when the distractor was presented in the high probability location compared to when it was presented in the low probability locations. The average across all participants is plotted below. These results indicate that the individuals are learning within the first block where the distractor is likely to appear. 
+
+
+
+```{r create_df_to_transform}
+space2 <- space_block %>%
+  group_by(block_num) %>%
+  summarize(rts = mean(difference, na.rm = TRUE),
+            sd_rt=sd(difference, na.rm = TRUE),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=rts+se,
+            lower_limit=rts-se
+            )
+
+```
+
+```{r line_plot_avg}
+ggplot(data = space2,aes(x=block_num, y=rts))+
+  geom_line()+
+  geom_point()+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  labs(title = "Average Difference in Response Times By Block", subtitle = "for distractor presentation at the low-probability locations and high-probability location", x="Block number", y="Difference in RT (ms)")
+
+```
