@@ -117,10 +117,32 @@ Create a new data frame with the average RT for each relative distractor locatio
 
 space <- trimmed %>%
   group_by(ID, relative_hp_dist) %>%
-  summarize(rts = mean(RT),
+  summarize(rts = mean(RT)
             )
 space
   
+```
+
+
+```{r cut out blocks 7 and 8}
+
+df2 <- subset(trimmed,block_num!='7' )
+df2 <- subset(df2,block_num!='8')
+
+space2<- df2 %>%
+  group_by(ID, relative_hp_dist) %>%
+  summarize(rts = mean(RT)
+            )
+space2
+
+```
+
+```{r subset_anova_test}
+
+aov_car(rts ~ relative_hp_dist + Error(ID/relative_hp_dist), data=space2)
+
+
+
 ```
 
 Need to reformat the above df to have a column for each relative_hp_dist/ID.
