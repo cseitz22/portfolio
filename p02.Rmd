@@ -298,6 +298,22 @@ t.test(x=space_anova$high_prob, y=space_anova$low_prob, alternative="greater", m
 
 ```
 
+Test for significant differences between the high and low prob locations for 6 blocks and 4 blocks. 
+
+```{r t-test_half}
+
+space_half <- setDT(space2)
+space_half <- dcast(space_half,ID~relative_target,value.var='rts')
+
+space_half <- space_half %>%
+ mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+space_half %>%
+  t.test(x=space_half$low_prob, y=space_half$high_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95)
+
+```
+
+
 ### Distractor and Target Location Effects on Accuracy
 
 

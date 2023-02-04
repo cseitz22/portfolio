@@ -619,6 +619,27 @@ in the high-probabilty vs. low-probability locations is significant.</p>
 ## sample estimates:
 ## mean difference 
 ##        17.10478</code></pre>
+<p>Test for significant differences between the high and low prob
+locations for 6 blocks and 4 blocks.</p>
+<pre class="r"><code>space_half &lt;- setDT(space2)
+space_half &lt;- dcast(space_half,ID~relative_target,value.var=&#39;rts&#39;)
+
+space_half &lt;- space_half %&gt;%
+ mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+space_half %&gt;%
+  t.test(x=space_half$low_prob, y=space_half$high_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95)</code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  space_half$low_prob and space_half$high_prob
+## t = -2.066, df = 20, p-value = 0.974
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  -35.03614       Inf
+## sample estimates:
+## mean difference 
+##       -19.09513</code></pre>
 </div>
 <div id="distractor-and-target-location-effects-on-accuracy"
 class="section level3">
