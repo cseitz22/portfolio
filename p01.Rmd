@@ -1,3 +1,4 @@
+---
 title: "Portfolio 1 - Distractor Suppression Pilot Study"
 name: "Cat Seitz"
 date: "1.21.2023"
@@ -217,6 +218,58 @@ space_anova %>%
 
 ```
 
+Now, I want to create a smaller graph with just 3 bars: one for the high-probability rts, average of low-probability rts, and no distractor. 
+
+```{r get_info_for_smaller_firgure}
+
+df_mod <- subset(space_anova, select=c(ID, no_dist, dist_0, low_prob))
+
+df_mod <- reshape2::melt(df_mod, id.var=c('ID'), variable.name= "relative_hp_dist")
+
+```
+
+```{r another_df_with_mean_rts}
+
+sum_stats2 <- df_mod%>%
+  group_by(relative_hp_dist)%>%
+  summarize(mean_rts=mean(value),
+            sd_rt=sd(value),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+sum_stats2
+
+```
+
+
+
+This figure displays the mean response times depending on the location of the distractor relative to the high probability location. I chose those particular colors based on Wake Forest's color scheme. 
+
+
+```{r - graph 2 - distractor location effect on rt}
+ggplot(data = sum_stats2, aes(x = relative_hp_dist, y = mean_rts)) +
+  geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(700,1000))+
+  theme_classic()+
+  labs(x = "Distractor Location", y = "Response Time (ms)")+
+  labs(title = "Distractor Location Effect on RT")+
+  labs(caption = "An ANOVA test shows a difference in RT depending on distractor location, F(1.97,39.33)=67.98, p<.001.")
+  
+```
+
+One last ANOVA test on this subset of data. 
+
+```{r 3_loc_anova_test}
+
+model3 <- aov_car(value ~ relative_hp_dist + Error(ID/relative_hp_dist), data=df_mod)
+
+model3
+
+
+```
 
 ### Examine block-by-block learning of distractor location
 

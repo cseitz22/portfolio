@@ -11,12 +11,12 @@
 
 
 
-<title>p01.knit</title>
+<title>Portfolio 1 - Distractor Suppression Pilot Study</title>
 
 <script src="site_libs/header-attrs-2.19/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -290,13 +290,13 @@ $(document).ready(function () {
 
 
 
+<h1 class="title toc-ignore">Portfolio 1 - Distractor Suppression Pilot
+Study</h1>
+<h4 class="date">1.21.2023</h4>
 
 </div>
 
 
-<p>title: “Portfolio 1 - Distractor Suppression Pilot Study” name: “Cat
-Seitz” date: “1.21.2023” data: “Distractor Suppression Pilot Study”
-output: html_document: theme: cerulean —</p>
 <pre class="r"><code>library(tidyverse) 
 library(tidyr)
 library(rstatix)
@@ -552,6 +552,53 @@ across the low-probability locations was significantly different
 ## sample estimates:
 ## mean difference 
 ##        55.63165</code></pre>
+<p>Now, I want to create a smaller graph with just 3 bars: one for the
+high-probability rts, average of low-probability rts, and no
+distractor.</p>
+<pre class="r"><code>df_mod &lt;- subset(space_anova, select=c(ID, no_dist, dist_0, low_prob))
+
+df_mod &lt;- reshape2::melt(df_mod, id.var=c(&#39;ID&#39;), variable.name= &quot;relative_hp_dist&quot;)</code></pre>
+<pre class="r"><code>sum_stats2 &lt;- df_mod%&gt;%
+  group_by(relative_hp_dist)%&gt;%
+  summarize(mean_rts=mean(value),
+            sd_rt=sd(value),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+sum_stats2</code></pre>
+<pre><code>## # A tibble: 3 × 7
+##   relative_hp_dist mean_rts sd_rt  n_rt    se upper_limit lower_limit
+##   &lt;fct&gt;               &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1 no_dist              781.  115.    21  25.2        806.        756.
+## 2 dist_0               862.  153.    21  33.4        895.        828.
+## 3 low_prob             917.  153.    21  33.5        951.        884.</code></pre>
+<p>This figure displays the mean response times depending on the
+location of the distractor relative to the high probability location. I
+chose those particular colors based on Wake Forest’s color scheme.</p>
+<pre class="r"><code>ggplot(data = sum_stats2, aes(x = relative_hp_dist, y = mean_rts)) +
+  geom_bar(stat = &quot;identity&quot;, fill=&quot;#9E7E38&quot;, color=&#39;#000000&#39;) +
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(700,1000))+
+  theme_classic()+
+  labs(x = &quot;Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
+  labs(title = &quot;Distractor Location Effect on RT&quot;)+
+  labs(caption = &quot;An ANOVA test shows a difference in RT depending on distractor location, F(1.97,39.33)=67.98, p&lt;.001.&quot;)</code></pre>
+<p><img src="p01_files/figure-html/-%20graph%202%20-%20distractor%20location%20effect%20on%20rt-1.png" width="672" /></p>
+<p>One last ANOVA test on this subset of data.</p>
+<pre class="r"><code>model3 &lt;- aov_car(value ~ relative_hp_dist + Error(ID/relative_hp_dist), data=df_mod)
+
+model3</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: value
+##             Effect          df     MSE         F  ges p.value
+## 1 relative_hp_dist 1.97, 39.33 1483.18 67.98 *** .141   &lt;.001
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
 </div>
 <div id="examine-block-by-block-learning-of-distractor-location"
 class="section level3">
