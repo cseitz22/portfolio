@@ -86,6 +86,11 @@ pilot <- pilot %>%
                      target_loc=="loc5" & high_prob==6 ~ 1,
                      target_loc=="loc6" & high_prob==6 ~ 0,))
 
+pilot$relative_target[pilot$relative_target == 0] <- "high_prob"
+pilot$relative_target[pilot$relative_target == 1] <- "lp_1"
+pilot$relative_target[pilot$relative_target == 2] <- "lp_2"
+pilot$relative_target[pilot$relative_target == 3] <- "lp_3"
+
 ```
 
 ### Trim the Data
@@ -235,6 +240,64 @@ model2
 
 
 ```
+
+This next section will examine the differences between response times when averaging across low-probability locations. 
+
+```{r get_low-prob_avg}
+
+space_anova <- space_anova %>%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+```
+
+```{r get_info_for_smaller_figure}
+
+df_mod <- subset(space_anova, select=c(ID, high_prob, low_prob))
+
+df_mod <- reshape2::melt(df_mod, id.var=c('ID'), variable.name= "relative_target")
+
+```
+
+```{r another_df_with_mean_rts}
+
+sum_stats2 <- df_mod%>%
+  group_by(relative_target)%>%
+  summarize(mean_rts=mean(value),
+            sd_rt=sd(value),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+sum_stats2
+
+```
+
+
+
+This figure displays the mean response times depending on the location of the target relative to the high probability location. I chose those particular colors based on Wake Forest's color scheme. 
+
+
+```{r - graph 2 - target location effect on rt}
+ggplot(data = sum_stats2, aes(x = relative_target, y = mean_rts)) +
+  geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(700,850))+
+  theme_classic()+
+  labs(x = "Target Location", y = "Response Time (ms)")+
+  labs(title = "Target Location Effect on RT")+
+  labs(caption = "A t-test shows a difference in RT depending on distractor location, t(20)=1.91, p=.035.")
+  
+```
+
+Determine if the difference between response times when the target is in the high-probabilty vs. low-probability locations is significant. 
+
+```{r t-test}
+
+t.test(x=space_anova$high_prob, y=space_anova$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95)
+
+```
+
 ### Distractor and Target Location Effects on Accuracy
 
 
