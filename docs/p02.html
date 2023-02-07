@@ -437,8 +437,8 @@ scheme.</p>
 <p><img src="p02_files/figure-html/-%20graph%201%20-%20distractor%20location%20effect%20on%20rt-1.png" width="672" /></p>
 <pre class="r"><code>df2 &lt;- subset(trimmed,block_num!=&#39;7&#39; &amp; relative_hp_dist==&quot;no_dist&quot;)
 df2 &lt;- subset(df2,block_num!=&#39;8&#39;)
-#df2 &lt;- subset(df2,block_num!=&#39;5&#39;)
-#df2 &lt;- subset(df2,block_num!=&#39;6&#39;)
+df2 &lt;- subset(df2,block_num!=&#39;5&#39;)
+df2 &lt;- subset(df2,block_num!=&#39;6&#39;)
 
 space2&lt;- df2 %&gt;%
   group_by(ID, relative_target) %&gt;%
@@ -451,23 +451,23 @@ space2&lt;- df2 %&gt;%
 ## # Groups:   ID [21]
 ##       ID relative_target   rts
 ##    &lt;dbl&gt; &lt;chr&gt;           &lt;dbl&gt;
-##  1    11 high_prob       1150.
-##  2    11 lp_1            1092.
-##  3    11 lp_2            1113.
-##  4    11 lp_3            1150.
-##  5    12 high_prob        802.
-##  6    12 lp_1             779.
-##  7    12 lp_2             729.
-##  8    12 lp_3             742.
-##  9    13 high_prob        771.
-## 10    13 lp_1             766.
+##  1    11 high_prob       1195.
+##  2    11 lp_1            1177.
+##  3    11 lp_2            1180.
+##  4    11 lp_3            1195.
+##  5    12 high_prob        809.
+##  6    12 lp_1             811.
+##  7    12 lp_2             764.
+##  8    12 lp_3             771.
+##  9    13 high_prob        789.
+## 10    13 lp_1             803.
 ## # … with 74 more rows</code></pre>
 <pre class="r"><code>aov_car(rts ~ relative_target + Error(ID/relative_target), data=space2)</code></pre>
 <pre><code>## Anova Table (Type 3 tests)
 ## 
 ## Response: rts
 ##            Effect          df     MSE    F  ges p.value
-## 1 relative_target 2.39, 47.74 1058.05 2.29 .004    .103
+## 1 relative_target 1.98, 39.63 1989.92 0.66 .002    .519
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
@@ -628,18 +628,37 @@ space_half &lt;- space_half %&gt;%
  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
 
 space_half %&gt;%
-  t.test(x=space_half$low_prob, y=space_half$high_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95)</code></pre>
+  t.test(x=space_half$high_prob, y=space_half$low_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95)</code></pre>
 <pre><code>## 
 ##  Paired t-test
 ## 
-## data:  space_half$low_prob and space_half$high_prob
-## t = -2.066, df = 20, p-value = 0.974
+## data:  space_half$high_prob and space_half$low_prob
+## t = 1.014, df = 20, p-value = 0.1613
 ## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
-##  -35.03614       Inf
+##  -8.682608       Inf
 ## sample estimates:
 ## mean difference 
-##       -19.09513</code></pre>
+##        12.38736</code></pre>
+<p>Examine the summary statistics for subset of data.</p>
+<pre class="r"><code>df_mod2 &lt;- subset(space_half, select=c(ID, high_prob, low_prob))
+df_mod2 &lt;- reshape2::melt(df_mod2, id.var=c(&#39;ID&#39;), variable.name= &quot;relative_target&quot;)
+
+sum_stats3 &lt;- df_mod2%&gt;%
+  group_by(relative_target)%&gt;%
+  summarize(mean_rts=mean(value),
+            sd_rt=sd(value),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+sum_stats3</code></pre>
+<pre><code>## # A tibble: 2 × 7
+##   relative_target mean_rts sd_rt  n_rt    se upper_limit lower_limit
+##   &lt;fct&gt;              &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1 high_prob           850.  138.    21  30.1        880.        820.
+## 2 low_prob            838.  137.    21  29.9        868.        808.</code></pre>
 </div>
 <div id="distractor-and-target-location-effects-on-accuracy"
 class="section level3">

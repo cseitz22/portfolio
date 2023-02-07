@@ -158,8 +158,8 @@ ggplot(data = target_means, aes(x = relative_target, y = mean_rts)) +
 
 df2 <- subset(trimmed,block_num!='7' & relative_hp_dist=="no_dist")
 df2 <- subset(df2,block_num!='8')
-#df2 <- subset(df2,block_num!='5')
-#df2 <- subset(df2,block_num!='6')
+df2 <- subset(df2,block_num!='5')
+df2 <- subset(df2,block_num!='6')
 
 space2<- df2 %>%
   group_by(ID, relative_target) %>%
@@ -309,10 +309,29 @@ space_half <- space_half %>%
  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
 
 space_half %>%
-  t.test(x=space_half$low_prob, y=space_half$high_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95)
+  t.test(x=space_half$high_prob, y=space_half$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95)
 
 ```
 
+Examine the summary statistics for subset of data.
+
+```{r another_df_with_mean_rts_half}
+
+df_mod2 <- subset(space_half, select=c(ID, high_prob, low_prob))
+df_mod2 <- reshape2::melt(df_mod2, id.var=c('ID'), variable.name= "relative_target")
+
+sum_stats3 <- df_mod2%>%
+  group_by(relative_target)%>%
+  summarize(mean_rts=mean(value),
+            sd_rt=sd(value),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+sum_stats3
+
+```
 
 ### Distractor and Target Location Effects on Accuracy
 
