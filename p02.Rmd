@@ -282,11 +282,16 @@ This figure displays the mean response times depending on the location of the ta
 ggplot(data = sum_stats2, aes(x = relative_target, y = mean_rts)) +
   geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(700,850))+
+  coord_cartesian(ylim = c(700,1000))+
   theme_classic()+
   labs(x = "Target Location", y = "Response Time (ms)")+
   labs(title = "Target Location Effect on RT")+
-  labs(caption = "A t-test shows a difference in RT depending on distractor location, t(20)=1.91, p=.035.")
+  #labs(caption = "A t-test shows a difference in RT depending on distractor location, t(20)=1.91, p=.035.")+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=18,face="bold"),
+        title = element_text(size = 20))+
+  scale_x_discrete(labels= c("high_prob"="High Prob Distractor Location","low_prob"="Low Prob Distractor Location"))
+  
   
 ```
 

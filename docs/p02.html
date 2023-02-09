@@ -599,11 +599,15 @@ chose those particular colors based on Wake Forest’s color scheme.</p>
 <pre class="r"><code>ggplot(data = sum_stats2, aes(x = relative_target, y = mean_rts)) +
   geom_bar(stat = &quot;identity&quot;, fill=&quot;#9E7E38&quot;, color=&#39;#000000&#39;) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(700,850))+
+  coord_cartesian(ylim = c(700,1000))+
   theme_classic()+
   labs(x = &quot;Target Location&quot;, y = &quot;Response Time (ms)&quot;)+
   labs(title = &quot;Target Location Effect on RT&quot;)+
-  labs(caption = &quot;A t-test shows a difference in RT depending on distractor location, t(20)=1.91, p=.035.&quot;)</code></pre>
+  #labs(caption = &quot;A t-test shows a difference in RT depending on distractor location, t(20)=1.91, p=.035.&quot;)+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=18,face=&quot;bold&quot;),
+        title = element_text(size = 20))+
+  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;High Prob Distractor Location&quot;,&quot;low_prob&quot;=&quot;Low Prob Distractor Location&quot;))</code></pre>
 <p><img src="p02_files/figure-html/-%20graph%202%20-%20target%20location%20effect%20on%20rt-1.png" width="672" /></p>
 <p>Determine if the difference between response times when the target is
 in the high-probabilty vs. low-probability locations is significant.</p>

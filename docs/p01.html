@@ -584,7 +584,11 @@ chose those particular colors based on Wake Forest’s color scheme.</p>
   theme_classic()+
   labs(x = &quot;Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
   labs(title = &quot;Distractor Location Effect on RT&quot;)+
-  labs(caption = &quot;An ANOVA test shows a difference in RT depending on distractor location, F(1.97,39.33)=67.98, p&lt;.001.&quot;)</code></pre>
+  #labs(caption = &quot;An ANOVA test shows a difference in RT depending on distractor location, F(1.97,39.33)=67.98, p&lt;.001.&quot;)+
+    theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=18,face=&quot;bold&quot;),
+        title = element_text(size = 20))+
+  scale_x_discrete(labels= c(&quot;no_dist&quot;=&quot;Distractor Absent&quot;,&quot;low_prob&quot;=&quot;Low Prob Location&quot;, &quot;dist_0&quot;=&quot;High Prob Location&quot;))</code></pre>
 <p><img src="p01_files/figure-html/-%20graph%202%20-%20distractor%20location%20effect%20on%20rt-1.png" width="672" /></p>
 <p>One last ANOVA test on this subset of data.</p>
 <pre class="r"><code>model3 &lt;- aov_car(value ~ relative_hp_dist + Error(ID/relative_hp_dist), data=df_mod)
