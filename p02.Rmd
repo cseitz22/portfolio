@@ -13,6 +13,7 @@ library(data.table)
 library(afex)
 library(emmeans)
 library(psych)
+library(ggsignif)
 ```
 
 The data used is from a visual search task in which participants are searching for a unique item in an array of six items and press a button to indicate whether the item is facing right or left. On 50% of trials, a salient, color distractor is present in the array. On 67% of distractor present trials, the distractor appears in the same location in the array with an equal number of trials in the other 5 locations. This study is testing whether adults can learn to suppress their attention to the high-probabilty location of the distractor. 
@@ -284,6 +285,7 @@ ggplot(data = sum_stats2, aes(x = relative_target, y = mean_rts)) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(700,1000))+
   theme_classic()+
+  #geom_signif(comparisons=list(c("dist_0","low_prob")), annotations="*")+
   labs(x = "Target Location", y = "Response Time (ms)")+
   labs(title = "Target Location Effect on RT")+
   #labs(caption = "A t-test shows a difference in RT depending on distractor location, t(20)=1.91, p=.035.")+
