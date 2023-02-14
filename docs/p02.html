@@ -302,7 +302,11 @@ library(rstatix)
 library(data.table)
 library(afex)
 library(emmeans)
-library(psych)</code></pre>
+library(psych)
+library(ggsignif)
+library(ggprism)
+library(patchwork)
+library(magrittr)</code></pre>
 <p>The data used is from a visual search task in which participants are
 searching for a unique item in an array of six items and press a button
 to indicate whether the item is facing right or left. On 50% of trials,
@@ -593,22 +597,6 @@ sum_stats2</code></pre>
 ##   &lt;fct&gt;              &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
 ## 1 high_prob           795.  120.    21  26.1        821.        769.
 ## 2 low_prob            778.  117.    21  25.6        803.        752.</code></pre>
-<p>This figure displays the mean response times depending on the
-location of the target relative to the high probability location. I
-chose those particular colors based on Wake Forest’s color scheme.</p>
-<pre class="r"><code>ggplot(data = sum_stats2, aes(x = relative_target, y = mean_rts)) +
-  geom_bar(stat = &quot;identity&quot;, fill=&quot;#9E7E38&quot;, color=&#39;#000000&#39;) +
-  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(700,1000))+
-  theme_classic()+
-  labs(x = &quot;Target Location&quot;, y = &quot;Response Time (ms)&quot;)+
-  labs(title = &quot;Target Location Effect on RT&quot;)+
-  #labs(caption = &quot;A t-test shows a difference in RT depending on distractor location, t(20)=1.91, p=.035.&quot;)+
-  theme(axis.text=element_text(size=14),
-        axis.title=element_text(size=18,face=&quot;bold&quot;),
-        title = element_text(size = 20))+
-  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;High Prob Distractor Location&quot;,&quot;low_prob&quot;=&quot;Low Prob Distractor Location&quot;))</code></pre>
-<p><img src="p02_files/figure-html/-%20graph%202%20-%20target%20location%20effect%20on%20rt-1.png" width="672" /></p>
 <p>Determine if the difference between response times when the target is
 in the high-probabilty vs. low-probability locations is significant.</p>
 <pre class="r"><code>t.test(x=space_anova$high_prob, y=space_anova$low_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95)</code></pre>
@@ -623,6 +611,38 @@ in the high-probabilty vs. low-probability locations is significant.</p>
 ## sample estimates:
 ## mean difference 
 ##        17.10478</code></pre>
+<pre class="r"><code>result&lt;- 0.035</code></pre>
+<pre class="r"><code>#Make df for adding the p-value 
+p_val&lt;- data.frame(
+  group_1=&quot;high_prob&quot;,
+  group_2=&quot;low_prob&quot;,
+  label=result,
+  y.position=900
+)</code></pre>
+<p>This figure displays the mean response times depending on the
+location of the target relative to the high probability location. I
+chose those particular colors based on Wake Forest’s color scheme.</p>
+<pre class="r"><code>ggplot(data = sum_stats2, aes(x = relative_target, y = mean_rts)) +
+  geom_bar(stat = &quot;identity&quot;, fill=&quot;#9E7E38&quot;, color=&#39;#000000&#39;) +
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(700,1000))+
+  theme_classic()+
+  add_pvalue(p_val,
+             xmin = &quot;group_1&quot;,
+             xmax = &quot;group_2&quot;,
+             label = &quot;p = {label}&quot;,
+             y.position = &quot;y.position&quot;,
+             label.size = 7,
+             bracket.size = 1) +
+  #geom_signif(comparisons=list(c(&quot;dist_0&quot;,&quot;low_prob&quot;)), annotations=&quot;*&quot;)+
+  labs(x = &quot;Target Location&quot;, y = &quot;Response Time (ms)&quot;)+
+  labs(title = &quot;Target Location Effect on RT&quot;)+
+  #labs(caption = &quot;A t-test shows a difference in RT depending on distractor location, t(20)=1.91, p=.035.&quot;)+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=18,face=&quot;bold&quot;),
+        title = element_text(size = 20))+
+  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;High Prob Distractor Location&quot;,&quot;low_prob&quot;=&quot;Low Prob Distractor Location&quot;))</code></pre>
+<p><img src="p02_files/figure-html/-%20graph%202%20-%20target%20location%20effect%20on%20rt-1.png" width="672" /></p>
 <p>Test for significant differences between the high and low prob
 locations for 6 blocks and 4 blocks.</p>
 <pre class="r"><code>space_half &lt;- setDT(space2)

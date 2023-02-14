@@ -17,6 +17,9 @@ library(data.table)
 library(afex)
 library(emmeans)
 library(psych)
+library(ggprism)
+library(patchwork)
+library(magrittr)
 ```
 
 The data used is from a visual search task in which participants are searching for a unique item in an array of six items and press a button to indicate whether the item is facing right or left. On 50% of trials, a salient, color distractor is present in the array. On 67% of distractor present trials, the distractor appears in the same location in the array with an equal number of trials in the other 5 locations. This study is testing whether adults can learn to suppress their attention to the high-probabilty location of the distractor. 
@@ -214,13 +217,17 @@ space_anova <- space_anova %>%
 ```{r t-test}
 
 space_anova %>%
-  t.test(x=space_anova$low_prob, y=space_anova$dist_0, alternative="greater", mu=0,paired = TRUE, conf.level = .95)
+  t.test(x=space_anova$low_prob, y=space_anova$dist_0, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
+space_anova%>%
+  t.test(x=space_anova$dist_0, y=space_anova$no_dist, alternative="greater", mu=0, paired =TRUE, conf.level = .95) 
+space_anova%>%
+  t.test(x=space_anova$low_prob, y=space_anova$no_dist, alternative="greater", mu=0, paired =TRUE, conf.level = .95)
 
 ```
 
 Now, I want to create a smaller graph with just 3 bars: one for the high-probability rts, average of low-probability rts, and no distractor. 
 
-```{r get_info_for_smaller_firgure}
+```{r get_info_for_smaller_figure}
 
 df_mod <- subset(space_anova, select=c(ID, no_dist, dist_0, low_prob))
 
@@ -243,7 +250,35 @@ sum_stats2
 
 ```
 
+```{r adding-p-values}
 
+result<- .001
+
+
+#Make df for adding the p-value 
+p_val1<- data.frame(
+  group_1="dist_0",
+  group_2="low_prob",
+  label=result,
+  y.position=1050
+)
+
+p_val2<- data.frame(
+  group_1="no_dist",
+  group_2="low_prob",
+  label=result,
+  y.position=1150
+)
+
+p_val3<- data.frame(
+  group_1="no_dist",
+  group_2="dist_0",
+  label=result,
+  y.position=950
+)
+
+
+```
 
 This figure displays the mean response times depending on the location of the distractor relative to the high probability location. I chose those particular colors based on Wake Forest's color scheme. 
 
@@ -252,8 +287,29 @@ This figure displays the mean response times depending on the location of the di
 ggplot(data = sum_stats2, aes(x = relative_hp_dist, y = mean_rts)) +
   geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(700,1000))+
+  coord_cartesian(ylim = c(700,1200))+
   theme_classic()+
+  add_pvalue(p_val1,
+             xmin = "group_1",
+             xmax = "group_2",
+             label = "p < {label}",
+             y.position = "y.position",
+             label.size = 4,
+             bracket.size = .5)+
+  add_pvalue(p_val2,
+             xmin = "group_1",
+             xmax = "group_2",
+             label = "p < {label}",
+             y.position = "y.position",
+             label.size = 4,
+             bracket.size = .5)+
+  add_pvalue(p_val3,
+             xmin = "group_1",
+             xmax = "group_2",
+             label = "p < {label}",
+             y.position = "y.position",
+             label.size = 4,
+             bracket.size = .5)+
   labs(x = "Distractor Location", y = "Response Time (ms)")+
   labs(title = "Distractor Location Effect on RT")+
   #labs(caption = "An ANOVA test shows a difference in RT depending on distractor location, F(1.97,39.33)=67.98, p<.001.")+

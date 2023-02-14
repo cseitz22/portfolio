@@ -303,7 +303,10 @@ library(rstatix)
 library(data.table)
 library(afex)
 library(emmeans)
-library(psych)</code></pre>
+library(psych)
+library(ggprism)
+library(patchwork)
+library(magrittr)</code></pre>
 <p>The data used is from a visual search task in which participants are
 searching for a unique item in an array of six items and press a button
 to indicate whether the item is facing right or left. On 50% of trials,
@@ -540,7 +543,7 @@ across the low-probability locations was significantly different
 <pre class="r"><code>space_anova &lt;- space_anova %&gt;%
   mutate(low_prob = (dist_1+dist_2+dist_3)/3)</code></pre>
 <pre class="r"><code>space_anova %&gt;%
-  t.test(x=space_anova$low_prob, y=space_anova$dist_0, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95)</code></pre>
+  t.test(x=space_anova$low_prob, y=space_anova$dist_0, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
 <pre><code>## 
 ##  Paired t-test
 ## 
@@ -552,6 +555,32 @@ across the low-probability locations was significantly different
 ## sample estimates:
 ## mean difference 
 ##        55.63165</code></pre>
+<pre class="r"><code>space_anova%&gt;%
+  t.test(x=space_anova$dist_0, y=space_anova$no_dist, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95) </code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  space_anova$dist_0 and space_anova$no_dist
+## t = 7.0068, df = 20, p-value = 4.239e-07
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  61.06419      Inf
+## sample estimates:
+## mean difference 
+##        81.00314</code></pre>
+<pre class="r"><code>space_anova%&gt;%
+  t.test(x=space_anova$low_prob, y=space_anova$no_dist, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95)</code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  space_anova$low_prob and space_anova$no_dist
+## t = 10.921, df = 20, p-value = 3.523e-10
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  115.0573      Inf
+## sample estimates:
+## mean difference 
+##        136.6348</code></pre>
 <p>Now, I want to create a smaller graph with just 3 bars: one for the
 high-probability rts, average of low-probability rts, and no
 distractor.</p>
@@ -574,14 +603,59 @@ sum_stats2</code></pre>
 ## 1 no_dist              781.  115.    21  25.2        806.        756.
 ## 2 dist_0               862.  153.    21  33.4        895.        828.
 ## 3 low_prob             917.  153.    21  33.5        951.        884.</code></pre>
+<pre class="r"><code>result&lt;- .001
+
+
+#Make df for adding the p-value 
+p_val1&lt;- data.frame(
+  group_1=&quot;dist_0&quot;,
+  group_2=&quot;low_prob&quot;,
+  label=result,
+  y.position=1050
+)
+
+p_val2&lt;- data.frame(
+  group_1=&quot;no_dist&quot;,
+  group_2=&quot;low_prob&quot;,
+  label=result,
+  y.position=1150
+)
+
+p_val3&lt;- data.frame(
+  group_1=&quot;no_dist&quot;,
+  group_2=&quot;dist_0&quot;,
+  label=result,
+  y.position=950
+)</code></pre>
 <p>This figure displays the mean response times depending on the
 location of the distractor relative to the high probability location. I
 chose those particular colors based on Wake Forest’s color scheme.</p>
 <pre class="r"><code>ggplot(data = sum_stats2, aes(x = relative_hp_dist, y = mean_rts)) +
   geom_bar(stat = &quot;identity&quot;, fill=&quot;#9E7E38&quot;, color=&#39;#000000&#39;) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(700,1000))+
+  coord_cartesian(ylim = c(700,1200))+
   theme_classic()+
+  add_pvalue(p_val1,
+             xmin = &quot;group_1&quot;,
+             xmax = &quot;group_2&quot;,
+             label = &quot;p &lt; {label}&quot;,
+             y.position = &quot;y.position&quot;,
+             label.size = 4,
+             bracket.size = .5)+
+  add_pvalue(p_val2,
+             xmin = &quot;group_1&quot;,
+             xmax = &quot;group_2&quot;,
+             label = &quot;p &lt; {label}&quot;,
+             y.position = &quot;y.position&quot;,
+             label.size = 4,
+             bracket.size = .5)+
+  add_pvalue(p_val3,
+             xmin = &quot;group_1&quot;,
+             xmax = &quot;group_2&quot;,
+             label = &quot;p &lt; {label}&quot;,
+             y.position = &quot;y.position&quot;,
+             label.size = 4,
+             bracket.size = .5)+
   labs(x = &quot;Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
   labs(title = &quot;Distractor Location Effect on RT&quot;)+
   #labs(caption = &quot;An ANOVA test shows a difference in RT depending on distractor location, F(1.97,39.33)=67.98, p&lt;.001.&quot;)+

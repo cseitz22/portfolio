@@ -14,6 +14,9 @@ library(afex)
 library(emmeans)
 library(psych)
 library(ggsignif)
+library(ggprism)
+library(patchwork)
+library(magrittr)
 ```
 
 The data used is from a visual search task in which participants are searching for a unique item in an array of six items and press a button to indicate whether the item is facing right or left. On 50% of trials, a salient, color distractor is present in the array. On 67% of distractor present trials, the distractor appears in the same location in the array with an equal number of trials in the other 5 locations. This study is testing whether adults can learn to suppress their attention to the high-probabilty location of the distractor. 
@@ -274,7 +277,24 @@ sum_stats2
 
 ```
 
+Determine if the difference between response times when the target is in the high-probabilty vs. low-probability locations is significant. 
 
+```{r t-test}
+
+t.test(x=space_anova$high_prob, y=space_anova$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95)
+result<- 0.035
+```
+
+```{r construct-p-value-df}
+#Make df for adding the p-value 
+p_val<- data.frame(
+  group_1="high_prob",
+  group_2="low_prob",
+  label=result,
+  y.position=900
+)
+
+```
 
 This figure displays the mean response times depending on the location of the target relative to the high probability location. I chose those particular colors based on Wake Forest's color scheme. 
 
@@ -285,6 +305,13 @@ ggplot(data = sum_stats2, aes(x = relative_target, y = mean_rts)) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(700,1000))+
   theme_classic()+
+  add_pvalue(p_val,
+             xmin = "group_1",
+             xmax = "group_2",
+             label = "p = {label}",
+             y.position = "y.position",
+             label.size = 7,
+             bracket.size = 1) +
   #geom_signif(comparisons=list(c("dist_0","low_prob")), annotations="*")+
   labs(x = "Target Location", y = "Response Time (ms)")+
   labs(title = "Target Location Effect on RT")+
@@ -297,13 +324,6 @@ ggplot(data = sum_stats2, aes(x = relative_target, y = mean_rts)) +
   
 ```
 
-Determine if the difference between response times when the target is in the high-probabilty vs. low-probability locations is significant. 
-
-```{r t-test}
-
-t.test(x=space_anova$high_prob, y=space_anova$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95)
-
-```
 
 Test for significant differences between the high and low prob locations for 6 blocks and 4 blocks. 
 
