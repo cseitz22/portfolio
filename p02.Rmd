@@ -277,7 +277,7 @@ sum_stats2
 
 ```
 
-Determine if the difference between response times when the target is in the high-probabilty vs. low-probability locations is significant. 
+Determine if the difference between response times when the target is in the high-probability vs. low-probability locations is significant. 
 
 ```{r t-test}
 
