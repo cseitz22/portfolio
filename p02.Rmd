@@ -110,9 +110,9 @@ stds <- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173,
 
 Trim the data and compute the percent trimmed
 ```{r trimming}
-add
+add_this<- pilot[pilot$acc==100,]
 
-trimmed <- pilot[pilot$acc==100,] %>% 
+trimmed <- add_this[add_this$relative_hp_dist=="no_dist",] %>% 
   group_by(ID, relative_target) %>%
            mutate(sdc = ifelse(length(RT)>=100,2.5,approx(xsize,stds,xout=length(RT))$y), avg = mean(RT), stdev = sd(RT)) %>%
            filter(RT <= sdc*stdev+avg & RT >=avg-(sdc*stdev) & RT >=.200) %>%
@@ -121,9 +121,9 @@ trimmed <- pilot[pilot$acc==100,] %>%
 
 
 statPrep <- trimmed %>% group_by(ID, relative_target) %>% summarise(measurement=mean(RT)) %>% as.data.frame()
-100-(nrow(trimmed)/nrow(pilot[pilot$acc==100 && pilot$relative_hp_dist=="no_dist",]))*100
+100-(nrow(trimmed)/nrow(add_this[add_this$relative_hp_dist=="no_dist",]))*100
 ```
-Again, trimmed 2.51% of trials. 
+Again, trimmed 2.69% of trials. 
 
 ###Target Location Effects
 
@@ -152,11 +152,14 @@ This figure displays the mean response times depending on the location of the ta
 ggplot(data = target_means, aes(x = relative_target, y = mean_rts)) +
   geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(700,900))+
+  coord_cartesian(ylim = c(700,1000))+
   theme_classic()+
   labs(x = "Target Location Relative to High-probability Distractor Location", y = "Response Time (ms)")+
   labs(title = "Target Location Effect on RT")+
-  labs(caption = "An ANOVA test shows a difference in RT depending on target location, F(3,60)=13.29, p<.001.")
+  theme(axis.text=element_text(size=12),
+    axis.title=element_text(size=14,face="bold"),
+    title = element_text(size = 20))+
+  scale_x_discrete(labels= c("high_prob"="dist-0","lp_1"="dist-1", "lp_2"="dist-2", "lp_3"="dist-3"))
   
 ```
 
@@ -286,7 +289,7 @@ Determine if the difference between response times when the target is in the hig
 ```{r t-test}
 
 t.test(x=space_anova$high_prob, y=space_anova$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95)
-result<- 0.035
+result<- 0.037
 ```
 
 ```{r construct-p-value-df}
@@ -393,7 +396,7 @@ pilot_targacc <- pilot %>%
 
 ```
 
-```{r - graph distractor location effects on accuracy}
+```{r - graph distractor location effects on accuracy, fig.height=9, fig.width=6}
 ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy)) +
   geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
@@ -401,11 +404,14 @@ ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy)) +
   theme_classic()+
   labs(x = "Distractor Location Relative to High-probability Distractor Location", y = "Accuracy (%)")+
   labs(title = "Distractor Location Effect on Accuracy")+
-  labs(caption = "An ANOVA test shows a difference in accuracy depending on distractor location, F(4,80)=3.24, p=.016.")
-
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="bold"),
+        title = element_text(size = 16))+
+  scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
+  
 ```
 
-```{r - graph target location effects on accuracy}
+```{r - graph target location effects on accuracy, fig.height=9, fig.width=6}
 ggplot(data = pilot_targacc, aes(x = relative_target, y = accuracy)) +
   geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
@@ -413,8 +419,11 @@ ggplot(data = pilot_targacc, aes(x = relative_target, y = accuracy)) +
   theme_classic()+
   labs(x = "Target Location Relative to High-probability Distractor Location", y = "Accuracy (%)")+
   labs(title = "Target Location Effect on Accuracy")+
-  labs(caption = "An ANOVA test shows a difference in accuracy depending on target location, F(3,60)=4.55, p=.006.")
-
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="bold"),
+        title = element_text(size = 16))+
+  scale_x_discrete(labels= c("high_prob"="dist-0","lp_1"="dist-1","lp_2"="dist-2","lp_3"="dist-3"))
+  
 ```
 
 ```{r create_accuracy_df_for_ANOVAs}

@@ -112,7 +112,10 @@ ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
   labs(x = "Distractor Location", y = "Response Time (ms)")+
   labs(title = "Distractor Location Effect on RT")+
   #labs(caption = "An ANOVA test shows a difference in RT depending on distractor location, F(3.28,65.57)=33.3, p<.001.")+
-  scale_x_discrete(labels= c("no_dist"="Distractor Absent","low_prob"="Low Prob Location", "dist_0"="High Prob Location"))
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=14,face="bold"),
+        title = element_text(size = 20))+
+  scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
   
 ```
 

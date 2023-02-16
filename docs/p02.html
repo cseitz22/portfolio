@@ -391,19 +391,22 @@ stds &lt;- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173,
             2.22, 2.246, 2.274, 2.31, 2.326, 2.391, 2.41, 2.4305, 
             2.45, 2.48, 2.5)</code></pre>
 <p>Trim the data and compute the percent trimmed</p>
-<pre class="r"><code>trimmed &lt;- pilot[pilot$acc==100, ] %&gt;% group_by(ID, relative_hp_dist) %&gt;%
+<pre class="r"><code>add_this&lt;- pilot[pilot$acc==100,]
+
+trimmed &lt;- add_this[add_this$relative_hp_dist==&quot;no_dist&quot;,] %&gt;% 
+  group_by(ID, relative_target) %&gt;%
            mutate(sdc = ifelse(length(RT)&gt;=100,2.5,approx(xsize,stds,xout=length(RT))$y), avg = mean(RT), stdev = sd(RT)) %&gt;%
            filter(RT &lt;= sdc*stdev+avg &amp; RT &gt;=avg-(sdc*stdev) &amp; RT &gt;=.200) %&gt;%
            select(ID, relative_hp_dist, RT, block_num, relative_target) %&gt;%
            as.data.frame()
 
 
-statPrep &lt;- trimmed %&gt;% group_by(ID, relative_hp_dist) %&gt;% summarise(measurement=mean(RT)) %&gt;% as.data.frame()</code></pre>
+statPrep &lt;- trimmed %&gt;% group_by(ID, relative_target) %&gt;% summarise(measurement=mean(RT)) %&gt;% as.data.frame()</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
 ## argument.</code></pre>
-<pre class="r"><code>100-(nrow(trimmed)/nrow(pilot[pilot$acc==100, ]))*100</code></pre>
-<pre><code>## [1] 2.509732</code></pre>
-<p>Again, trimmed 2.51% of trials.</p>
+<pre class="r"><code>100-(nrow(trimmed)/nrow(add_this[add_this$relative_hp_dist==&quot;no_dist&quot;,]))*100</code></pre>
+<pre><code>## [1] 2.694489</code></pre>
+<p>Again, trimmed 2.69% of trials.</p>
 <p>###Target Location Effects</p>
 <p>Create new data frame with the mean response times grouped by
 distractor location relative to the high-probability location and add
@@ -422,10 +425,10 @@ target_means</code></pre>
 <pre><code>## # A tibble: 4 × 7
 ##   relative_target mean_rts sd_rt  n_rt    se upper_limit lower_limit
 ##   &lt;chr&gt;              &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
-## 1 high_prob           795.  215.    21  47.0        842.        748.
-## 2 lp_1                783.  214.    21  46.7        829.        736.
-## 3 lp_2                774.  214.    21  46.6        821.        728.
-## 4 lp_3                777.  219.    21  47.7        824.        729.</code></pre>
+## 1 high_prob           797.  221.    21  48.2        845.        749.
+## 2 lp_1                782.  215.    21  46.8        829.        736.
+## 3 lp_2                776.  216.    21  47.1        823.        728.
+## 4 lp_3                775.  217.    21  47.2        822.        728.</code></pre>
 <p>This figure displays the mean response times depending on the
 location of the target relative to the high probability location of the
 distractor. I chose those particular colors based on Wake Forest’s color
@@ -433,11 +436,14 @@ scheme.</p>
 <pre class="r"><code>ggplot(data = target_means, aes(x = relative_target, y = mean_rts)) +
   geom_bar(stat = &quot;identity&quot;, fill=&quot;#9E7E38&quot;, color=&#39;#000000&#39;) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(700,900))+
+  coord_cartesian(ylim = c(700,1000))+
   theme_classic()+
   labs(x = &quot;Target Location Relative to High-probability Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
   labs(title = &quot;Target Location Effect on RT&quot;)+
-  labs(caption = &quot;An ANOVA test shows a difference in RT depending on target location, F(3,60)=13.29, p&lt;.001.&quot;)</code></pre>
+  theme(axis.text=element_text(size=12),
+    axis.title=element_text(size=14,face=&quot;bold&quot;),
+    title = element_text(size = 20))+
+  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;dist-0&quot;,&quot;lp_1&quot;=&quot;dist-1&quot;, &quot;lp_2&quot;=&quot;dist-2&quot;, &quot;lp_3&quot;=&quot;dist-3&quot;))</code></pre>
 <p><img src="p02_files/figure-html/-%20graph%201%20-%20distractor%20location%20effect%20on%20rt-1.png" width="672" /></p>
 <pre class="r"><code>df2 &lt;- subset(trimmed,block_num!=&#39;7&#39; &amp; relative_hp_dist==&quot;no_dist&quot;)
 df2 &lt;- subset(df2,block_num!=&#39;8&#39;)
@@ -458,20 +464,20 @@ space2&lt;- df2 %&gt;%
 ##  1    11 high_prob       1195.
 ##  2    11 lp_1            1177.
 ##  3    11 lp_2            1180.
-##  4    11 lp_3            1195.
-##  5    12 high_prob        809.
+##  4    11 lp_3            1166.
+##  5    12 high_prob        875.
 ##  6    12 lp_1             811.
 ##  7    12 lp_2             764.
-##  8    12 lp_3             771.
+##  8    12 lp_3             755.
 ##  9    13 high_prob        789.
-## 10    13 lp_1             803.
+## 10    13 lp_1             814.
 ## # … with 74 more rows</code></pre>
 <pre class="r"><code>aov_car(rts ~ relative_target + Error(ID/relative_target), data=space2)</code></pre>
 <pre><code>## Anova Table (Type 3 tests)
 ## 
 ## Response: rts
 ##            Effect          df     MSE    F  ges p.value
-## 1 relative_target 1.98, 39.63 1989.92 0.66 .002    .519
+## 1 relative_target 1.62, 32.39 3706.09 0.96 .004    .376
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
@@ -494,13 +500,13 @@ ANOVA.</p>
 ##  1    11 high_prob       1088.
 ##  2    11 lp_1            1083.
 ##  3    11 lp_2            1056.
-##  4    11 lp_3            1118.
-##  5    12 high_prob        768.
+##  4    11 lp_3            1102.
+##  5    12 high_prob        801.
 ##  6    12 lp_1             749.
-##  7    12 lp_2             706.
-##  8    12 lp_3             717.
+##  7    12 lp_2             701.
+##  8    12 lp_3             708.
 ##  9    13 high_prob        748.
-## 10    13 lp_1             743.
+## 10    13 lp_1             756.
 ## # … with 74 more rows</code></pre>
 <p>Need to reformat the above df to have a column for each
 relative_hp_dist/ID.</p>
@@ -510,20 +516,16 @@ space_anova &lt;- dcast(space_anova,ID~relative_target,value.var=&#39;rts&#39;)<
 space %&gt;%
   group_by(relative_target) %&gt;%
   identify_outliers(rts)</code></pre>
-<pre><code>## # A tibble: 11 × 5
-##    relative_target    ID   rts is.outlier is.extreme
-##    &lt;chr&gt;           &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;      &lt;lgl&gt;     
-##  1 high_prob          11 1088. TRUE       FALSE     
-##  2 high_prob          28 1044. TRUE       FALSE     
-##  3 lp_1               11 1083. TRUE       TRUE      
-##  4 lp_1               20  983. TRUE       FALSE     
-##  5 lp_2               11 1056. TRUE       TRUE      
-##  6 lp_2               20 1004. TRUE       FALSE     
-##  7 lp_2               28  931. TRUE       FALSE     
-##  8 lp_3               11 1118. TRUE       TRUE      
-##  9 lp_3               17  603. TRUE       FALSE     
-## 10 lp_3               20 1001. TRUE       FALSE     
-## 11 lp_3               28  966. TRUE       FALSE</code></pre>
+<pre><code>## # A tibble: 7 × 5
+##   relative_target    ID   rts is.outlier is.extreme
+##   &lt;chr&gt;           &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;      &lt;lgl&gt;     
+## 1 high_prob          11 1088. TRUE       FALSE     
+## 2 lp_1               11 1083. TRUE       TRUE      
+## 3 lp_1               20  983. TRUE       FALSE     
+## 4 lp_2               11 1056. TRUE       FALSE     
+## 5 lp_2               20 1004. TRUE       FALSE     
+## 6 lp_3               11 1102. TRUE       FALSE     
+## 7 lp_3               20 1001. TRUE       FALSE</code></pre>
 <pre class="r"><code>#testing the normality assumption -- data is normally distributed enough because no conditions have a p-value less than .05
 space %&gt;%
   group_by(relative_target) %&gt;%
@@ -531,10 +533,10 @@ space %&gt;%
 <pre><code>## # A tibble: 4 × 4
 ##   relative_target variable statistic      p
 ##   &lt;chr&gt;           &lt;chr&gt;        &lt;dbl&gt;  &lt;dbl&gt;
-## 1 high_prob       rts          0.900 0.0352
-## 2 lp_1            rts          0.920 0.0887
-## 3 lp_2            rts          0.903 0.0392
-## 4 lp_3            rts          0.883 0.0164</code></pre>
+## 1 high_prob       rts          0.913 0.0640
+## 2 lp_1            rts          0.924 0.105 
+## 3 lp_2            rts          0.912 0.0594
+## 4 lp_3            rts          0.900 0.0357</code></pre>
 <p>Assumption of sphericity is automatically checked during the ANOVA
 test. Next, we’ll do the ANOVA test. The ANOVA shows a significant
 difference among distractor locations, F(1.74,34.86)=12.925,
@@ -543,8 +545,8 @@ p&lt;.001.</p>
 get_anova_table(res.aov)</code></pre>
 <pre><code>## ANOVA Table (type III tests)
 ## 
-##            Effect  DFn   DFd     F     p p&lt;.05   ges
-## 1 relative_target 2.18 43.51 2.198 0.119       0.005</code></pre>
+##            Effect DFn   DFd    F     p p&lt;.05   ges
+## 1 relative_target   2 40.09 2.05 0.142       0.006</code></pre>
 <p>I ran the ANOVA using base R as well because the rstatix package was
 giving me errors when running for accuracy data later on. The rstatix
 packages has a lot of requests and hasn’t been updated in years so I
@@ -555,22 +557,45 @@ summary(model)</code></pre>
 <pre><code>## 
 ## Error: factor(ID)
 ##           Df  Sum Sq Mean Sq F value Pr(&gt;F)
-## Residuals 20 1086156   54308               
+## Residuals 20 1081449   54072               
 ## 
 ## Error: Within
-##                         Df Sum Sq Mean Sq F value Pr(&gt;F)  
-## factor(relative_target)  3   5130  1709.9   2.198 0.0975 .
-## Residuals               60  46670   777.8                 
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+##                         Df Sum Sq Mean Sq F value Pr(&gt;F)
+## factor(relative_target)  3   6629    2210    2.05  0.116
+## Residuals               60  64684    1078</code></pre>
 <pre class="r"><code>model2 &lt;- aov_car(rts ~ relative_target + Error(ID/relative_target), data=space)
 
-model2</code></pre>
+summary(model2)</code></pre>
+<pre><code>## 
+## Univariate Type III Repeated-Measures ANOVA Assuming Sphericity
+## 
+##                   Sum Sq num Df Error SS den Df  F value Pr(&gt;F)    
+## (Intercept)     51400027      1  1081449     20 950.5772 &lt;2e-16 ***
+## relative_target     6629      3    64684     60   2.0495 0.1165    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## 
+## Mauchly Tests for Sphericity
+## 
+##                 Test statistic    p-value
+## relative_target        0.33078 0.00093538
+## 
+## 
+## Greenhouse-Geisser and Huynh-Feldt Corrections
+##  for Departure from Sphericity
+## 
+##                  GG eps Pr(&gt;F[GG])
+## relative_target 0.66819      0.142
+## 
+##                    HF eps Pr(&gt;F[HF])
+## relative_target 0.7427063  0.1359304</code></pre>
+<pre class="r"><code>model2</code></pre>
 <pre><code>## Anova Table (Type 3 tests)
 ## 
 ## Response: rts
 ##            Effect          df     MSE    F  ges p.value
-## 1 relative_target 2.18, 43.51 1072.62 2.20 .005    .119
+## 1 relative_target 2.00, 40.09 1613.42 2.05 .006    .142
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
@@ -595,28 +620,29 @@ sum_stats2</code></pre>
 <pre><code>## # A tibble: 2 × 7
 ##   relative_target mean_rts sd_rt  n_rt    se upper_limit lower_limit
 ##   &lt;fct&gt;              &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
-## 1 high_prob           795.  120.    21  26.1        821.        769.
-## 2 low_prob            778.  117.    21  25.6        803.        752.</code></pre>
+## 1 high_prob           797.  120.    21  26.2        823.        771.
+## 2 low_prob            777.  117.    21  25.6        803.        752.</code></pre>
 <p>Determine if the difference between response times when the target is
-in the high-probabilty vs. low-probability locations is significant.</p>
+in the high-probability vs. low-probability locations is
+significant.</p>
 <pre class="r"><code>t.test(x=space_anova$high_prob, y=space_anova$low_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95)</code></pre>
 <pre><code>## 
 ##  Paired t-test
 ## 
 ## data:  space_anova$high_prob and space_anova$low_prob
-## t = 1.9136, df = 20, p-value = 0.03504
+## t = 1.8799, df = 20, p-value = 0.03738
 ## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
-##  1.688679      Inf
+##  1.619941      Inf
 ## sample estimates:
 ## mean difference 
-##        17.10478</code></pre>
-<pre class="r"><code>result&lt;- 0.035</code></pre>
+##        19.62472</code></pre>
+<pre class="r"><code>result&lt;- 0.037</code></pre>
 <pre class="r"><code>#Make df for adding the p-value 
 p_val&lt;- data.frame(
   group_1=&quot;high_prob&quot;,
   group_2=&quot;low_prob&quot;,
-  label=result,
+  label=&quot;*&quot;,
   y.position=900
 )</code></pre>
 <p>This figure displays the mean response times depending on the
@@ -630,7 +656,7 @@ chose those particular colors based on Wake Forest’s color scheme.</p>
   add_pvalue(p_val,
              xmin = &quot;group_1&quot;,
              xmax = &quot;group_2&quot;,
-             label = &quot;p = {label}&quot;,
+             label = &quot;{label}&quot;,
              y.position = &quot;y.position&quot;,
              label.size = 7,
              bracket.size = 1) +
@@ -657,13 +683,13 @@ space_half %&gt;%
 ##  Paired t-test
 ## 
 ## data:  space_half$high_prob and space_half$low_prob
-## t = 1.014, df = 20, p-value = 0.1613
+## t = 1.0802, df = 20, p-value = 0.1464
 ## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
-##  -8.682608       Inf
+##  -10.17031       Inf
 ## sample estimates:
 ## mean difference 
-##        12.38736</code></pre>
+##        17.04616</code></pre>
 <p>Examine the summary statistics for subset of data.</p>
 <pre class="r"><code>df_mod2 &lt;- subset(space_half, select=c(ID, high_prob, low_prob))
 df_mod2 &lt;- reshape2::melt(df_mod2, id.var=c(&#39;ID&#39;), variable.name= &quot;relative_target&quot;)
@@ -681,8 +707,8 @@ sum_stats3</code></pre>
 <pre><code>## # A tibble: 2 × 7
 ##   relative_target mean_rts sd_rt  n_rt    se upper_limit lower_limit
 ##   &lt;fct&gt;              &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
-## 1 high_prob           850.  138.    21  30.1        880.        820.
-## 2 low_prob            838.  137.    21  29.9        868.        808.</code></pre>
+## 1 high_prob           853.  142.    21  31.0        884.        822.
+## 2 low_prob            836.  137.    21  30.0        866.        806.</code></pre>
 </div>
 <div id="distractor-and-target-location-effects-on-accuracy"
 class="section level3">
@@ -713,8 +739,11 @@ pilot_targacc &lt;- pilot %&gt;%
   theme_classic()+
   labs(x = &quot;Distractor Location Relative to High-probability Distractor Location&quot;, y = &quot;Accuracy (%)&quot;)+
   labs(title = &quot;Distractor Location Effect on Accuracy&quot;)+
-  labs(caption = &quot;An ANOVA test shows a difference in accuracy depending on distractor location, F(4,80)=3.24, p=.016.&quot;)</code></pre>
-<p><img src="p02_files/figure-html/-%20graph%20distractor%20location%20effects%20on%20accuracy-1.png" width="672" /></p>
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face=&quot;bold&quot;),
+        title = element_text(size = 16))+
+  scale_x_discrete(labels= c(&quot;no_dist&quot;=&quot;no-dist&quot;,&quot;dist_0&quot;=&quot;dist-0&quot;,&quot;dist_1&quot;=&quot;dist-1&quot;,&quot;dist_2&quot;=&quot;dist-2&quot;,&quot;dist_3&quot;=&quot;dist-3&quot;))</code></pre>
+<p><img src="p02_files/figure-html/-%20graph%20distractor%20location%20effects%20on%20accuracy-1.png" width="576" /></p>
 <pre class="r"><code>ggplot(data = pilot_targacc, aes(x = relative_target, y = accuracy)) +
   geom_bar(stat = &quot;identity&quot;, fill=&quot;#9E7E38&quot;, color=&#39;#000000&#39;) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
@@ -722,8 +751,11 @@ pilot_targacc &lt;- pilot %&gt;%
   theme_classic()+
   labs(x = &quot;Target Location Relative to High-probability Distractor Location&quot;, y = &quot;Accuracy (%)&quot;)+
   labs(title = &quot;Target Location Effect on Accuracy&quot;)+
-  labs(caption = &quot;An ANOVA test shows a difference in accuracy depending on target location, F(3,60)=4.55, p=.006.&quot;)</code></pre>
-<p><img src="p02_files/figure-html/-%20graph%20target%20location%20effects%20on%20accuracy-1.png" width="672" /></p>
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face=&quot;bold&quot;),
+        title = element_text(size = 16))+
+  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;dist-0&quot;,&quot;lp_1&quot;=&quot;dist-1&quot;,&quot;lp_2&quot;=&quot;dist-2&quot;,&quot;lp_3&quot;=&quot;dist-3&quot;))</code></pre>
+<p><img src="p02_files/figure-html/-%20graph%20target%20location%20effects%20on%20accuracy-1.png" width="576" /></p>
 <pre class="r"><code>pilot_dist &lt;- pilot %&gt;%
   group_by(ID, relative_hp_dist) %&gt;%
   summarize(accuracy = mean(acc)
