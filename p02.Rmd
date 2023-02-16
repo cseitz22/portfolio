@@ -110,15 +110,18 @@ stds <- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173,
 
 Trim the data and compute the percent trimmed
 ```{r trimming}
-trimmed <- pilot[pilot$acc==100, ] %>% group_by(ID, relative_hp_dist) %>%
+add
+
+trimmed <- pilot[pilot$acc==100,] %>% 
+  group_by(ID, relative_target) %>%
            mutate(sdc = ifelse(length(RT)>=100,2.5,approx(xsize,stds,xout=length(RT))$y), avg = mean(RT), stdev = sd(RT)) %>%
            filter(RT <= sdc*stdev+avg & RT >=avg-(sdc*stdev) & RT >=.200) %>%
            select(ID, relative_hp_dist, RT, block_num, relative_target) %>%
            as.data.frame()
 
 
-statPrep <- trimmed %>% group_by(ID, relative_hp_dist) %>% summarise(measurement=mean(RT)) %>% as.data.frame()
-100-(nrow(trimmed)/nrow(pilot[pilot$acc==100, ]))*100
+statPrep <- trimmed %>% group_by(ID, relative_target) %>% summarise(measurement=mean(RT)) %>% as.data.frame()
+100-(nrow(trimmed)/nrow(pilot[pilot$acc==100 && pilot$relative_hp_dist=="no_dist",]))*100
 ```
 Again, trimmed 2.51% of trials. 
 
@@ -240,6 +243,7 @@ summary(model)
 
 model2 <- aov_car(rts ~ relative_target + Error(ID/relative_target), data=space)
 
+summary(model2)
 model2
 
 
@@ -290,7 +294,7 @@ result<- 0.035
 p_val<- data.frame(
   group_1="high_prob",
   group_2="low_prob",
-  label=result,
+  label="*",
   y.position=900
 )
 
@@ -308,7 +312,7 @@ ggplot(data = sum_stats2, aes(x = relative_target, y = mean_rts)) +
   add_pvalue(p_val,
              xmin = "group_1",
              xmax = "group_2",
-             label = "p = {label}",
+             label = "{label}",
              y.position = "y.position",
              label.size = 7,
              bracket.size = 1) +

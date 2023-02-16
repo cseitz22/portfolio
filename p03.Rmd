@@ -1,5 +1,91 @@
 ---
 title: "Portfolio 3"
+name: "Cat Seitz"
+date: "2.16.2023"
+data: "Web Scraping Rotten Tomatoes"
+output: 
+  html_document: 
+    theme: cerulean
 ---
 
+
+```{r load-packages, message=FALSE}
+library(tidyverse) 
+library(tidyr)
+library(rvest)
+library(httr)
+```
+
+Goal:
+Product: 
+Data: 
+Interpretation: 
+
 > The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
+
+
+```{r check-allowed}
+
+library(robotstxt)
+paths_allowed("http://www.usnews.com")
+
+```
+
+```{r read-page}
+
+url<-"https://www.usnews.com/news/best-states/rankings"
+
+
+page <- read_html(url)
+
+page
+
+
+```
+
+```{r test}
+
+page %>% 
+    html_nodes("._h3_cuogz_1")
+
+
+```
+
+
+```{r try_this}
+
+page <- read_html("http://www.imdb.com/chart/top")
+
+
+titles <- page %>%
+  html_nodes(".titleColumn a") %>%
+  html_text()
+
+# Years -----------------------------------------------------------------------
+years <- page %>%
+  html_nodes(".secondaryInfo") %>%
+  html_text() %>%
+  str_remove("\\(") %>% # remove (
+  str_remove("\\)") %>% # remove )
+  as.numeric()
+
+# Scores ----------------------------------------------------------------------
+scores <- page %>%
+  html_nodes("#main strong") %>%
+  html_text() %>%
+  as.numeric()
+
+# Create data frame -----------------------------------------------------------
+imdb_top_250 <- tibble(
+  title = titles, 
+  year = years, 
+  score = scores
+)
+
+```
+
+
+
+
+
+
