@@ -448,6 +448,7 @@ pilot_targ
 
 ```
 
+
 ```{r anova_distractor_accuracy}
 
 model = aov(accuracy~factor(relative_hp_dist)+
@@ -477,6 +478,36 @@ summary(model)
 model2 <- aov_car(accuracy ~ relative_target + Error(ID/relative_target), data=pilot_targ)
 
 model2
+
+
+```
+
+Create df and do t-test for HP and average of LP locations. 
+
+```{r t-test-target-acc}
+
+targ_t <- setDT(pilot_targ)
+targ_t <- dcast(pilot_targ,ID~relative_target,value.var='accuracy')
+
+targ_t <- targ_t %>%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+targ_t %>%
+  t.test(x=targ_t$low_prob, y=targ_t$high_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
+
+
+```
+
+```{r t-test-distractor-acc}
+
+dist_t <- setDT(pilot_dist)
+dist_t <- dcast(pilot_dist,ID~relative_hp_dist,value.var='accuracy')
+
+dist_t <- dist_t %>%
+  mutate(low_prob = (dist_1+dist_2+dist_3)/3)
+
+dist_t %>%
+  t.test(x=dist_t$dist_0, y=dist_t$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
 
 
 ```

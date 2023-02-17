@@ -453,8 +453,8 @@ ggplot(data = space2,aes(x=block_num, y=rts))+
 
 model4 <- aov_car(difference ~ block_num + Error(ID/block_num), data=space_block)
 
+summary(model4)
 model4
-
 
 ```
 
