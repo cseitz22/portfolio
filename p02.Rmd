@@ -511,7 +511,28 @@ dist_t %>%
 
 
 ```
+Running ANOVA on high-prob, low-prob, and distractor absent trials. 
 
+```{r create-usable-df}
+
+df_mod <- subset(dist_t, select=c(ID, no_dist, dist_0, low_prob))
+
+df_mod <- reshape2::melt(df_mod, id.var=c('ID'), variable.name= "relative_hp_dist")
+
+#run the ANOVA
+
+anova_dist <- aov_car(value ~ relative_hp_dist + Error(ID/relative_hp_dist), data=df_mod)
+
+anova_dist
+
+
+```
+
+
+```
+
+
+Examining only some of the block of trials. 
 
 ```{r half_data}
 df3 <- subset(pilot,block_num!='7')

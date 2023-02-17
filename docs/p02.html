@@ -850,6 +850,45 @@ model2</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
 ## Sphericity correction method: GG</code></pre>
+<p>Create df and do t-test for HP and average of LP locations.</p>
+<pre class="r"><code>targ_t &lt;- setDT(pilot_targ)
+targ_t &lt;- dcast(pilot_targ,ID~relative_target,value.var=&#39;accuracy&#39;)
+
+targ_t &lt;- targ_t %&gt;%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+targ_t %&gt;%
+  t.test(x=targ_t$low_prob, y=targ_t$high_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  targ_t$low_prob and targ_t$high_prob
+## t = 1.2922, df = 20, p-value = 0.1055
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  -0.2324223        Inf
+## sample estimates:
+## mean difference 
+##       0.6944444</code></pre>
+<pre class="r"><code>dist_t &lt;- setDT(pilot_dist)
+dist_t &lt;- dcast(pilot_dist,ID~relative_hp_dist,value.var=&#39;accuracy&#39;)
+
+dist_t &lt;- dist_t %&gt;%
+  mutate(low_prob = (dist_1+dist_2+dist_3)/3)
+
+dist_t %&gt;%
+  t.test(x=dist_t$dist_0, y=dist_t$low_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  dist_t$dist_0 and dist_t$low_prob
+## t = 2.1259, df = 20, p-value = 0.02308
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  0.2579158       Inf
+## sample estimates:
+## mean difference 
+##        1.366686</code></pre>
 <pre class="r"><code>df3 &lt;- subset(pilot,block_num!=&#39;7&#39;)
 df3 &lt;- subset(df3,block_num!=&#39;8&#39;)
 df3 &lt;- subset(df3,block_num!=&#39;5&#39;)

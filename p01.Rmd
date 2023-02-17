@@ -211,7 +211,7 @@ model2
 ```
 
 
-Test whether the high-prob location and the average across low-prob locations were significantly different. Using a paired samples t-test, I found that the response times for when the distractor was presented in the high-probability location compared to the average response time across the low-probability locations was significantly different (t(20)=4.95, p<.001). I also examined whether there were significant differences between the high-prob and distractor absent conditions and th elow-prob and distractor absent conditions, using paired samples t-tests. All were significantly different with a p of <.001. 
+Test whether the high-prob location and the average across low-prob locations were significantly different. Using a paired samples t-test, I found that the response times for when the distractor was presented in the high-probability location compared to the average response time across the low-probability locations was significantly different (t(20)=4.95, p<.001). I also examined whether there were significant differences between the high-prob and distractor absent conditions and the low-prob and distractor absent conditions, using paired samples t-tests. All were significantly different with a p of <.001. 
 
 ```{r set up data for t-test for high and low conditions only}
 
