@@ -434,11 +434,27 @@ space2 <- space_block %>%
 
 ```
 
-```{r line_plot_avg}
+```{r line_plot_avg, fig.height=4, fig.width=12}
 ggplot(data = space2,aes(x=block_num, y=rts))+
   geom_line()+
   geom_point()+
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  labs(title = "Average Difference in Response Times By Block", subtitle = "for distractor presentation at the low-probability locations and high-probability location", x="Block number", y="Difference in RT (ms)")
+  labs(title = "Singleton Distractor Present")+
+  xlab("Block number")+
+  ylab(expression(atop("Suppression effect (ms)", paste("(high prob. - low prob.)"))))+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=14,face="bold"),
+        title = element_text(size = 16))
 
 ```
+
+
+```{r anova_test_by_block}
+
+model4 <- aov_car(difference ~ block_num + Error(ID/block_num), data=space_block)
+
+model4
+
+
+```
+

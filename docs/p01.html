@@ -778,8 +778,25 @@ is likely to appear.</p>
   geom_line()+
   geom_point()+
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  labs(title = &quot;Average Difference in Response Times By Block&quot;, subtitle = &quot;for distractor presentation at the low-probability locations and high-probability location&quot;, x=&quot;Block number&quot;, y=&quot;Difference in RT (ms)&quot;)</code></pre>
-<p><img src="p01_files/figure-html/line_plot_avg-1.png" width="672" /></p>
+  labs(title = &quot;Singleton Distractor Present&quot;)+
+  xlab(&quot;Block number&quot;)+
+  ylab(expression(atop(&quot;Suppression effect (ms)&quot;, paste(&quot;(high prob. - low prob.)&quot;))))+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=14,face=&quot;bold&quot;),
+        title = element_text(size = 16))</code></pre>
+<p><img src="p01_files/figure-html/line_plot_avg-1.png" width="1152" /></p>
+<pre class="r"><code>model4 &lt;- aov_car(difference ~ block_num + Error(ID/block_num), data=space_block)
+
+model4</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: difference
+##      Effect           df      MSE    F  ges p.value
+## 1 block_num 5.15, 103.07 10849.67 0.41 .015    .847
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
 </div>
 
 
