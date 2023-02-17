@@ -306,7 +306,8 @@ library(emmeans)
 library(psych)
 library(ggprism)
 library(patchwork)
-library(magrittr)</code></pre>
+library(magrittr)
+library(cowplot)</code></pre>
 <p>The data used is from a visual search task in which participants are
 searching for a unique item in an array of six items and press a button
 to indicate whether the item is facing right or left. On 50% of trials,
@@ -385,20 +386,19 @@ sum_stats</code></pre>
 <p>This figure displays the mean response times depending on the
 location of the distractor relative to the high probability location. I
 chose those particular colors based on Wake Forest’s color scheme.</p>
-<pre class="r"><code>ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
+<pre class="r"><code>a&lt;-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
   #geom_point()+
   geom_bar(stat = &quot;identity&quot;, fill=&quot;#9E7E38&quot;, color=&#39;#000000&#39;) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(700,1050))+
   theme_classic()+
   labs(x = &quot;Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
-  labs(title = &quot;Distractor Location Effect on RT&quot;)+
+  labs(title = &quot;Singleton Distractor Present&quot;)+
   #labs(caption = &quot;An ANOVA test shows a difference in RT depending on distractor location, F(3.28,65.57)=33.3, p&lt;.001.&quot;)+
-  theme(axis.text=element_text(size=12),
-        axis.title=element_text(size=14,face=&quot;bold&quot;),
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=16,face=&quot;bold&quot;),
         title = element_text(size = 20))+
   scale_x_discrete(labels= c(&quot;no_dist&quot;=&quot;no-dist&quot;,&quot;dist_0&quot;=&quot;dist-0&quot;,&quot;dist_1&quot;=&quot;dist-1&quot;,&quot;dist_2&quot;=&quot;dist-2&quot;,&quot;dist_3&quot;=&quot;dist-3&quot;))</code></pre>
-<p><img src="p01_files/figure-html/-%20graph%201%20-%20distractor%20location%20effect%20on%20rt-1.png" width="672" /></p>
 <p>Create a new data frame with the average RT for each relative
 distractor location per participant, so we can do a repeated measures
 ANOVA.</p>
@@ -688,6 +688,30 @@ model3</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
 ## Sphericity correction method: GG</code></pre>
+<p>Combine graphs of rt and accuracy for NC Cog Poster.</p>
+<pre class="r"><code>pilot_distacc &lt;- pilot %&gt;%
+  group_by(relative_hp_dist) %&gt;%
+  summarize(accuracy = mean(acc),
+            sd_rt=sd(acc),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=accuracy+se,
+            lower_limit=accuracy-se
+            )
+
+b&lt;-ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy)) +
+  geom_bar(stat = &quot;identity&quot;, fill=&quot;#9E7E38&quot;, color=&#39;#000000&#39;) +
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(85,105))+
+  theme_classic()+
+  labs(x = &quot;Distractor Location&quot;, y = &quot;Accuracy (%)&quot;)+
+  #labs(title = &quot;Distractor Location Effect on Accuracy&quot;)+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=16,face=&quot;bold&quot;),
+        title = element_text(size = 16))+
+  scale_x_discrete(labels= c(&quot;no_dist&quot;=&quot;no-dist&quot;,&quot;dist_0&quot;=&quot;dist-0&quot;,&quot;dist_1&quot;=&quot;dist-1&quot;,&quot;dist_2&quot;=&quot;dist-2&quot;,&quot;dist_3&quot;=&quot;dist-3&quot;))</code></pre>
+<pre class="r"><code>plot_grid(a,b,labels = c(&#39;A&#39;,&#39;B&#39;), label_size=16, rel_widths = c(2,1))</code></pre>
+<p><img src="p01_files/figure-html/dist_2-plots-1.png" width="1536" /></p>
 </div>
 <div id="examine-block-by-block-learning-of-distractor-location"
 class="section level3">

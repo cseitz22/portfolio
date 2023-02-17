@@ -306,7 +306,8 @@ library(psych)
 library(ggsignif)
 library(ggprism)
 library(patchwork)
-library(magrittr)</code></pre>
+library(magrittr)
+library(cowplot)</code></pre>
 <p>The data used is from a visual search task in which participants are
 searching for a unique item in an array of six items and press a button
 to indicate whether the item is facing right or left. On 50% of trials,
@@ -433,18 +434,17 @@ target_means</code></pre>
 location of the target relative to the high probability location of the
 distractor. I chose those particular colors based on Wake Forest’s color
 scheme.</p>
-<pre class="r"><code>ggplot(data = target_means, aes(x = relative_target, y = mean_rts)) +
+<pre class="r"><code>c&lt;-ggplot(data = target_means, aes(x = relative_target, y = mean_rts)) +
   geom_bar(stat = &quot;identity&quot;, fill=&quot;#9E7E38&quot;, color=&#39;#000000&#39;) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(700,1000))+
   theme_classic()+
-  labs(x = &quot;Target Location Relative to High-probability Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
-  labs(title = &quot;Target Location Effect on RT&quot;)+
-  theme(axis.text=element_text(size=12),
-    axis.title=element_text(size=14,face=&quot;bold&quot;),
-    title = element_text(size = 20))+
+  labs(x = &quot;Target Location&quot;, y = &quot;Response Time (ms)&quot;)+
+  labs(title = &quot;Singleton Distractor Absent&quot;)+
+  theme(axis.text=element_text(size=14),
+    axis.title=element_text(size=16,face=&quot;bold&quot;),
+    title = element_text(size = 24))+
   scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;dist-0&quot;,&quot;lp_1&quot;=&quot;dist-1&quot;, &quot;lp_2&quot;=&quot;dist-2&quot;, &quot;lp_3&quot;=&quot;dist-3&quot;))</code></pre>
-<p><img src="p02_files/figure-html/-%20graph%201%20-%20distractor%20location%20effect%20on%20rt-1.png" width="672" /></p>
 <pre class="r"><code>df2 &lt;- subset(trimmed,block_num!=&#39;7&#39; &amp; relative_hp_dist==&quot;no_dist&quot;)
 df2 &lt;- subset(df2,block_num!=&#39;8&#39;)
 df2 &lt;- subset(df2,block_num!=&#39;5&#39;)
@@ -737,25 +737,24 @@ pilot_targacc &lt;- pilot %&gt;%
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(85,105))+
   theme_classic()+
-  labs(x = &quot;Distractor Location Relative to High-probability Distractor Location&quot;, y = &quot;Accuracy (%)&quot;)+
-  labs(title = &quot;Distractor Location Effect on Accuracy&quot;)+
-  theme(axis.text=element_text(size=12),
-        axis.title=element_text(size=12,face=&quot;bold&quot;),
+  labs(x = &quot;Distractor Location&quot;, y = &quot;Accuracy (%)&quot;)+
+  #labs(title = &quot;Distractor Location Effect on Accuracy&quot;)+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=16,face=&quot;bold&quot;),
         title = element_text(size = 16))+
   scale_x_discrete(labels= c(&quot;no_dist&quot;=&quot;no-dist&quot;,&quot;dist_0&quot;=&quot;dist-0&quot;,&quot;dist_1&quot;=&quot;dist-1&quot;,&quot;dist_2&quot;=&quot;dist-2&quot;,&quot;dist_3&quot;=&quot;dist-3&quot;))</code></pre>
 <p><img src="p02_files/figure-html/-%20graph%20distractor%20location%20effects%20on%20accuracy-1.png" width="576" /></p>
-<pre class="r"><code>ggplot(data = pilot_targacc, aes(x = relative_target, y = accuracy)) +
+<pre class="r"><code>d&lt;-ggplot(data = pilot_targacc, aes(x = relative_target, y = accuracy)) +
   geom_bar(stat = &quot;identity&quot;, fill=&quot;#9E7E38&quot;, color=&#39;#000000&#39;) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(85,105))+
   theme_classic()+
-  labs(x = &quot;Target Location Relative to High-probability Distractor Location&quot;, y = &quot;Accuracy (%)&quot;)+
-  labs(title = &quot;Target Location Effect on Accuracy&quot;)+
-  theme(axis.text=element_text(size=12),
-        axis.title=element_text(size=12,face=&quot;bold&quot;),
+  labs(x = &quot;Target Location&quot;, y = &quot;Accuracy (%)&quot;)+
+  #labs(title = &quot;Target Location Effect on Accuracy&quot;)+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=16,face=&quot;bold&quot;),
         title = element_text(size = 16))+
   scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;dist-0&quot;,&quot;lp_1&quot;=&quot;dist-1&quot;,&quot;lp_2&quot;=&quot;dist-2&quot;,&quot;lp_3&quot;=&quot;dist-3&quot;))</code></pre>
-<p><img src="p02_files/figure-html/-%20graph%20target%20location%20effects%20on%20accuracy-1.png" width="576" /></p>
 <pre class="r"><code>pilot_dist &lt;- pilot %&gt;%
   group_by(ID, relative_hp_dist) %&gt;%
   summarize(accuracy = mean(acc)
@@ -888,6 +887,9 @@ df3 &lt;- subset(df3,block_num!=&#39;6&#39;)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
 ## Sphericity correction method: GG</code></pre>
+<p>Created the below plot for NC Cognition Poster.</p>
+<pre class="r"><code>plot_grid(c,d,labels = c(&#39;A&#39;,&#39;B&#39;), label_size=16, rel_widths = c(2,1))</code></pre>
+<p><img src="p02_files/figure-html/join-2-figures-1.png" width="1536" /></p>
 </div>
 
 

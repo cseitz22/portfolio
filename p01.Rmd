@@ -20,6 +20,7 @@ library(psych)
 library(ggprism)
 library(patchwork)
 library(magrittr)
+library(cowplot)
 ```
 
 The data used is from a visual search task in which participants are searching for a unique item in an array of six items and press a button to indicate whether the item is facing right or left. On 50% of trials, a salient, color distractor is present in the array. On 67% of distractor present trials, the distractor appears in the same location in the array with an equal number of trials in the other 5 locations. This study is testing whether adults can learn to suppress their attention to the high-probabilty location of the distractor. 
@@ -103,17 +104,17 @@ This figure displays the mean response times depending on the location of the di
 
 
 ```{r - graph 1 - distractor location effect on rt}
-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
+a<-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
   #geom_point()+
   geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(700,1050))+
   theme_classic()+
   labs(x = "Distractor Location", y = "Response Time (ms)")+
-  labs(title = "Distractor Location Effect on RT")+
+  labs(title = "Singleton Distractor Present")+
   #labs(caption = "An ANOVA test shows a difference in RT depending on distractor location, F(3.28,65.57)=33.3, p<.001.")+
-  theme(axis.text=element_text(size=12),
-        axis.title=element_text(size=14,face="bold"),
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=16,face="bold"),
         title = element_text(size = 20))+
   scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
   
@@ -335,6 +336,41 @@ model3 <- aov_car(value ~ relative_hp_dist + Error(ID/relative_hp_dist), data=df
 
 model3
 
+
+```
+
+Combine graphs of rt and accuracy for NC Cog Poster.
+
+```{r create_accuracy_df}
+
+pilot_distacc <- pilot %>%
+  group_by(relative_hp_dist) %>%
+  summarize(accuracy = mean(acc),
+            sd_rt=sd(acc),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=accuracy+se,
+            lower_limit=accuracy-se
+            )
+
+b<-ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy)) +
+  geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(85,105))+
+  theme_classic()+
+  labs(x = "Distractor Location", y = "Accuracy (%)")+
+  #labs(title = "Distractor Location Effect on Accuracy")+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=16,face="bold"),
+        title = element_text(size = 16))+
+  scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
+
+
+```
+
+```{r dist_2-plots, fig.height=8, fig.width=16}
+
+plot_grid(a,b,labels = c('A','B'), label_size=16, rel_widths = c(2,1))
 
 ```
 

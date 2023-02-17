@@ -17,6 +17,7 @@ library(ggsignif)
 library(ggprism)
 library(patchwork)
 library(magrittr)
+library(cowplot)
 ```
 
 The data used is from a visual search task in which participants are searching for a unique item in an array of six items and press a button to indicate whether the item is facing right or left. On 50% of trials, a salient, color distractor is present in the array. On 67% of distractor present trials, the distractor appears in the same location in the array with an equal number of trials in the other 5 locations. This study is testing whether adults can learn to suppress their attention to the high-probabilty location of the distractor. 
@@ -148,17 +149,17 @@ target_means
 This figure displays the mean response times depending on the location of the target relative to the high probability location of the distractor. I chose those particular colors based on Wake Forest's color scheme. 
 
 
-```{r - graph 1 - distractor location effect on rt}
-ggplot(data = target_means, aes(x = relative_target, y = mean_rts)) +
+```{r - graph 1 - distractor location effect on rt, fig.height=9, fig.width=12}
+c<-ggplot(data = target_means, aes(x = relative_target, y = mean_rts)) +
   geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(700,1000))+
   theme_classic()+
-  labs(x = "Target Location Relative to High-probability Distractor Location", y = "Response Time (ms)")+
-  labs(title = "Target Location Effect on RT")+
-  theme(axis.text=element_text(size=12),
-    axis.title=element_text(size=14,face="bold"),
-    title = element_text(size = 20))+
+  labs(x = "Target Location", y = "Response Time (ms)")+
+  labs(title = "Singleton Distractor Absent")+
+  theme(axis.text=element_text(size=14),
+    axis.title=element_text(size=16,face="bold"),
+    title = element_text(size = 24))+
   scale_x_discrete(labels= c("high_prob"="dist-0","lp_1"="dist-1", "lp_2"="dist-2", "lp_3"="dist-3"))
   
 ```
@@ -402,25 +403,25 @@ ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy)) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(85,105))+
   theme_classic()+
-  labs(x = "Distractor Location Relative to High-probability Distractor Location", y = "Accuracy (%)")+
-  labs(title = "Distractor Location Effect on Accuracy")+
-  theme(axis.text=element_text(size=12),
-        axis.title=element_text(size=12,face="bold"),
+  labs(x = "Distractor Location", y = "Accuracy (%)")+
+  #labs(title = "Distractor Location Effect on Accuracy")+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=16,face="bold"),
         title = element_text(size = 16))+
   scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
   
 ```
 
 ```{r - graph target location effects on accuracy, fig.height=9, fig.width=6}
-ggplot(data = pilot_targacc, aes(x = relative_target, y = accuracy)) +
+d<-ggplot(data = pilot_targacc, aes(x = relative_target, y = accuracy)) +
   geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(85,105))+
   theme_classic()+
-  labs(x = "Target Location Relative to High-probability Distractor Location", y = "Accuracy (%)")+
-  labs(title = "Target Location Effect on Accuracy")+
-  theme(axis.text=element_text(size=12),
-        axis.title=element_text(size=12,face="bold"),
+  labs(x = "Target Location", y = "Accuracy (%)")+
+  #labs(title = "Target Location Effect on Accuracy")+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=16,face="bold"),
         title = element_text(size = 16))+
   scale_x_discrete(labels= c("high_prob"="dist-0","lp_1"="dist-1","lp_2"="dist-2","lp_3"="dist-3"))
   
@@ -526,4 +527,17 @@ aov_car(accuracy ~ relative_target + Error(ID/relative_target), data=pilot_targ3
 
 
 ```
+
+Created the below plot for NC Cognition Poster. 
+
+```{r join-2-figures, fig.height=8, fig.width=16}
+
+plot_grid(c,d,labels = c('A','B'), label_size=16, rel_widths = c(2,1))
+
+
+```
+
+
+
+
 
