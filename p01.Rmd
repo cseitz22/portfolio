@@ -115,7 +115,7 @@ a<-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
   #labs(caption = "An ANOVA test shows a difference in RT depending on distractor location, F(3.28,65.57)=33.3, p<.001.")+
   theme(axis.text=element_text(size=14),
         axis.title=element_text(size=16,face="bold"),
-        title = element_text(size = 20))+
+        title = element_text(size = 24))+
   scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
   
 ```
