@@ -14,14 +14,14 @@ library(tidyverse)
 library(tidyr)
 library(rvest)
 library(httr)
+library(usmap)
 ```
 
 Goal: Webscrape data from usnews about US state rankings and scores in certain departments. 
-Product: 
+Product: Create interactive plot, where the user can hover and see data for whatever state. 
 Data: State rankings
 Interpretation: 
 
-> The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
 
 First, check to see if we are allowed to pull data from that website. 
 
@@ -38,9 +38,9 @@ Read the url.
 url<-"https://www.usnews.com/news/best-states/rankings"
 
 
-page <- read_html(url)
+#page <- read_html(url)
 
-page
+#page
 
 
 ```
@@ -49,8 +49,8 @@ Pull the data I want. This did not work and the website wasn't really set up wel
 
 ```{r test}
 
-page %>% 
-    html_nodes("._h3_cuogz_1")
+#page %>% 
+    #html_nodes("._h3_cuogz_1")
 
 
 ```
@@ -69,11 +69,44 @@ Let's total the scores in the 8 variables and see how the states stack up across
 ```{r total-variables}
 
 ranks<-ranks %>%
-  mutate(Total = select(., Health_care:Natural_environment) %>% 
+  mutate(Total = select(., health_care:natural_environment) %>% 
            rowSums(na.rm = TRUE))
 ```
 
-On first glance, these totals are roughly the same as the overall rankings with higher totals receiving higher rankings. 
+On first glance, these totals are roughly the same as the overall rankings with higher totals receiving higher rankings, so it doesn't seem useful to review the overall rankings. 
+
+```{r create-df-for-plot}
+
+state_ranks <- ranks[,c("state", "rank")]
+  
+
+```
+
+
+```{r basic-rankings-plot}
+
+plot_usmap(data=state_ranks, values = "rank")+
+  labs(title = "Overall State Rankings",
+       caption = "Darker colors are for higher ranks.")
+
+```
+
+
+
+```{r }
+
+
+
+```
+
+
+
+
+
+
+
+
+
 
 
 
