@@ -368,7 +368,7 @@ b<-ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy)) +
 
 ```
 
-```{r dist_2-plots, fig.height=8, fig.width=16} 
+```{r dist_2-plots, fig.height=11, fig.width=22} 
 #
 plot_grid(a,b,labels = c('A','B'), label_size=20, rel_widths = c(2,1))
   
