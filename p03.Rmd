@@ -22,7 +22,7 @@ library(sf)
 Goal: Webscrape data from usnews about US state rankings and scores in certain departments. 
 Product: Create interactive plot, where the user can hover and see data for whatever state. 
 Data: State rankings
-Interpretation: 
+Interpretation: Washington state is clearly the best state, but most others can vary greatly in what they excel at and what they need to work on. 
 
 
 First, check to see if we are allowed to pull data from that website. 
@@ -47,7 +47,7 @@ url<-"https://www.usnews.com/news/best-states/rankings"
 
 ```
 
-Pull the data I want. This did not work and the website wasn't really set up well to use the selector gadget. When trying to select the data I wanted, the whole page would highlight instead and I couldn't grab just the important data. Instead, the website seems like i could just copy/paste into a csv and import to R that way. 
+Pull the data I want. This did not work and the website wasn't really set up well to use the selector gadget. When trying to select the data I wanted, the whole page would highlight instead and I couldn't grab just the important data. Instead, the website seems like I could just copy/paste into a csv and import to R that way. 
 
 ```{r test}
 
@@ -88,8 +88,10 @@ state_ranks <- ranks[,c("state", "rank")]
 ```{r basic-rankings-plot}
 
 p<-plot_usmap(data=state_ranks, values = "rank")+
+  scale_fill_continuous(
+    low = "white", high = "hotpink", name = "Education Rank")+
   labs(title = "Overall State Rankings",
-       caption = "Darker colors are for higher ranks.")
+       caption = "Lighter colors are for higher ranks.")
 
 ```
 
@@ -240,6 +242,51 @@ subplot(a,b,c,d,e,f,g,h, nrows=4)%>%
   
 
 ```
+
+Create code that will return the top state in each category. 
+
+```{r top-states}
+
+ranks$state[ranks$health_care==1]
+ranks$state[ranks$education==1]
+ranks$state[ranks$economy==1]
+ranks$state[ranks$infrastructure==1]
+ranks$state[ranks$opportunity==1]
+ranks$state[ranks$fiscal_stability==1]
+ranks$state[ranks$crime_corrections==1]
+ranks$state[ranks$natural_environment==1]
+
+```
+
+```{r top-states--plot}
+
+z<-plot_usmap(include = c(ranks$state[ranks$health_care==1]), color="red", labels=TRUE)+
+  labs(title="First in Health Care")
+y<-plot_usmap(include = c(ranks$state[ranks$education==1]), color="orange", labels=TRUE)+
+  labs(title="First in Education")
+x<-plot_usmap(include = c(ranks$state[ranks$economy==1]), color="yellow", labels=TRUE)+
+  labs(title="First in Economy")
+w<-plot_usmap(include = c(ranks$state[ranks$infrastructure==1]), color="green", labels=TRUE)+
+  labs(title="First in Infrastructure")
+v<-plot_usmap(include = c(ranks$state[ranks$opportunity==1]), color="lightblue", labels=TRUE)+
+  labs(title="First in Opportunity")
+u<-plot_usmap(include = c(ranks$state[ranks$fiscal_stability==1]), color="blue", labels=TRUE)+
+  labs(title="First in Fiscal Stability")
+t<-plot_usmap(include = c(ranks$state[ranks$crime_corrections==1]), color="violet", labels=TRUE)+
+  labs(title="First in Crime & Corrections")
+s<-plot_usmap(include = c(ranks$state[ranks$natural_environment==1]), color="pink", labels=TRUE)+
+  labs(title="First in Natural Environment")
+
+```
+
+```{r plot-top-states}
+
+subplot(z,y,x,w,v,u,t,s, nrows=4)%>% 
+  layout(title = 'Top States in Each Category', annotations=annotations)
+
+
+```
+
 
 
 
