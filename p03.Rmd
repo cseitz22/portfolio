@@ -16,6 +16,7 @@ library(rvest)
 library(httr)
 library(usmap)
 library(plotly)
+library(sf)
 ```
 
 Goal: Webscrape data from usnews about US state rankings and scores in certain departments. 
@@ -86,7 +87,7 @@ state_ranks <- ranks[,c("state", "rank")]
 
 ```{r basic-rankings-plot}
 
-p<-plot_usmap(data=state_ranks, values = "rank")+
+p<-plot_usmap(data=state_ranks, values = "rank")
   labs(title = "Overall State Rankings",
        caption = "Darker colors are for higher ranks.")
 
@@ -98,11 +99,14 @@ ggplotly(p)
 
 ```
 
-```{r add-more-info-to-plots}
+```{r make-plot-prettier}
 
-z<-plot_usmap(data=ranks, values = "rank")+
-  labs(title = "Overall State Rankings",
-       caption = "Darker colors are for higher ranks.")
+z<-plot_usmap(data=ranks, values = "health_care", color="purple")+
+  labs(title = "State Rankings in Health Care",
+       caption = "Lighter colors are for higher ranks.")+ 
+  scale_fill_continuous(
+    low = "white", high = "purple", name = "Health Care Rank")+
+  theme(legend.position = "right")
 
 ggplotly(z)
 
