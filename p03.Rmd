@@ -15,6 +15,7 @@ library(tidyr)
 library(rvest)
 library(httr)
 library(usmap)
+library(plotly)
 ```
 
 Goal: Webscrape data from usnews about US state rankings and scores in certain departments. 
@@ -85,7 +86,7 @@ state_ranks <- ranks[,c("state", "rank")]
 
 ```{r basic-rankings-plot}
 
-plot_usmap(data=state_ranks, values = "rank")+
+p<-plot_usmap(data=state_ranks, values = "rank")+
   labs(title = "Overall State Rankings",
        caption = "Darker colors are for higher ranks.")
 
@@ -93,9 +94,9 @@ plot_usmap(data=state_ranks, values = "rank")+
 
 
 
-```{r }
+```{r make-plot-interactive}
 
-
+ggplotly(p)
 
 ```
 
