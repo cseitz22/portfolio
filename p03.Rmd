@@ -2,7 +2,7 @@
 title: "Portfolio 3"
 name: "Cat Seitz"
 date: "2.16.2023"
-data: "Web Scraping Rotten Tomatoes"
+data: "US News State Rankings"
 output: 
   html_document: 
     theme: cerulean
@@ -92,19 +92,21 @@ p<-plot_usmap(data=state_ranks, values = "rank")+
 
 ```
 
-
-
 ```{r make-plot-interactive}
 
 ggplotly(p)
 
 ```
 
+```{r add-more-info-to-plots}
 
+z<-plot_usmap(data=ranks, values = "rank")+
+  labs(title = "Overall State Rankings",
+       caption = "Darker colors are for higher ranks.")
 
+ggplotly(z)
 
-
-
+```
 
 
 
