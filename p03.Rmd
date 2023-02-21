@@ -87,7 +87,7 @@ state_ranks <- ranks[,c("state", "rank")]
 
 ```{r basic-rankings-plot}
 
-p<-plot_usmap(data=state_ranks, values = "rank")
+p<-plot_usmap(data=state_ranks, values = "rank")+
   labs(title = "Overall State Rankings",
        caption = "Darker colors are for higher ranks.")
 
@@ -99,25 +99,147 @@ ggplotly(p)
 
 ```
 
-```{r make-plot-prettier}
+```{r make-plot-for-each-variable}
 
-z<-plot_usmap(data=ranks, values = "health_care", color="purple")+
-  labs(title = "State Rankings in Health Care",
-       caption = "Lighter colors are for higher ranks.")+ 
+a<-plot_usmap(data=ranks, values = "health_care", color="red")+
   scale_fill_continuous(
-    low = "white", high = "purple", name = "Health Care Rank")+
-  theme(legend.position = "right")
+    low = "white", high = "red", name = "Health Care Rank")+
+  labs(title = "Health Care Rankings")
 
-ggplotly(z)
+b<-plot_usmap(data=ranks, values = "education", color="orange")+
+  scale_fill_continuous(
+    low = "white", high = "orange", name = "Education Rank")+
+  labs(title = "Education Rankings")
+
+c<-plot_usmap(data=ranks, values = "economy", color="yellow")+
+  scale_fill_continuous(
+    low = "white", high = "yellow", name = "Economy Rank")
+
+d<-plot_usmap(data=ranks, values = "infrastructure", color="green")+
+  scale_fill_continuous(
+    low = "white", high = "green", name = "Infrastructure Rank")
+
+e<-plot_usmap(data=ranks, values = "opportunity", color="lightblue")+
+  scale_fill_continuous(
+    low = "white", high = "lightblue", name = "Opportunity Rank")
+
+f<-plot_usmap(data=ranks, values = "fiscal_stability", color="blue")+
+  scale_fill_continuous(
+    low = "white", high = "blue", name = "Fiscal Stability Rank")
+
+g<-plot_usmap(data=ranks, values = "crime_corrections", color="violet")+
+  scale_fill_continuous(
+    low = "white", high = "violet", name = "Crime and Corrections Rank")
+
+h<-plot_usmap(data=ranks, values = "natural_environment", color="pink")+
+  scale_fill_continuous(
+    low = "white", high = "pink", name = "Natural Environment Rank")
+
 
 ```
 
 
+```{r make-interactive}
+a<-ggplotly(a)
+b<-ggplotly(b)
+c<-ggplotly(c)
+d<-ggplotly(d)
+e<-ggplotly(e)
+f<-ggplotly(f)
+g<-ggplotly(g)
+h<-ggplotly(h)
+```
 
 
+```{r big-interactive-plot-of-all-variables} 
+#
+annotations = list( 
+  list( 
+    x = 0.23,  
+    y = 1.0,  
+    text = "Health Care",  
+    xref = "paper",  
+    yref = "paper",  
+    xanchor = "center",  
+    yanchor = "bottom",  
+    showarrow = FALSE 
+  ),  
+  list( 
+    x = 0.75,  
+    y = 1,  
+    text = "Education",  
+    xref = "paper",  
+    yref = "paper",  
+    xanchor = "center",  
+    yanchor = "bottom",  
+    showarrow = FALSE 
+  ),  
+  list( 
+    x = 0.23,  
+    y = 0.73,  
+    text = "Economy",  
+    xref = "paper",  
+    yref = "paper",  
+    xanchor = "center",  
+    yanchor = "bottom",  
+    showarrow = FALSE 
+  ),
+  list( 
+    x = 0.75,  
+    y = 0.73,  
+    text = "Infrastructure",  
+    xref = "paper",  
+    yref = "paper",  
+    xanchor = "center",  
+    yanchor = "bottom",  
+    showarrow = FALSE 
+  ),  
+  list( 
+    x = 0.23,  
+    y = 0.48,  
+    text = "Opportunity",  
+    xref = "paper",  
+    yref = "paper",  
+    xanchor = "center",  
+    yanchor = "bottom",  
+    showarrow = FALSE 
+  ),
+  list( 
+    x = 0.75,  
+    y = 0.48,  
+    text = "Fiscal Stability",  
+    xref = "paper",  
+    yref = "paper",  
+    xanchor = "center",  
+    yanchor = "bottom",  
+    showarrow = FALSE 
+  ),  
+  list( 
+    x = 0.23,  
+    y = 0.22,  
+    text = "Crime & Corrections",  
+    xref = "paper",  
+    yref = "paper",  
+    xanchor = "center",  
+    yanchor = "bottom",  
+    showarrow = FALSE 
+  ),
+  list( 
+    x = 0.75,  
+    y = 0.22,  
+    text = "Natural Environment",  
+    xref = "paper",  
+    yref = "paper",  
+    xanchor = "center",  
+    yanchor = "bottom",  
+    showarrow = FALSE
+  ))
 
+subplot(a,b,c,d,e,f,g,h, nrows=4)%>% 
+  layout(title = 'State Rankings of Measures', annotations=annotations)
+  
 
-
+```
 
 
 
