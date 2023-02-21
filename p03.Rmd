@@ -16,13 +16,14 @@ library(rvest)
 library(httr)
 ```
 
-Goal:
+Goal: Webscrape data from usnews about US state rankings and scores in certain departments. 
 Product: 
-Data: 
+Data: State rankings
 Interpretation: 
 
 > The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
 
+First, check to see if we are allowed to pull data from that website. 
 
 ```{r check-allowed}
 
@@ -30,6 +31,7 @@ library(robotstxt)
 paths_allowed("http://www.usnews.com")
 
 ```
+Read the url. 
 
 ```{r read-page}
 
@@ -43,6 +45,8 @@ page
 
 ```
 
+Pull the data I want. This did not work and the website wasn't really set up well to use the selector gadget. When trying to select the data I wanted, the whole page would highlight instead and I couldn't grab just the important data. Instead, the website seems like i could just copy/paste into a csv and import to R that way. 
+
 ```{r test}
 
 page %>% 
@@ -51,38 +55,31 @@ page %>%
 
 ```
 
-
-```{r try_this}
-
-page <- read_html("http://www.imdb.com/chart/top")
+The data set has the overall rank of each state and the rank on 8 variables: health, education, economy, infrastructure, opportunity, fiscal stability, crime and corrections and natural environment. USNews gave more weight to health and education than other variables when calculating the overall rankings due to people thinking those are more important. Treating each variable as equal, if we total the scores across all 8 variables, then the lowest score would be the objectively best state.
 
 
-titles <- page %>%
-  html_nodes(".titleColumn a") %>%
-  html_text()
+```{r import data}
 
-# Years -----------------------------------------------------------------------
-years <- page %>%
-  html_nodes(".secondaryInfo") %>%
-  html_text() %>%
-  str_remove("\\(") %>% # remove (
-  str_remove("\\)") %>% # remove )
-  as.numeric()
-
-# Scores ----------------------------------------------------------------------
-scores <- page %>%
-  html_nodes("#main strong") %>%
-  html_text() %>%
-  as.numeric()
-
-# Create data frame -----------------------------------------------------------
-imdb_top_250 <- tibble(
-  title = titles, 
-  year = years, 
-  score = scores
-)
-
+ranks <- read_csv("state_rankings.csv", show_col_types = FALSE)
+  
 ```
+
+Let's total the scores in the 8 variables and see how the states stack up across all variables. 
+
+```{r total-variables}
+
+ranks<-ranks %>%
+  mutate(Total = select(., Health_care:Natural_environment) %>% 
+           rowSums(na.rm = TRUE))
+```
+
+On first glance, these totals are roughly the same as the overall rankings with higher totals receiving higher rankings. 
+
+
+
+
+
+
 
 
 
