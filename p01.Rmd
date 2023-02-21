@@ -113,9 +113,9 @@ a<-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
   labs(x = "Distractor Location", y = "Response Time (ms)")+
   labs(title = "Singleton Distractor Present")+
   #labs(caption = "An ANOVA test shows a difference in RT depending on distractor location, F(3.28,65.57)=33.3, p<.001.")+
-  theme(axis.text=element_text(size=14),
-        axis.title=element_text(size=16,face="bold"),
-        title = element_text(size = 24))+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face="bold"),
+        title = element_text(size = 40))+
   scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
   
 ```
@@ -360,17 +360,18 @@ b<-ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy)) +
   theme_classic()+
   labs(x = "Distractor Location", y = "Accuracy (%)")+
   #labs(title = "Distractor Location Effect on Accuracy")+
-  theme(axis.text=element_text(size=14),
-        axis.title=element_text(size=16,face="bold"),
-        title = element_text(size = 16))+
-  scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face="bold"),
+        title = element_text(size = 24))+
+  scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="1","dist_2"="2","dist_3"="3"))
 
 
 ```
 
-```{r dist_2-plots, fig.height=8, fig.width=16}
-
-plot_grid(a,b,labels = c('A','B'), label_size=16, rel_widths = c(2,1))
+```{r dist_2-plots, fig.height=8, fig.width=16} 
+#
+plot_grid(a,b,labels = c('A','B'), label_size=20, rel_widths = c(2,1))
+  
 
 ```
 

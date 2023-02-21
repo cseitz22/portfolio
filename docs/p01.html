@@ -395,9 +395,9 @@ chose those particular colors based on Wake Forest’s color scheme.</p>
   labs(x = &quot;Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
   labs(title = &quot;Singleton Distractor Present&quot;)+
   #labs(caption = &quot;An ANOVA test shows a difference in RT depending on distractor location, F(3.28,65.57)=33.3, p&lt;.001.&quot;)+
-  theme(axis.text=element_text(size=14),
-        axis.title=element_text(size=16,face=&quot;bold&quot;),
-        title = element_text(size = 24))+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face=&quot;bold&quot;),
+        title = element_text(size = 40))+
   scale_x_discrete(labels= c(&quot;no_dist&quot;=&quot;no-dist&quot;,&quot;dist_0&quot;=&quot;dist-0&quot;,&quot;dist_1&quot;=&quot;dist-1&quot;,&quot;dist_2&quot;=&quot;dist-2&quot;,&quot;dist_3&quot;=&quot;dist-3&quot;))</code></pre>
 <p>Create a new data frame with the average RT for each relative
 distractor location per participant, so we can do a repeated measures
@@ -546,7 +546,7 @@ the high-probability location compared to the average response time
 across the low-probability locations was significantly different
 (t(20)=4.95, p&lt;.001). I also examined whether there were significant
 differences between the high-prob and distractor absent conditions and
-th elow-prob and distractor absent conditions, using paired samples
+the low-prob and distractor absent conditions, using paired samples
 t-tests. All were significantly different with a p of &lt;.001.</p>
 <pre class="r"><code>space_anova &lt;- space_anova %&gt;%
   mutate(low_prob = (dist_1+dist_2+dist_3)/3)</code></pre>
@@ -706,11 +706,12 @@ b&lt;-ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy)) +
   theme_classic()+
   labs(x = &quot;Distractor Location&quot;, y = &quot;Accuracy (%)&quot;)+
   #labs(title = &quot;Distractor Location Effect on Accuracy&quot;)+
-  theme(axis.text=element_text(size=14),
-        axis.title=element_text(size=16,face=&quot;bold&quot;),
-        title = element_text(size = 16))+
-  scale_x_discrete(labels= c(&quot;no_dist&quot;=&quot;no-dist&quot;,&quot;dist_0&quot;=&quot;dist-0&quot;,&quot;dist_1&quot;=&quot;dist-1&quot;,&quot;dist_2&quot;=&quot;dist-2&quot;,&quot;dist_3&quot;=&quot;dist-3&quot;))</code></pre>
-<pre class="r"><code>plot_grid(a,b,labels = c(&#39;A&#39;,&#39;B&#39;), label_size=16, rel_widths = c(2,1))</code></pre>
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face=&quot;bold&quot;),
+        title = element_text(size = 24))+
+  scale_x_discrete(labels= c(&quot;no_dist&quot;=&quot;no-dist&quot;,&quot;dist_0&quot;=&quot;dist-0&quot;,&quot;dist_1&quot;=&quot;1&quot;,&quot;dist_2&quot;=&quot;2&quot;,&quot;dist_3&quot;=&quot;3&quot;))</code></pre>
+<pre class="r"><code>#
+plot_grid(a,b,labels = c(&#39;A&#39;,&#39;B&#39;), label_size=20, rel_widths = c(2,1))</code></pre>
 <p><img src="p01_files/figure-html/dist_2-plots-1.png" width="1536" /></p>
 </div>
 <div id="examine-block-by-block-learning-of-distractor-location"
@@ -787,7 +788,34 @@ is likely to appear.</p>
 <p><img src="p01_files/figure-html/line_plot_avg-1.png" width="1152" /></p>
 <pre class="r"><code>model4 &lt;- aov_car(difference ~ block_num + Error(ID/block_num), data=space_block)
 
-model4</code></pre>
+summary(model4)</code></pre>
+<pre><code>## Warning in summary.Anova.mlm(object$Anova, multivariate = FALSE): HF eps &gt; 1
+## treated as 1</code></pre>
+<pre><code>## 
+## Univariate Type III Repeated-Measures ANOVA Assuming Sphericity
+## 
+##             Sum Sq num Df Error SS den Df F value    Pr(&gt;F)    
+## (Intercept) 481262      1   416676     20  23.100 0.0001074 ***
+## block_num    22870      7  1118290    140   0.409 0.8954818    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## 
+## Mauchly Tests for Sphericity
+## 
+##           Test statistic p-value
+## block_num        0.27598 0.72295
+## 
+## 
+## Greenhouse-Geisser and Huynh-Feldt Corrections
+##  for Departure from Sphericity
+## 
+##            GG eps Pr(&gt;F[GG])
+## block_num 0.73622     0.8467
+## 
+##            HF eps Pr(&gt;F[HF])
+## block_num 1.02213  0.8954818</code></pre>
+<pre class="r"><code>model4</code></pre>
 <pre><code>## Anova Table (Type 3 tests)
 ## 
 ## Response: difference
