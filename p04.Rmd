@@ -1,5 +1,79 @@
 ---
 title: "Portfolio 4"
+name: "Cat Seitz"
+date: "02.28.2023"
+data: ""
+output: 
+  html_document: 
+    theme: cerulean
 ---
 
-> The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
+
+Goal: 
+Product: 
+Data: 
+Interpretation: 
+
+
+```{r load-packages, message=FALSE}
+library(tidyverse) 
+library(tidyr)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
