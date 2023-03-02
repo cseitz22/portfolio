@@ -65,7 +65,7 @@ linear_reg() %>%
 
 ```
 
-The intercept isn't meaningful because no chocolate bar would have 0% of cocoa. Generally, if we increase cocoa percentage, rating of the chocolate decreases.
+Using a linear model, the intercept isn't meaningful because no chocolate bar would have 0% of cocoa. Generally, if we increase cocoa percentage, rating of the chocolate decreases.
 
 
 
