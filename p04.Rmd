@@ -11,29 +11,61 @@ output:
 
 Goal: 
 Product: 
-Data: 
+Data: Chocolate Bar Ratings
 Interpretation: 
 
 
 ```{r load-packages, message=FALSE}
 library(tidyverse) 
 library(tidyr)
-
+library(tidytuesdayR)
+library(tidymodels)
+library(openintro)
+library(broom)
 ```
 
 
+```{r import-data}
+
+tuesdata <- tidytuesdayR::tt_load('2022-01-18')
+chocolate <- tuesdata$chocolate
+
+```
+
+First, convert the cocoa percentage column to numbers without the percent sign. Since this column is a string, we'll want to convert it to numeric. 
+
+```{r change-percent}
+
+chocolate$cocoa_percent<-gsub("%$","",chocolate$cocoa_percent)
+chocolate<-transform(chocolate, cocoa_percent = as.numeric(cocoa_percent))
+class(chocolate$cocoa_percent)
+
+```
+
+Based on my own experience, as the cocoa_percentage increases, the chocolate tastes worse -- too bitter. Let's see if this theory holds true with the raw data and in the taste of others. 
 
 
+```{r plot-ratings-cocoa-percentage}
 
 
+ggplot(chocolate, aes(y = rating, x=cocoa_percent))+
+  geom_jitter()+
+  stat_smooth(method="lm")+
+  labs(title="Relationship between Cocoa Percentage and Rating", y="Rating", x="Cocoa Percentage")
 
 
+```
 
+```{r fit-linear-model-cocoa-percentage}
 
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit(rating ~ cocoa_percent, data = chocolate) %>%
+  tidy()
 
+```
 
-
-
+The intercept isn't meaningful because no chocolate bar would have 0% of cocoa. Generally, if we increase cocoa percentage, rating of the chocolate decreases.
 
 
 
