@@ -68,7 +68,25 @@ linear_reg() %>%
 Using a linear model, the intercept isn't meaningful because no chocolate bar would have 0% of cocoa. Generally, if we increase cocoa percentage, rating of the chocolate decreases.
 
 
+Taking a closer look at the scatterplot, it seems a quadratic regression model might fit the data better than a linear regression model. Let's explore that. 
 
+
+```{r fit-quadratic-model}
+
+#create percent squared variable
+chocolate$cocoa_percent2<-chocolate$cocoa_percent^2
+
+#fit quad regression model
+
+quad_model <- lm(rating ~ cocoa_percent + cocoa_percent2, data=chocolate)
+
+#view model
+
+summary(quad_model)
+
+
+
+```
 
 
 

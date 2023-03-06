@@ -212,7 +212,10 @@ plot_power(young_design, min_n=5, max_n = 100, desired_power=80, exact2 = TRUE)
 
 ```
 
+```{r power-targ-rts}
+results=ANOVA_power(design_result = young_design,alpha_level = 0.05, nsims = 10000, seed=1234,)
 
+```
 
 
 Distractor and Target Accuracy
@@ -309,5 +312,46 @@ distacc_design <- ANOVA_design(design = "3w",
 
 ```{r plot-dist-acc}
 plot_power(distacc_design, min_n=5, max_n = 100, desired_power=80, exact2 = TRUE)
+
+```
+
+
+Now, find power using data from Wang and Theeuwes (2018). Response times used here were estimated from plots in the paper. 
+
+
+```{r theeuwes-plot-distrt}
+
+theeuwes_dist_design <- ANOVA_design(design = "3w",
+                             n=20,
+                             mu = c(900, 925, 975),
+                             sd = 150,
+                             r <- c(0.96, 0.96, 0.96),
+                             labelnames = c("DistractorLocation", "Absent", "HighProb", "LowProb")
+                             )
+
+```
+
+
+```{r plot-distrt-power-theeuwes}
+plot_power(theeuwes_dist_design, min_n=5, max_n = 100, desired_power=99, exact2 = TRUE)
+
+```
+
+
+```{r theeuwes-plot-targrt}
+
+theeuwes_targ_design <- ANOVA_design(design = "2w",
+                             n=20,
+                             mu = c(949, 898),
+                             sd = 150,
+                             r <- c(0.92),
+                             labelnames = c("TargetLocation", "HighProb", "LowProb")
+                             )
+
+```
+
+
+```{r plot-targ-rt-power-theeuwes}
+plot_power(theeuwes_targ_design, min_n=5, max_n = 100, desired_power=80, exact2 = TRUE)
 
 ```
