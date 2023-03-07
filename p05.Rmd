@@ -10,7 +10,7 @@ output:
 
 Goal: Determine the number of participants needed for 80% power. 
 Data: Pilot study on distractor suppression in adults
-Interpretation: 
+
 
 ```{r load-packages}
 library(Superpower)
@@ -22,7 +22,7 @@ library(tidyr)
 
 Instructions from the package are here: https://cran.r-project.org/web/packages/Superpower/vignettes/intro_to_superpower.html#anova_design-function
 
-Set up the design. In this package, we need to choose the right design (we have a single variable with 3 groups), input the number of participants, means of each group, standard deviation (I chose the highest of the 3 groups), the correlations between the 3 groups, and the label names. 
+Set up the design. In this package, we need to choose the right design (we have a single variable with 3 groups), input the number of participants, means of each group, standard deviation (I chose the highest of the 3 groups), the correlations between the 3 groups, and the label names. This first one is for the distractor location response times. 
 
 ```{r run design}
 young_design <- ANOVA_design(design = "3w",
@@ -36,14 +36,14 @@ young_design <- ANOVA_design(design = "3w",
 ```
 
 
-Plot power as a function of sample size
+Plot power as a function of sample size.
 
 ```{r plot}
 plot_power(young_design, min_n=5, max_n = 100, desired_power=80, exact2 = TRUE)
 
 ```
 
-Run a power simulation based on the N defined above.
+Run a power simulation based on the N defined above. Here we can play around with the alpha level. 
 
 ```{r}
 results=ANOVA_power(design_result = young_design,alpha_level = 0.001, nsims = 10000, seed=1234,)
@@ -51,7 +51,7 @@ results=ANOVA_power(design_result = young_design,alpha_level = 0.001, nsims = 10
 ```
 
 
-Run correlations:
+Run correlations that we'll use in the design. 
 
 Distractor location response times
 
@@ -199,6 +199,9 @@ cor(space_anova$high_prob, space_anova$low_prob)
 
 ```
 
+
+Run the design for the target response times and plot. 
+
 ```{r plot target rts}
 young_design <- ANOVA_design(design = "2w",
                              n=21,
@@ -221,13 +224,10 @@ results=ANOVA_power(design_result = young_design,alpha_level = 0.05, nsims = 100
 ```
 
 
-Distractor and Target Accuracy
+Now, we'll take a look at the distractor and target location accuracy data. First, we'll find the correlations between the groups for each. 
 
 
 ```{r create_accuracy_df}
-
-
-
 
 pilot_distacc <- pilot %>%
   group_by(relative_hp_dist) %>%
@@ -284,6 +284,8 @@ cor(targ_t$high_prob, targ_t$low_prob)
 
 ```
 
+Run the design for target accuracy. 
+
 
 ```{r plot target acc}
 targacc_design <- ANOVA_design(design = "2w",
@@ -301,6 +303,7 @@ plot_power(targacc_design, min_n=5, max_n = 100, desired_power=80, exact2 = TRUE
 
 ```
 
+Run the design for distractor accuracy. 
 
 ```{r plot dist acc}
 distacc_design <- ANOVA_design(design = "3w",
