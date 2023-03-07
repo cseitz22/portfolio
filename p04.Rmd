@@ -9,10 +9,10 @@ output:
 ---
 
 
-Goal: 
-Product: 
+Goal: Examine the tidy tuesday dataset on chocolate bars
+Product: Finding the best model for predicting chocolate bars ratings based on their cocoa percentage. 
 Data: Chocolate Bar Ratings
-Interpretation: 
+Interpretation: A quadratic model fit the data best. This model shows that the highest rated chocolate bars did not have the highest or lowest cocoa percentage, but had a medium percentage of cocoa. 
 
 
 ```{r load-packages, message=FALSE}
@@ -49,7 +49,7 @@ Based on my own experience, as the cocoa_percentage increases, the chocolate tas
 
 
 ggplot(chocolate, aes(y = rating, x=cocoa_percent))+
-  geom_jitter()+
+  geom_point()+
   stat_smooth(method="lm")+
   labs(title="Relationship between Cocoa Percentage and Rating", y="Rating", x="Cocoa Percentage")
 
@@ -65,7 +65,13 @@ linear_reg() %>%
 
 ```
 
-Using a linear model, the intercept isn't meaningful because no chocolate bar would have 0% of cocoa. Generally, if we increase cocoa percentage, rating of the chocolate decreases.
+```{r linear-model-summary}
+
+summary(lm(rating ~ cocoa_percent, data=chocolate))
+
+```
+
+Using a linear model, the intercept isn't meaningful because no chocolate bar would have 0% of cocoa. Generally, if we increase cocoa percentage, rating of the chocolate decreases. The adjusted r-squared suggests that 2.1% of the variation in rating is accounted for by the cocoa percent. 
 
 
 Taking a closer look at the scatterplot, it seems a quadratic regression model might fit the data better than a linear regression model. Let's explore that. 
@@ -88,42 +94,52 @@ summary(quad_model)
 
 ```
 
+This new model explains 6% of the total variance in chocolate bar ratings; and therefore, is a better model than the previous one. 
 
 
+I'm attempting to plot the quadratic regression line but it isn't working using the code professor google told me to use, so I'm going to try something else. 
+
+```{r plot-quad}
+
+#create sequence of pct values
+pctValues <- seq(40, 100, 0.1)
+
+#create list of predicted happines levels using quadratic model
+#rating_predict <- predict(quad_model,list(pcts=pctValues, pcts2=pctValues^2)) #
+
+#create scatterplot of original data values
+#plot(chocolate$cocoa_percent, chocolate$rating, pch=16)
+#add predicted lines based on quadratic regression model
+#lines(pctValues, rating_predict, col='blue')
+
+```
 
 
+Trying another method to plot the quadratic regression line. Looks like it worked!
 
 
+```{r plot-quad-line}
 
 
+ggplot(chocolate, aes(y = rating, x=cocoa_percent))+
+  geom_jitter()+
+  stat_smooth(method="lm",
+              formula = y ~ poly(x, 2))+
+  labs(title="Relationship between Cocoa Percentage and Rating", y="Rating", x="Cocoa Percentage")
 
 
+```
+
+I wanted to test this other way of fitting a quadratic model to make sure I got the same results as the method I used previously. 
 
 
+```{r testing}
+#fit quad regression model
 
+quad_model2 <- lm(rating ~ poly(cocoa_percent, 2), data=chocolate)
 
+#view model
 
+summary(quad_model2)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```
