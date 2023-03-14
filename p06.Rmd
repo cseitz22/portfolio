@@ -11,7 +11,7 @@ output:
 Goal: Create a model for predicting how far in March Madness a team will go. 
 Product: The perfect March Madness bracket.  
 Data: 2022 team stats on season win percentage, conference difficulty, times the team has made it to each round of the post-season, bracket rank, and power rankings from Bleacher Report. 
-Interpretation: 
+Interpretation: I predict Kansas and Duke will play in the 2023 championship game and Kansas will win based on my model. 
 
 
 I would like to recognize that 1 year of post-season data is not great for predicting future brackets, but it took awhile to get all this data into a usable form, so it's what we'll work with for this portfolio and my bracket this year. 
@@ -34,7 +34,7 @@ mm22 <- read_csv("docs/2022marchmadness.csv", show_col_types = FALSE)
 
 First, we'll check out how well the season percent wins predicts the round the team lost in the post-season. This is unlikely to be very predictive because the teams have a large range of schedule difficulties, meaning that some teams play the best teams all season and others play average teams all season. It's likely that teams that play better teams in their regular season will go further in the post season. 
 
-```{r plot-round-lost}
+```{r plot-pct-wins}
 
 
 ggplot(mm22, aes(y = round_lost, x=pct_wins))+
@@ -117,7 +117,7 @@ ggplot(mm22, aes(y = round_lost, x=diff_pts))+
 ```
 
 
-```{r fit-linear-model-post-season-times}
+```{r fit-linear-modelfreethrow}
 
 linear_reg() %>%
   set_engine("lm") %>%
@@ -166,9 +166,103 @@ mm23 <- read_csv("docs/2023marchmadness.csv", show_col_types = FALSE)
 ```{r add-predicted-round-lost}
 
 mm23<-mm23 %>%
-  mutate(round_lost<- 2.8 + (.62*x_runner) + (.65*x_won) - (.025*overall_rank) - (.045*diff_pts))
+  mutate(round_lost = 2.8 + (.62*x_runner) + (.65*x_won) - (.025*overall_rank) - (.045*diff_pts))
 
 ```
+
+```{r show-best-teams}
+
+mm23 %>%                                      # Top N highest values by group
+  arrange(desc(round_lost)) %>%
+  slice(1:64)
+```
+
+Lastly, I wanted to test out a model that doesn't necessarily take into account previous win history. This model only accounts for 22.5% of the variance in the round a team lost, so doesn't seem to be as good as the previous model but I'll use it for a different bracket and see which one wins. 
+
+
+```{r fit-linear-model-final2}
+
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit(round_lost ~ strength_schedule+ overall_rank+ ft_pct+ pts_earned+pts_allowed+bracket_rank, data = mm22) %>%
+  tidy()
+summary(lm(round_lost ~ strength_schedule+ overall_rank+ ft_pct+ pts_earned+pts_allowed+bracket_rank, data = mm22))
+
+```
+
+
+
+```{r add-predicted-round-lost2}
+
+mm23<-mm23 %>%
+  mutate(round_lost2 = .269 + (.06*ft_pct) - (.06*pts_earned) + (.05*pts_allowed) - (.09*overall_rank)+ (.16*bracket_rank))
+
+
+mm23 %>%                                      # Top N highest values by group
+  arrange(desc(round_lost2)) %>%
+  slice(1:64)
+
+```
+
+Second lastly, instead of the round the team lost as the predictor, I ranked the teams by the outcome of March Madness from 2022 by each round and how badly they lost. We'll see how this ranking is predicted based on the same variables. The first model takes into account the strength of the team's schedule, their power rankings, free throw percentage, points earned, points allowed, and their bracket ranking. 
+
+Model: Final ranking = -2.13 + .022*strength_schedule + .81*overall_rank - .43*ft_pct+ .5pts_earned+.13pts_allowed - 1.05*bracket_rank
+
+
+
+```{r fit-linear-model-final3}
+
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit(final_ranking ~ strength_schedule + overall_rank + 
+    ft_pct + pts_earned + pts_allowed + bracket_rank, data = mm22) %>%
+  tidy()
+summary(lm(final_ranking ~ strength_schedule + overall_rank + 
+    ft_pct + pts_earned + pts_allowed + bracket_rank, data = mm22))
+
+```
+
+```{r add-predicted-round-lost3}
+
+mm23<-mm23 %>%
+  mutate(round_lost3 = -2.145+ (.022*strength_schedule) +(.81*overall_rank)-(.43*ft_pct)+(.5*pts_earned)+(.13*pts_allowed)- (1.05*bracket_rank))
+
+
+mm23 %>%                                      # Top N highest values by group
+  arrange((round_lost3)) %>%
+  slice(1:64)
+
+```
+
+
+
+The second model takes into account the strength of schedule, times as runner up, times winning, and their power ranking. 
+
+Model: final ranking = 18.49 + .033*strength_schedule - 4.96*x_runner - 2.17*x_won + .39*overall_rank
+
+
+```{r fit-linear-model-final4}
+
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit(final_ranking ~ strength_schedule+x_runner + x_won + overall_rank, data = mm22) %>%
+  tidy()
+summary(lm(final_ranking ~strength_schedule+ x_runner + x_won + overall_rank, data = mm22))
+
+```
+
+```{r add-predicted-round-lost4}
+
+mm23<-mm23 %>%
+  mutate(round_lost4 = 18.49 + (.033*strength_schedule)- (4.96*x_runner) - (2.17*x_won) + (.39*overall_rank))
+
+mm23 %>%                                      # Top N highest values by group
+  arrange((round_lost4)) %>%
+  slice(1:64)
+```
+
+
+
 
 
 
