@@ -26,7 +26,7 @@ library(broom)
 ```
 
 
-```{r import data}
+```{r import-2022-data}
 
 mm22 <- read_csv("docs/2022marchmadness.csv", show_col_types = FALSE)
   
@@ -105,25 +105,34 @@ summary(lm(round_lost ~ x_sweet16 + x_elite8 + x_final4 + x_runner + x_won, data
 
 Now, I'm going to add some of these variables together to make the best model. Using backward-selection, I came to the following model for predicting the round a team will lose. 
 
-Round Lost = 1.96 + .06(Sweet 16 times) + .42(Runner up times) + .52(Champ times) -.014(power rank)
+Round Lost = 1.96 +  .42(Runner up times) + .52(Champ times) -.014(power rank)
 
-The intercept is not super helpful because it predicts the round a team will lose if they have never made it to Sweet 16 but are ranked basically in 1st, which is pretty much not ever going to happen. 
+The intercept is not super helpful because it predicts the round a team will lose if they have never made it to championship game but are ranked basically in 1st, which is pretty much not ever going to happen. This model accounts for 42.4% of variance in the 
 
 
 ```{r fit-linear-model-final}
 
 linear_reg() %>%
   set_engine("lm") %>%
-  fit(round_lost ~ x_sweet16 + x_runner + x_won + overall_rank, data = mm22) %>%
+  fit(round_lost ~ x_runner + x_won + overall_rank, data = mm22) %>%
   tidy()
-summary(lm(round_lost ~ x_sweet16 +x_runner + x_won + overall_rank, data = mm22))
+summary(lm(round_lost ~ x_runner + x_won + overall_rank, data = mm22))
 
 ```
 
+Here, I loaded in the 2023 team data and predicted the round each team will lose and I can sort by highest to lowest and build my bracket. Overall, this isn't a super insightful model because it is largely using the power rankings from Bleacher Report which must take in a bunch of other data to create their ranking, and past championship appearances from each team, which doesn't totally mean much to how well a team will do in the current season. Nevertheless, we will see how far this model will get me in my March Madness pools. Based on this model, Kansas and UConn will play in the final and Kansas will win. Unfortunately, Kansas and UConn are in the same region so this is impossible -- my model could not take this into account, so I'll have to deal with this a different way. I could try to 
 
+```{r import-2023-data}
 
+mm23 <- read_csv("docs/2023marchmadness.csv", show_col_types = FALSE)
+  
+```
 
+```{r add-predicted-round-lost}
 
+mm23<-mm23 %>%
+  mutate(round_lost<- 1.96 + (.42*x_runner) + (.52*x_won) - (.014*overall_rank))
 
+```
 
 
