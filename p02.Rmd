@@ -517,7 +517,11 @@ dist_t <- dist_t %>%
   mutate(low_prob = (dist_1+dist_2+dist_3)/3)
 
 dist_t %>%
-  t.test(x=dist_t$dist_0, y=dist_t$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
+  t.test(x=dist_t$dist_0, y=dist_t$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95)
+dist_t %>%
+  t.test(x=dist_t$no_dist, y=dist_t$dist_0, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
+dist_t %>%
+  t.test(x=dist_t$no_dist, y=dist_t$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
 
 
 ```

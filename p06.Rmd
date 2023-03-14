@@ -1,5 +1,97 @@
 ---
-title: "Portfolio 6"
+title: "Portfolio 6 - March Madness Regression"
+name: "Cat Seitz"
+date: "1.21.2023"
+data: "Distractor Suppression Pilot Study"
+output: 
+  html_document: 
+    theme: cerulean
 ---
 
-> The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
+Goal: Create a model for predicting how far in March Madness a team will go. 
+Product: The perfect March Madness bracket.  
+Data: 2022 team stats on season win percentage, conference difficulty, times the team has made it to each round of the post-season, bracket rank, and power rankings from Bleacher Report. 
+Interpretation: 
+
+
+```{r load-packages, message=FALSE}
+library(tidyverse) 
+library(tidyr)
+library(tidytuesdayR)
+library(tidymodels)
+library(openintro)
+library(broom)
+```
+
+
+```{r import data}
+
+mm22 <- read_csv("docs/2022marchmadness.csv", show_col_types = FALSE)
+  
+```
+
+
+```{r plot-round-lost}
+
+
+ggplot(mm22, aes(y = round_lost, x=pct_wins))+
+  geom_point()+
+  stat_smooth(method="lm")
+#  labs(title="Relationship between Cocoa Percentage and Rating", y="Rating", x="Cocoa Percentage")
+
+
+```
+
+```{r fit-linear-model-pct-wins}
+
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit(round_lost ~ pct_wins, data = mm22) %>%
+  tidy()
+
+summary(lm(round_lost ~ pct_wins, data = mm22))
+```
+
+```{r fit-linear-model-conference-difficulty}
+
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit(round_lost ~ conference_difficulty, data = mm22) %>%
+  tidy()
+
+summary(lm(round_lost ~ conference_difficulty, data=mm22))
+
+```
+
+
+```{r fit-linear-model-ranks}
+
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit(round_lost ~ overall_rank + bracket_rank, data = mm22) %>%
+  tidy()
+summary(lm(round_lost ~ overall_rank + bracket_rank, data = mm22))
+
+```
+
+
+```{r fit-linear-model-post-season-times}
+
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit(round_lost ~ x_sweet16 + x_elite8 + x_final4 + x_runner + x_won, data = mm22) %>%
+  tidy()
+summary(lm(round_lost ~ x_sweet16 + x_elite8 + x_final4 + x_runner + x_won, data = mm22))
+
+```
+
+
+
+
+
+
+
+
+
+
+

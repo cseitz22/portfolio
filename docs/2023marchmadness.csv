@@ -1,0 +1,65 @@
+school,region,bracket_rank,overall_rank,pct_wins,league,conference_difficulty,x_sweet16,x_elite8,x_final4,x_runner,x_won
+Alabama,south,1,4,85.29,SEC,3,2,1,0,0,0
+Houston,midwest,1,1,91.18,Am,8,3,2,1,0,0
+Purdue,east,1,9,85.29,Big10,2,7,2,0,0,0
+Kansas,west,1,2,79.41,Big12,1,14,11,6,2,2
+Arizona,south,2,3,82.35,Pac12,5,11,6,1,1,0
+Texas ,midwest,2,7,76.47,Big12,1,5,3,1,0,0
+Marquette,east,2,8,82.35,BigE,4,5,2,1,0,0
+UCLA,west,2,5,85.29,Pac12,5,11,4,4,1,0
+Baylor,south,3,19,68.75,Big12,1,5,3,1,0,1
+Xavier,midwest,3,13,73.53,BigE,4,7,3,0,0,0
+Kansas St. ,east,3,14,71.88,Big12,1,2,2,0,0,0
+Gonzaga,west,3,11,84.85,WCC,9,11,4,2,2,0
+Virginia,south,4,32,78.13,ACC,7,3,2,1,0,1
+Indiana,midwest,4,16,66.67,Big10,2,4,1,1,1,0
+Tennessee,east,4,22,69.7,SEC,3,6,1,0,0,0
+Uconn,west,4,6,75.76,BigE,4,7,6,4,0,3
+San Diego St. ,south,5,18,81.82,MW,6,2,0,0,0,0
+Miami,midwest,5,30,78.13,ACC,7,4,1,0,0,0
+Duke,east,5,10,76.47,ACC,7,16,8,5,0,3
+Saint Mary's,west,5,20,78.79,WCC,9,1,0,0,0,0
+Creighton,south,6,15,63.64,BigE,4,1,0,0,0,0
+Iowa St. ,midwest,6,26,59.38,Big12,1,4,1,0,0,0
+Kentucky,east,6,12,65.63,SEC,3,12,9,4,1,1
+TCU,west,6,17,63.64,Big12,1,0,0,0,0,0
+Missouri,south,7,37,72.73,SEC,3,2,2,0,0,0
+Texas A&M,midwest,7,23,73.53,SEC,3,3,0,0,0,0
+Michigan St. ,east,7,35,61.29,Big10,2,12,9,7,1,1
+Northwestern,west,7,33,65.63,Big10,2,0,0,0,0,0
+Maryland,south,8,40,62.5,Big10,2,4,2,2,0,1
+Iowa,midwest,8,42,59.38,Big10,2,0,0,0,0,0
+Memphis,east,8,21,76.47,Am,8,4,3,1,1,0
+Arkansas,west,8,25,60.61,SEC,3,2,2,0,0,0
+West Virginia,south,9,27,57.58,Big12,1,7,2,1,0,0
+Auburn,midwest,9,41,62.5,SEC,3,2,1,1,0,0
+FAU,east,9,24,91.18,CUSA,10,0,0,0,0,0
+Illinois,west,9,29,62.5,Big10,2,4,2,1,1,0
+Utah St. ,south,10,28,76.47,MW,6,0,0,0,0,0
+Penn St. ,midwest,10,31,62.86,Big10,2,1,0,0,0,0
+USC,east,10,34,68.75,Pac12,5,3,2,0,0,0
+Boise St. ,west,10,36,72.73,MW,6,0,0,0,0,0
+NC State,south,11,38,69.7,ACC,7,3,0,0,0,0
+undecided,midwest,11,,,,,,,,,
+Providence,east,11,43,65.63,BigE,4,1,0,0,0,0
+undecided,west,11,,,,,,,,,
+Charleston,south,12,49,91.18,CAA,11,0,0,0,0,0
+Drake,midwest,12,47,79.41,MW,6,0,0,0,0,0
+Oral Roberts,east,12,45,88.24,Summit,11,1,0,0,0,0
+VCU,west,12,48,79.41,A10,11,1,1,1,0,0
+Furman,south,13,55,79.41,SoCon,11,0,0,0,0,0
+Kent St. ,midwest,13,39,82.35,MAC,11,1,1,0,0,0
+Louisiana,east,13,57,78.79,SunBelt,11,0,0,0,0,0
+Iona,west,13,52,79.41,MAAC,11,0,0,0,0,0
+UCSB,south,14,58,79.41,BigW,11,0,0,0,0,0
+Kennesaw St. ,midwest,14,59,76.47,ASUN,11,0,0,0,0,0
+Montana St. ,east,14,60,73.53,BigSky,11,0,0,0,0,0
+Grand Canyon,west,14,50,68.57,WAC,11,0,0,0,0,0
+Princeton,south,15,54,72.41,Ivy,11,0,0,0,0,0
+Colgate,midwest,15,56,76.47,Patriot,11,0,0,0,0,0
+Vermont,east,15,61,69.7,AmEast,11,0,0,0,0,0
+UNC-Ash.,west,15,62,79.41,BigSouth,11,0,0,0,0,0
+undecided,south,16,,,,,,,,,
+N. Kentucky,midwest,16,63,64.71,Horizon,11,0,0,0,0,0
+undecided ,east,16,,,,,,,,,
+Howard,west,16,65,64.71,MEAC,11,0,0,0,0,0

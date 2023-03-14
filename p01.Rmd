@@ -106,7 +106,7 @@ This figure displays the mean response times depending on the location of the di
 ```{r - graph 1 - distractor location effect on rt}
 a<-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
   #geom_point()+
-  geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
+  geom_bar(stat = "identity", fill="blue", color='#000000') + ##9E7E38
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(700,1050))+
   theme_classic()+
@@ -209,7 +209,6 @@ model2
 
 
 ```
-
 
 Test whether the high-prob location and the average across low-prob locations were significantly different. Using a paired samples t-test, I found that the response times for when the distractor was presented in the high-probability location compared to the average response time across the low-probability locations was significantly different (t(20)=4.95, p<.001). I also examined whether there were significant differences between the high-prob and distractor absent conditions and the low-prob and distractor absent conditions, using paired samples t-tests. All were significantly different with a p of <.001. 
 
