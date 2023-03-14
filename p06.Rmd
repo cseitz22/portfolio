@@ -103,8 +103,22 @@ summary(lm(round_lost ~ x_sweet16 + x_elite8 + x_final4 + x_runner + x_won, data
 
 ```
 
+Now, I'm going to add some of these variables together to make the best model. Using backward-selection, I came to the following model for predicting the round a team will lose. 
+
+Round Lost = 1.96 + .06(Sweet 16 times) + .42(Runner up times) + .52(Champ times) -.014(power rank)
+
+The intercept is not super helpful because it predicts the round a team will lose if they have never made it to Sweet 16 but are ranked basically in 1st, which is pretty much not ever going to happen. 
 
 
+```{r fit-linear-model-final}
+
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit(round_lost ~ x_sweet16 + x_runner + x_won + overall_rank, data = mm22) %>%
+  tidy()
+summary(lm(round_lost ~ x_sweet16 +x_runner + x_won + overall_rank, data = mm22))
+
+```
 
 
 
