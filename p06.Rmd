@@ -40,7 +40,6 @@ First, we'll check out how well the season percent wins predicts the round the t
 ggplot(mm22, aes(y = round_lost, x=pct_wins))+
   geom_point()+
   stat_smooth(method="lm")
-#  labs(title="Relationship between Cocoa Percentage and Rating", y="Rating", x="Cocoa Percentage")
 
 
 ```
@@ -60,22 +59,23 @@ As predicted, percent wins is not a great predictor of how far a team will go in
 ```{r plot-round-lost}
 
 
-ggplot(mm22, aes(y = round_lost, x=conference_difficulty))+
+ggplot(mm22, aes(y = round_lost, x=strength_schedule))+
   geom_point()+
   stat_smooth(method="lm")
-#  labs(title="Relationship between Cocoa Percentage and Rating", y="Rating", x="Cocoa Percentage")
 
 
 ```
+
+
 
 ```{r fit-linear-model-conference-difficulty}
 
 linear_reg() %>%
   set_engine("lm") %>%
-  fit(round_lost ~ conference_difficulty, data = mm22) %>%
+  fit(round_lost ~ strength_schedule, data = mm22) %>%
   tidy()
 
-summary(lm(round_lost ~ conference_difficulty, data=mm22))
+summary(lm(round_lost ~ strength_schedule, data=mm22))
 
 ```
 
@@ -103,24 +103,58 @@ summary(lm(round_lost ~ x_sweet16 + x_elite8 + x_final4 + x_runner + x_won, data
 
 ```
 
+Here, we'll take a look at freethrow percentage, points earned and points allowed. Freethrow percentage isn't related to round lost. The difference in points earned and points allowed seems to somewhat help predict what round a team lost. 
+
+
+```{r plot-round-diff-pts}
+
+
+ggplot(mm22, aes(y = round_lost, x=diff_pts))+
+  geom_point()+
+  stat_smooth(method="lm")
+
+
+```
+
+
+```{r fit-linear-model-post-season-times}
+
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit(round_lost ~ ft_pct, data = mm22) %>%
+  tidy()
+summary(lm(round_lost ~ ft_pct, data = mm22))
+
+```
+```{r fit-linear-model-diff-pts}
+
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit(round_lost ~ diff_pts, data = mm22) %>%
+  tidy()
+summary(lm(round_lost ~ diff_pts, data = mm22))
+
+```
+
+
 Now, I'm going to add some of these variables together to make the best model. Using backward-selection, I came to the following model for predicting the round a team will lose. 
 
-Round Lost = 1.96 +  .42(Runner up times) + .52(Champ times) -.014(power rank)
+Round Lost = 2.80 +  .62(Runner up times) + .65(Champ times) -.025(power rank) - .045(mean difference in points)
 
-The intercept is not super helpful because it predicts the round a team will lose if they have never made it to championship game but are ranked basically in 1st, which is pretty much not ever going to happen. This model accounts for 42.4% of variance in the 
+The intercept is not super helpful because it predicts the round a team will lose if they have never made it to championship game but are ranked basically in 1st, which is pretty much not ever going to happen. This model accounts for 42.8% of variance in the the round a team loses. 
 
 
 ```{r fit-linear-model-final}
 
 linear_reg() %>%
   set_engine("lm") %>%
-  fit(round_lost ~ x_runner + x_won + overall_rank, data = mm22) %>%
+  fit(round_lost ~ x_runner + x_won + overall_rank+ diff_pts, data = mm22) %>%
   tidy()
-summary(lm(round_lost ~ x_runner + x_won + overall_rank, data = mm22))
+summary(lm(round_lost ~ x_runner + x_won + overall_rank+ diff_pts, data = mm22))
 
 ```
 
-Here, I loaded in the 2023 team data and predicted the round each team will lose and I can sort by highest to lowest and build my bracket. Overall, this isn't a super insightful model because it is largely using the power rankings from Bleacher Report which must take in a bunch of other data to create their ranking, and past championship appearances from each team, which doesn't totally mean much to how well a team will do in the current season. Nevertheless, we will see how far this model will get me in my March Madness pools. Based on this model, Kansas and UConn will play in the final and Kansas will win. Unfortunately, Kansas and UConn are in the same region so this is impossible -- my model could not take this into account, so I'll have to deal with this a different way. I could try to 
+Here, I loaded in the 2023 team data and predicted the round each team will lose and I can sort by highest to lowest and build my bracket. Overall, this isn't a super insightful model because it is largely using the power rankings from Bleacher Report which must take in a bunch of other data to create their ranking, and past championship appearances from each team, which doesn't totally mean much to how well a team will do in the current season. Nevertheless, we will see how far this model will get me in my March Madness pools. Based on this model, Kansas and Duke will play in the final and Kansas will win. This model still doesn't account for teams being in the same side of the bracket and not necessarily going as far as they should, but I will not be able to deal with that here. 
 
 ```{r import-2023-data}
 
@@ -128,11 +162,14 @@ mm23 <- read_csv("docs/2023marchmadness.csv", show_col_types = FALSE)
   
 ```
 
+
 ```{r add-predicted-round-lost}
 
 mm23<-mm23 %>%
-  mutate(round_lost<- 1.96 + (.42*x_runner) + (.52*x_won) - (.014*overall_rank))
+  mutate(round_lost<- 2.8 + (.62*x_runner) + (.65*x_won) - (.025*overall_rank) - (.045*diff_pts))
 
 ```
+
+
 
 
