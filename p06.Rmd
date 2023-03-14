@@ -14,6 +14,8 @@ Data: 2022 team stats on season win percentage, conference difficulty, times the
 Interpretation: 
 
 
+I would like to recognize that 1 year of post-season data is not great for predicting future brackets, but it took awhile to get all this data into a usable form, so it's what we'll work with for this portfolio and my bracket this year. 
+
 ```{r load-packages, message=FALSE}
 library(tidyverse) 
 library(tidyr)
@@ -30,6 +32,7 @@ mm22 <- read_csv("docs/2022marchmadness.csv", show_col_types = FALSE)
   
 ```
 
+First, we'll check out how well the season percent wins predicts the round the team lost in the post-season. This is unlikely to be very predictive because the teams have a large range of schedule difficulties, meaning that some teams play the best teams all season and others play average teams all season. It's likely that teams that play better teams in their regular season will go further in the post season. 
 
 ```{r plot-round-lost}
 
@@ -52,6 +55,19 @@ linear_reg() %>%
 summary(lm(round_lost ~ pct_wins, data = mm22))
 ```
 
+As predicted, percent wins is not a great predictor of how far a team will go in the post-season. Next, we'll take a look at the difficulty of their conference. In hindsight, I should have scored difficulty in the opposite direction because lower scores indicate more difficult. This is because I scored as rankings of most difficult, but this shouldn't affect how the model works. Conference difficulty isn't too bad at predicting the round a team lost. The more difficulty a team's conference is, the further they go in the post-season tournament. 
+
+```{r plot-round-lost}
+
+
+ggplot(mm22, aes(y = round_lost, x=conference_difficulty))+
+  geom_point()+
+  stat_smooth(method="lm")
+#  labs(title="Relationship between Cocoa Percentage and Rating", y="Rating", x="Cocoa Percentage")
+
+
+```
+
 ```{r fit-linear-model-conference-difficulty}
 
 linear_reg() %>%
@@ -63,6 +79,7 @@ summary(lm(round_lost ~ conference_difficulty, data=mm22))
 
 ```
 
+Next, we'll explore how a team's bracket rank and their power ranking predict how far they go in the tournament. These two rankings account for 23% of the variance in the round a team lost. 
 
 ```{r fit-linear-model-ranks}
 
@@ -74,6 +91,7 @@ summary(lm(round_lost ~ overall_rank + bracket_rank, data = mm22))
 
 ```
 
+Now, we'll look at how a team's history of making it to further round of the tournament (starting in the year 2000) will predict how far they will go in the tournament in the current year. This accounts for 41% of the variance in the round a team lost. 
 
 ```{r fit-linear-model-post-season-times}
 
