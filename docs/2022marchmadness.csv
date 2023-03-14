@@ -1,0 +1,65 @@
+school,region,bracket_rank,overall_rank,pct_wins,league,conference_difficulty,x_sweet16,x_elite8,x_final4,x_runner,x_won,round_lost
+Baylor,east,1,4,81.25,Big12,1,5,3,1,0,1,2
+Kansas,midwest,1,3,82.35,Big12,1,14,11,6,2,2,7
+Arizona,south,1,2,91.18,Pac12,5,11,6,1,1,0,3
+Gonzaga,west,1,1,89.66,WCC,9,11,4,2,2,0,3
+Kentucky,east,2,5,78.79,SEC,3,12,9,4,1,1,1
+Auburn,midwest,2,8,84.38,SEC,3,2,1,1,0,0,2
+Villanova,south,2,7,78.79,BigE,4,8,5,4,0,2,5
+Duke,west,2,6,82.35,ACC,7,16,8,5,0,3,5
+Purdue,east,3,11,79.41,Big10,2,7,2,0,0,0,3
+Wisconsin,midwest,3,16,77.42,Big10,2,10,4,3,1,0,2
+Tennessee,south,3,10,78.79,SEC,3,6,1,0,0,0,2
+Texas Tech,west,3,9,73.53,Big12,1,4,2,1,1,0,3
+UCLA,east,4,13,78.13,Pac12,5,11,4,4,1,0,3
+Providence,midwest,4,17,83.33,BigE,4,1,0,0,0,0,3
+Illinois,south,4,12,70.97,Big10,2,4,2,1,1,0,2
+Arkansas,west,4,14,75.76,SEC,3,2,2,0,0,0,4
+Saint Mary's,east,5,19,78.13,WCC,9,1,0,0,0,0,2
+Iowa,midwest,5,15,74.29,Big10,2,0,0,0,0,0,1
+Houston,south,5,18,85.3,Am,8,3,2,1,0,0,4
+Uconn,west,5,20,71.88,BigE,4,7,6,4,0,3,1
+Texas,east,6,27,65.63,Big12,1,5,3,1,0,0,2
+LSU,midwest,6,28,66.67,SEC,3,3,1,1,0,0,1
+Colorado St. ,south,6,23,83.33,MW,6,0,0,0,0,0,1
+Alabama,west,6,21,59.38,SEC,3,2,1,0,0,0,1
+Murray St. ,east,7,26,93.75,MV,11,0,0,0,0,0,2
+USC,midwest,7,25,78.79,Pac12,5,3,2,0,0,0,1
+Ohio St. ,south,7,29,63.33,Big10,2,5,3,2,1,0,2
+Michigan St. ,west,7,30,64.71,Big10,2,12,9,7,1,1,2
+UNC,east,8,22,72.72,ACC,7,12,10,7,2,3,6
+San Diego St. ,midwest,8,33,74.19,MW,6,2,0,0,0,0,1
+Seton Hall,south,8,41,67.74,BigE,4,1,0,0,0,0,1
+Boise St. ,west,8,32,79.41,MW,6,0,0,0,0,0,1
+Marquette,east,9,36,61.29,BigE,4,5,2,1,0,0,1
+Creighton,midwest,9,40,66.67,BigE,4,1,0,0,0,0,2
+TCU,south,9,35,62.5,Big12,1,0,0,0,0,0,2
+Memphis,west,9,24,67.74,Am,8,4,3,1,1,0,2
+San Francisco,east,10,38,72.72,WCC,9,0,0,0,0,0,1
+Miami,midwest,10,44,69.7,ACC,7,4,1,0,0,0,4
+Loyola Chicago,south,10,31,78.13,A10,11,2,1,1,0,0,1
+Davidson,west,10,46,81.81,A10,11,1,1,0,0,0,1
+Virginia Tech,east,11,37,65.71,ACC,7,1,0,0,0,0,1
+Iowa St. ,midwest,11,34,62.5,Big12,1,4,1,0,0,0,3
+Michigan,south,11,39,54.84,Big10,2,7,4,2,2,0,3
+Notre Dame,west,11,51,68.75,ACC,7,3,2,0,0,0,2
+Indiana,east,12,47,60.61,Big10,2,4,1,1,1,0,1
+Richmond,midwest,12,53,65.71,A10,11,1,0,0,0,0,2
+UAB,south,12,45,79.41,CUSA,10,1,0,0,0,0,1
+New Mexico St. ,west,12,49,81.25,WAC,11,0,0,0,0,0,2
+Akron,east,13,54,72.73,MAC,11,0,0,0,0,0,1
+S. Dakota St. ,midwest,13,50,88.24,Summit,11,0,0,0,0,0,1
+Chattanooga,south,13,48,79.41,Southern,11,0,0,0,0,0,1
+Vermont,west,13,52,84.85,AE,11,0,0,0,0,0,1
+Yale,east,14,55,63.33,Ivy,11,0,0,0,0,0,1
+Colgate,midwest,14,59,67.65,Patriot,11,0,0,0,0,0,1
+Longwood,south,14,57,81.25,BS,11,0,0,0,0,0,1
+Montana St. ,west,14,61,79.41,BigSky,11,0,0,0,0,0,1
+St. Peter's ,east,15,56,63.33,MAAC,11,1,1,0,0,0,4
+Jacksonville St. ,midwest,15,63,67.74,ASUN,11,0,0,0,0,0,1
+Delaware,south,15,60,64.71,CAA,11,0,0,0,0,0,1
+Cal St. Fullerton,west,15,64,67.74,BigW,11,0,0,0,0,0,1
+Norfolk St. ,east,16,65,80,MEAC,11,0,0,0,0,0,1
+Texas Southern,midwest,16,67,60,SWAC,11,0,0,0,0,0,1
+Wright St. ,south,16,62,61.76,Horizon,11,0,0,0,0,0,1
+Georgia St. ,west,16,58,64.29,SunBelt,11,0,0,0,0,0,1
