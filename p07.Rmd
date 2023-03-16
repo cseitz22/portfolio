@@ -1,5 +1,58 @@
 ---
 title: "Portfolio 7"
+name: "Cat Seitz"
+date: "03.16.2023"
+data: "Tidy Tuesday Rent"
+output: 
+  html_document: 
+    theme: cerulean
 ---
 
-> The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
+Goal: Keep examining the tidy tuesday dataset on San Francisco Rent
+Product: 
+Data: San Francisco Rent
+Interpretation:  
+
+
+```{r load-packages, message=FALSE}
+library(tidyverse) 
+library(tidyr)
+library(tidytuesdayR)
+library(tidymodels)
+library(openintro)
+library(broom)
+```
+
+
+```{r import-data}
+
+tuesdata <- tidytuesdayR::tt_load('2022-07-05')
+tuesdata <- tidytuesdayR::tt_load(2022, week = 27)
+
+rent <- tuesdata$rent
+```
+
+
+```{r drop-na}
+
+rent <- rent %>%
+  drop_na(beds)%>%
+  drop_na(baths) %>%
+  drop_na(sqft)
+
+rent<-rent[rent$room_in_apt != 1, ]
+
+rent<- subset(rent, select = -c(address,lat, lon,descr, room_in_apt, details) )
+
+```
+
+This got us down to 14,000 from 200,000 observations. 
+
+
+
+
+
+
+
+
+
