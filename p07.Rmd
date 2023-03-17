@@ -33,7 +33,7 @@ rent <- tuesdata$rent
 ```
 
 
-```{r drop-na}
+```{r drop-columns&rows}
 
 rent <- rent %>%
   drop_na(beds)%>%
@@ -46,9 +46,9 @@ rent<- subset(rent, select = -c(address,lat, lon,descr, room_in_apt, details) )
 
 ```
 
-This got us down to 14,000 from 200,000 observations. 
+This got us down to around 14,000 from 200,000 observations. 
 
-
+Point plot price by sqft -- with bed/bath as colors?
 
 
 
