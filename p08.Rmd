@@ -196,10 +196,7 @@ ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
 
 ```
 
-Run ANOVA on 3 conditions first, and if significant, then run in on 5 conditions?
-
-
-Create a new data frame with the average RT for each relative distractor location per participant, so we can do a repeated measures ANOVA. 
+Create a new data frame with the average RT for each relative distractor location per participant, so we can do a repeated measures ANOVA -- eventually -- maybe. 
 
 ```{r smaller df for 1 line per condition per participant}
 
@@ -211,7 +208,76 @@ space
   
 ```
 
-Run an ANOVA on rts. 
+Run ANOVA on 3 conditions first, and if significant, then run in on 5 conditions?
+
+Need to reformat the above df to have a column for each relative_hp_dist/ID so we can average across low-probability locations. 
+
+```{r reformat}
+
+space_anova <- setDT(space)
+space_anova <- dcast(space_anova,id~relative_hp_dist,value.var='rts')
+
+```
+
+```{r set up data for t-test for high and low conditions only}
+
+space_anova <- space_anova %>%
+  mutate(low_prob = (dist_1+dist_2+dist_3)/3)
+
+```
+
+Now, I want to create a smaller graph with just 3 bars: one for the high-probability rts, average of low-probability rts, and no distractor. 
+
+```{r get_info_for_smaller_figure}
+
+df_mod <- subset(space_anova, select=c(id, high_prob, absent, low_prob))
+
+df_mod <- reshape2::melt(df_mod, id.var=c('id'), variable.name= "relative_hp_dist")
+
+```
+
+Summarize stats of 3 conditions and plot. 
+
+```{r another_df_with_mean_rts}
+
+sum_stats2 <- df_mod%>%
+  group_by(relative_hp_dist)%>%
+  summarize(mean_rts=mean(value),
+            sd_rt=sd(value),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+sum_stats2
+
+```
+
+
+```{r 3_loc_anova_test}
+
+model3 <- aov_car(value ~ relative_hp_dist + Error(id/relative_hp_dist), data=df_mod)
+
+model3
+
+
+```
+
+
+Run t-test to determine significant differences between conditions. 
+
+```{r t-test}
+
+space_anova %>%
+  t.test(x=space_anova$low_prob, y=space_anova$high_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
+space_anova%>%
+  t.test(x=space_anova$high_prob, y=space_anova$absent, alternative="greater", mu=0, paired =TRUE, conf.level = .95) 
+space_anova%>%
+  t.test(x=space_anova$low_prob, y=space_anova$absent, alternative="greater", mu=0, paired =TRUE, conf.level = .95)
+
+```
+
+Run an ANOVA on rts for all 5 conditions if the ANOVA on the 3 conditions was significant. 
 
 ```{r last_anova_test}
 
@@ -224,3 +290,7 @@ model_dist_rts
 
 
 
+
+### Examine accuracies
+
+Due to participants having extremely high accuracy overall, I expect there to be no differences. 
