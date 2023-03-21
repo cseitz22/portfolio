@@ -2,10 +2,146 @@
 title: "Portfolio 8"
 name: "Cat Seitz"
 date: "3.21.2023"
-data: "Thesis analysis 1"
+data: "Thesis analysis - adult data - distractor location rt and accuracy"
 output: 
   html_document: 
     theme: cerulean
 ---
 
-> The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
+```{r load-packages, message=FALSE}
+library(tidyverse) 
+library(tidyr)
+library(rstatix)
+library(data.table)
+library(afex)
+library(emmeans)
+library(psych)
+library(ggprism)
+library(patchwork)
+library(magrittr)
+library(cowplot)
+```
+
+
+```{r import data}
+
+adults <- read_csv("adult_data.csv", show_col_types = FALSE)
+  
+```
+
+```{r add-block-and-relative-dist-loc}
+
+block_num <- rep(c(1,2,3,4,5,6), each=60, times=28)
+adults <- cbind(adults, block_num)
+
+adults <- adults %>%
+  mutate(relative_hp_dist=
+           case_when(dist_loc=1 & hp_loc=1 ~ 0,
+                     dist_loc=1 & hp_loc=2 ~ 1,
+                     dist_loc=1 & hp_loc=3 ~ 2,
+                     dist_loc=1 & hp_loc=4 ~ 3,
+                     dist_loc=1 & hp_loc=5 ~ 2,
+                     dist_loc=1 & hp_loc=6 ~ 1,
+                     dist_loc=2 & hp_loc=1 ~ 1,
+                     dist_loc=2 & hp_loc=2 ~ 0,
+                     dist_loc=2 & hp_loc=3 ~ 1,
+                     dist_loc=2 & hp_loc=4 ~ 2,
+                     dist_loc=2 & hp_loc=5 ~ 3,
+                     dist_loc=2 & hp_loc=6 ~ 2,
+                     dist_loc=3 & hp_loc=1 ~ 2,
+                     dist_loc=3 & hp_loc=2 ~ 1,
+                     dist_loc=3 & hp_loc=3 ~ 0,
+                     dist_loc=3 & hp_loc=4 ~ 1,
+                     dist_loc=3 & hp_loc=5 ~ 2,
+                     dist_loc=3 & hp_loc=6 ~ 3,
+                     dist_loc=4 & hp_loc=1 ~ 3,
+                     dist_loc=4 & hp_loc=2 ~ 2,
+                     dist_loc=4 & hp_loc=3 ~ 1,
+                     dist_loc=4 & hp_loc=4 ~ 0,
+                     dist_loc=4 & hp_loc=5 ~ 1,
+                     dist_loc=4 & hp_loc=6 ~ 2,
+                     dist_loc=5 & hp_loc=1 ~ 2,
+                     dist_loc=5 & hp_loc=2 ~ 3,
+                     dist_loc=5 & hp_loc=3 ~ 2,
+                     dist_loc=5 & hp_loc=4 ~ 1,
+                     dist_loc=5 & hp_loc=5 ~ 0,
+                     dist_loc=5 & hp_loc=6 ~ 1,
+                     dist_loc=6 & hp_loc=1 ~ 1,
+                     dist_loc=6 & hp_loc=2 ~ 2,
+                     dist_loc=6 & hp_loc=3 ~ 3,
+                     dist_loc=6 & hp_loc=4 ~ 2,
+                     dist_loc=6 & hp_loc=5 ~ 1,
+                     dist_loc=6 & hp_loc=6 ~ 0,
+           ))
+
+adults <- adults %>%
+  mutate(relative_target=
+           case_when(target_loc==1 & hp_loc==1 ~ 0,
+                     target_loc==2 & hp_loc==1 ~ 1,
+                     target_loc==3 & hp_loc==1 ~ 2,
+                     target_loc==4 & hp_loc==1 ~ 3,
+                     target_loc==5 & hp_loc==1 ~ 2,
+                     target_loc==6 & hp_loc==1 ~ 1,
+                     target_loc==1 & hp_loc==2 ~ 1,
+                     target_loc==2 & hp_loc==2 ~ 0,
+                     target_loc==3 & hp_loc==2 ~ 1,
+                     target_loc==4 & hp_loc==2 ~ 2,
+                     target_loc==5 & hp_loc==2 ~ 3,
+                     target_loc==6 & hp_loc==2 ~ 2,
+                     target_loc==1 & hp_loc==3 ~ 2,
+                     target_loc==2 & hp_loc==3 ~ 1,
+                     target_loc==3 & hp_loc==3 ~ 0,
+                     target_loc==4 & hp_loc==3 ~ 1,
+                     target_loc==5 & hp_loc==3 ~ 2,
+                     target_loc==6 & hp_loc==3 ~ 3,
+                     target_loc==1 & hp_loc==4 ~ 3,
+                     target_loc==2 & hp_loc==4 ~ 2,
+                     target_loc==3 & hp_loc==4 ~ 1,
+                     target_loc==4 & hp_loc==4 ~ 0,
+                     target_loc==5 & hp_loc==4 ~ 1,
+                     target_loc==6 & hp_loc==4 ~ 2,
+                     target_loc==1 & hp_loc==5 ~ 2,
+                     target_loc==2 & hp_loc==5 ~ 3,
+                     target_loc==3 & hp_loc==5 ~ 2,
+                     target_loc==4 & hp_loc==5 ~ 1,
+                     target_loc==5 & hp_loc==5 ~ 0,
+                     target_loc==6 & hp_loc==5 ~ 1,
+                     target_loc==1 & hp_loc==6 ~ 1,
+                     target_loc==2 & hp_loc==6 ~ 2,
+                     target_loc==3 & hp_loc==6 ~ 3,
+                     target_loc==4 & hp_loc==6 ~ 2,
+                     target_loc==5 & hp_loc==6 ~ 1,
+                     target_loc==6 & hp_loc==6 ~ 0,))
+
+
+```
+
+
+### Trim the Data
+
+Define trimming criteria according to Van Selst and Jolicoeur 1994.
+```{r set_stds_depending_on_set_size}
+xsize <- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
+             25, 30, 35, 50, 100)
+stds <- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173, 
+            2.22, 2.246, 2.274, 2.31, 2.326, 2.391, 2.41, 2.4305, 
+            2.45, 2.48, 2.5)
+```
+
+Trim the data and compute the percent trimmed
+```{r trimming}
+trimmed <- adults[adults$acc==100, ] %>% group_by(id, relative_hp_dist) %>%
+           mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(RT))$y), avg = mean(rt), stdev = sd(rt)) %>%
+           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=.200) %>%
+           select(id, relative_hp_dist, rt, block_num) %>%  #keep these columns in the new data frame
+           as.data.frame()
+
+
+statPrep <- trimmed %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
+100-(nrow(trimmed)/nrow(adults[adults$acc==100, ]))*100
+```
+
+
+
+
+
