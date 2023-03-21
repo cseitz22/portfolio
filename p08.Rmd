@@ -22,115 +22,12 @@ library(magrittr)
 library(cowplot)
 ```
 
+I put all the messy loading in of different data sets and adding in important columns to an R script instead of having it here. 
+```{r, include=FALSE}
 
-```{r import data}
-
-adults <- read_csv("adult_data.csv", show_col_types = FALSE)
-  
-```
-
-```{r add-block-and-relative-dist&target-loc}
-
-block_num <- rep(c(1,2,3,4,5,6), each=60, times=28)
-adults <- cbind(adults, block_num)
-
-
-
-##need to add something for distractor absent trials - I think I added this
-adults <- adults %>%
-  mutate(relative_hp_dist=
-           case_when(dist_loc==0 ~ 4,
-                     dist_loc==1 & hp_loc==1 ~ 0,
-                     dist_loc==1 & hp_loc==2 ~ 1,
-                     dist_loc==1 & hp_loc==3 ~ 2,
-                     dist_loc==1 & hp_loc==4 ~ 3,
-                     dist_loc==1 & hp_loc==5 ~ 2,
-                     dist_loc==1 & hp_loc==6 ~ 1,
-                     dist_loc==2 & hp_loc==1 ~ 1,
-                     dist_loc==2 & hp_loc==2 ~ 0,
-                     dist_loc==2 & hp_loc==3 ~ 1,
-                     dist_loc==2 & hp_loc==4 ~ 2,
-                     dist_loc==2 & hp_loc==5 ~ 3,
-                     dist_loc==2 & hp_loc==6 ~ 2,
-                     dist_loc==3 & hp_loc==1 ~ 2,
-                     dist_loc==3 & hp_loc==2 ~ 1,
-                     dist_loc==3 & hp_loc==3 ~ 0,
-                     dist_loc==3 & hp_loc==4 ~ 1,
-                     dist_loc==3 & hp_loc==5 ~ 2,
-                     dist_loc==3 & hp_loc==6 ~ 3,
-                     dist_loc==4 & hp_loc==1 ~ 3,
-                     dist_loc==4 & hp_loc==2 ~ 2,
-                     dist_loc==4 & hp_loc==3 ~ 1,
-                     dist_loc==4 & hp_loc==4 ~ 0,
-                     dist_loc==4 & hp_loc==5 ~ 1,
-                     dist_loc==4 & hp_loc==6 ~ 2,
-                     dist_loc==5 & hp_loc==1 ~ 2,
-                     dist_loc==5 & hp_loc==2 ~ 3,
-                     dist_loc==5 & hp_loc==3 ~ 2,
-                     dist_loc==5 & hp_loc==4 ~ 1,
-                     dist_loc==5 & hp_loc==5 ~ 0,
-                     dist_loc==5 & hp_loc==6 ~ 1,
-                     dist_loc==6 & hp_loc==1 ~ 1,
-                     dist_loc==6 & hp_loc==2 ~ 2,
-                     dist_loc==6 & hp_loc==3 ~ 3,
-                     dist_loc==6 & hp_loc==4 ~ 2,
-                     dist_loc==6 & hp_loc==5 ~ 1,
-                     dist_loc==6 & hp_loc==6 ~ 0,
-           ))
-
-adults <- adults %>%
-  mutate(relative_target=
-           case_when(target_loc==1 & hp_loc==1 ~ 0,
-                     target_loc==2 & hp_loc==1 ~ 1,
-                     target_loc==3 & hp_loc==1 ~ 2,
-                     target_loc==4 & hp_loc==1 ~ 3,
-                     target_loc==5 & hp_loc==1 ~ 2,
-                     target_loc==6 & hp_loc==1 ~ 1,
-                     target_loc==1 & hp_loc==2 ~ 1,
-                     target_loc==2 & hp_loc==2 ~ 0,
-                     target_loc==3 & hp_loc==2 ~ 1,
-                     target_loc==4 & hp_loc==2 ~ 2,
-                     target_loc==5 & hp_loc==2 ~ 3,
-                     target_loc==6 & hp_loc==2 ~ 2,
-                     target_loc==1 & hp_loc==3 ~ 2,
-                     target_loc==2 & hp_loc==3 ~ 1,
-                     target_loc==3 & hp_loc==3 ~ 0,
-                     target_loc==4 & hp_loc==3 ~ 1,
-                     target_loc==5 & hp_loc==3 ~ 2,
-                     target_loc==6 & hp_loc==3 ~ 3,
-                     target_loc==1 & hp_loc==4 ~ 3,
-                     target_loc==2 & hp_loc==4 ~ 2,
-                     target_loc==3 & hp_loc==4 ~ 1,
-                     target_loc==4 & hp_loc==4 ~ 0,
-                     target_loc==5 & hp_loc==4 ~ 1,
-                     target_loc==6 & hp_loc==4 ~ 2,
-                     target_loc==1 & hp_loc==5 ~ 2,
-                     target_loc==2 & hp_loc==5 ~ 3,
-                     target_loc==3 & hp_loc==5 ~ 2,
-                     target_loc==4 & hp_loc==5 ~ 1,
-                     target_loc==5 & hp_loc==5 ~ 0,
-                     target_loc==6 & hp_loc==5 ~ 1,
-                     target_loc==1 & hp_loc==6 ~ 1,
-                     target_loc==2 & hp_loc==6 ~ 2,
-                     target_loc==3 & hp_loc==6 ~ 3,
-                     target_loc==4 & hp_loc==6 ~ 2,
-                     target_loc==5 & hp_loc==6 ~ 1,
-                     target_loc==6 & hp_loc==6 ~ 0,))
-
-
-adults$relative_target[adults$relative_target == 0] <- "high_prob"
-adults$relative_target[adults$relative_target == 1] <- "lp_1"
-adults$relative_target[adults$relative_target == 2] <- "lp_2"
-adults$relative_target[adults$relative_target == 3] <- "lp_3"
-
-adults$relative_hp_dist[adults$relative_hp_dist == 0] <- "high_prob"
-adults$relative_hp_dist[adults$relative_hp_dist == 1] <- "lp_1"
-adults$relative_hp_dist[adults$relative_hp_dist == 2] <- "lp_2"
-adults$relative_hp_dist[adults$relative_hp_dist == 3] <- "lp_3"
-adults$relative_hp_dist[adults$relative_hp_dist == 4] <- "absent"
+source("load_data.R", local = knitr::knit_global())
 
 ```
-
 
 ### Trim the Data
 
@@ -144,19 +41,44 @@ stds <- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173,
 ```
 
 Trim the data and compute the percent trimmed
-```{r trimming}
-trimmed <- adults[adults$acc==100, ] %>% group_by(id, relative_hp_dist) %>%
-           mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(RT))$y), avg = mean(rt), stdev = sd(rt)) %>%
+```{r trimming-adults}
+trimmedA <- adults[adults$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
+           mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
            filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=.200) %>%
            select(id, relative_hp_dist, rt, block_num) %>%  #keep these columns in the new data frame
            as.data.frame()
 
 
-statPrep <- trimmed %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
-100-(nrow(trimmed)/nrow(adults[adults$acc==100, ]))*100
+statPrep <- trimmedA %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
+100-(nrow(trimmedA)/nrow(adults[adults$acc==1, ]))*100
 ```
+2.89% of trials were trimmed from the adult data set. 
+
+```{r trimming-child12}
+trimmedC12 <- kids12[kids12$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
+           mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
+           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=.200) %>%
+           select(id, relative_hp_dist, rt, block_num1) %>%  #keep these columns in the new data frame
+           as.data.frame()
 
 
+statPrep <- trimmedC12 %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
+100-(nrow(trimmedC12)/nrow(kids12[kids12$acc==1, ]))*100
+```
+2.78% of trials were trimmed from the older child data set. 
+
+```{r trimming-child6}
+trimmedC6 <- kids6[kids6$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
+           mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
+           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=.200) %>%
+           select(id, relative_hp_dist, rt, block_num2) %>%  #keep these columns in the new data frame
+           as.data.frame()
+
+
+statPrep <- trimmedC6 %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
+100-(nrow(trimmedC6)/nrow(kids6[kids6$acc==1, ]))*100
+```
+6.07% of trials were trimmed from the ounger child data set
 
 ### Examine response times
 
