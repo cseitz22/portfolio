@@ -10,10 +10,10 @@ adults <- read_csv("RawDataAdults.csv", show_col_types = FALSE)
 kids12 <- read_csv("RawDataChildren12.csv", show_col_types = FALSE)
 kids6 <- read_csv("RawDataChildren6.csv", show_col_types = FALSE)
 
-block_num <- rep(c(1,2,3,4,5,6), each=60, times=28)
+block_num <- rep(c(1,2,3,4,5,6), each=60, times=27)
 adults <- cbind(adults, block_num)
 
-age <- (rep(c("adult"), times=10080))
+age <- (rep(c("adult"), times=9720))
 adults<- cbind(adults, age)
 
 #kids12
@@ -29,6 +29,10 @@ kids6 <- cbind(kids6, block_num2)
 
 age2 <- (rep(c("child"), times=1440))
 kids6<- cbind(kids6, age2)
+
+adults$rt <- adults$rt *1000
+kids12$rt <- kids12$rt *1000
+kids6$rt <- kids6$rt *1000
 
 ##need to add something for distractor absent trials - I think I added this
 adults <- adults %>%

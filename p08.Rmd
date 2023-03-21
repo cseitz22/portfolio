@@ -52,7 +52,7 @@ trimmedA <- adults[adults$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
 statPrep <- trimmedA %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
 100-(nrow(trimmedA)/nrow(adults[adults$acc==1, ]))*100
 ```
-2.89% of trials were trimmed from the adult data set. 
+2.88% of trials were trimmed from the adult data set. 
 
 ```{r trimming-child12}
 trimmedC12 <- kids12[kids12$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
@@ -78,15 +78,107 @@ trimmedC6 <- kids6[kids6$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
 statPrep <- trimmedC6 %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
 100-(nrow(trimmedC6)/nrow(kids6[kids6$acc==1, ]))*100
 ```
-6.07% of trials were trimmed from the ounger child data set
+6.07% of trials were trimmed from the younger child data set.
 
-### Examine response times
+
+### Response Time ANOVA for 3 conditions and 2 ages
+
+```{r change-column-names}
+
+kids12<- kids12 %>%
+  rename(
+    block_num=block_num1,
+    age=age1
+  )
+
+kids6<- kids6 %>%
+  rename(
+    block_num=block_num2,
+    age=age2
+  )
+
+
+```
+
+
+ 
+```{r combine-columns}
+
+all_data <- rbind(adults, kids12)
+ 
+```
+
+Create a new data frame with the average RT for each relative distractor location per participant, so we can do a repeated measures ANOVA -- eventually -- maybe. 
+
+```{r smaller df for 1 line per condition per participant}
+
+space <- all_data %>%
+  group_by(age, id, relative_hp_dist) %>%
+  summarize(rts = mean(rt)
+            )
+space
+  
+```
+
+Run ANOVA on 3 conditions first, and if significant, then run in on 5 conditions?
+
+Need to reformat the above df to have a column for each relative_hp_dist/ID so we can average across low-probability locations. 
+
+```{r reformat}
+
+space_anova <- setDT(space)
+space_anova <- dcast(space_anova,id+age~relative_hp_dist,value.var='rts')
+
+```
+
+```{r set up data for t-test for high and low conditions only}
+
+space_anova <- space_anova %>%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+```
+
+Now, I want to create a smaller graph with just 3 bars: one for the high-probability rts, average of low-probability rts, and no distractor. 
+
+```{r get_info_for_smaller_figure}
+
+df_mod <- subset(space_anova, select=c(id, age, high_prob, absent, low_prob))
+
+df_mod <- reshape2::melt(df_mod, id.var=c('id', 'age'), variable.name= "relative_hp_dist")
+
+```
+
+Plot data. 
+
+```{r plot-first}
+ggplot(df_mod, aes(relative_hp_dist, value, fill=relative_hp_dist)) +
+  geom_bar(stat="summary", fun.y="mean", position="dodge") + 
+  facet_grid(.~age) +
+  xlab("Distractor Location") + ylab("Response Times (ms)") +
+  scale_fill_brewer(palette="Dark2") +
+  theme(legend.position="none")
+
+```
+
+```{r ANOVA}
+
+model3 <- aov_car(value ~ age*relative_hp_dist + Error(id/relative_hp_dist), data=df_mod)
+
+model3
+
+```
+
+
+
+
+
+### TO BE MOVED AT SOME POINT
 
 Find means of each condition. 
 
 ```{r create new df with mean rts}
 
-sum_stats <- trimmed%>%
+sum_stats <- trimmedA%>%
   group_by(relative_hp_dist)%>%
   summarize(mean_rts=mean(rt),
             sd_rt=sd(rt),
@@ -118,45 +210,7 @@ ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
 
 ```
 
-Create a new data frame with the average RT for each relative distractor location per participant, so we can do a repeated measures ANOVA -- eventually -- maybe. 
 
-```{r smaller df for 1 line per condition per participant}
-
-space <- trimmed %>%
-  group_by(id, relative_hp_dist) %>%
-  summarize(rts = mean(rt)
-            )
-space
-  
-```
-
-Run ANOVA on 3 conditions first, and if significant, then run in on 5 conditions?
-
-Need to reformat the above df to have a column for each relative_hp_dist/ID so we can average across low-probability locations. 
-
-```{r reformat}
-
-space_anova <- setDT(space)
-space_anova <- dcast(space_anova,id~relative_hp_dist,value.var='rts')
-
-```
-
-```{r set up data for t-test for high and low conditions only}
-
-space_anova <- space_anova %>%
-  mutate(low_prob = (dist_1+dist_2+dist_3)/3)
-
-```
-
-Now, I want to create a smaller graph with just 3 bars: one for the high-probability rts, average of low-probability rts, and no distractor. 
-
-```{r get_info_for_smaller_figure}
-
-df_mod <- subset(space_anova, select=c(id, high_prob, absent, low_prob))
-
-df_mod <- reshape2::melt(df_mod, id.var=c('id'), variable.name= "relative_hp_dist")
-
-```
 
 Summarize stats of 3 conditions and plot. 
 
@@ -181,7 +235,6 @@ sum_stats2
 model3 <- aov_car(value ~ relative_hp_dist + Error(id/relative_hp_dist), data=df_mod)
 
 model3
-
 
 ```
 
