@@ -29,49 +29,53 @@ adults <- read_csv("adult_data.csv", show_col_types = FALSE)
   
 ```
 
-```{r add-block-and-relative-dist-loc}
+```{r add-block-and-relative-dist&target-loc}
 
 block_num <- rep(c(1,2,3,4,5,6), each=60, times=28)
 adults <- cbind(adults, block_num)
 
+
+
+##need to add something for distractor absent trials - I think I added this
 adults <- adults %>%
   mutate(relative_hp_dist=
-           case_when(dist_loc=1 & hp_loc=1 ~ 0,
-                     dist_loc=1 & hp_loc=2 ~ 1,
-                     dist_loc=1 & hp_loc=3 ~ 2,
-                     dist_loc=1 & hp_loc=4 ~ 3,
-                     dist_loc=1 & hp_loc=5 ~ 2,
-                     dist_loc=1 & hp_loc=6 ~ 1,
-                     dist_loc=2 & hp_loc=1 ~ 1,
-                     dist_loc=2 & hp_loc=2 ~ 0,
-                     dist_loc=2 & hp_loc=3 ~ 1,
-                     dist_loc=2 & hp_loc=4 ~ 2,
-                     dist_loc=2 & hp_loc=5 ~ 3,
-                     dist_loc=2 & hp_loc=6 ~ 2,
-                     dist_loc=3 & hp_loc=1 ~ 2,
-                     dist_loc=3 & hp_loc=2 ~ 1,
-                     dist_loc=3 & hp_loc=3 ~ 0,
-                     dist_loc=3 & hp_loc=4 ~ 1,
-                     dist_loc=3 & hp_loc=5 ~ 2,
-                     dist_loc=3 & hp_loc=6 ~ 3,
-                     dist_loc=4 & hp_loc=1 ~ 3,
-                     dist_loc=4 & hp_loc=2 ~ 2,
-                     dist_loc=4 & hp_loc=3 ~ 1,
-                     dist_loc=4 & hp_loc=4 ~ 0,
-                     dist_loc=4 & hp_loc=5 ~ 1,
-                     dist_loc=4 & hp_loc=6 ~ 2,
-                     dist_loc=5 & hp_loc=1 ~ 2,
-                     dist_loc=5 & hp_loc=2 ~ 3,
-                     dist_loc=5 & hp_loc=3 ~ 2,
-                     dist_loc=5 & hp_loc=4 ~ 1,
-                     dist_loc=5 & hp_loc=5 ~ 0,
-                     dist_loc=5 & hp_loc=6 ~ 1,
-                     dist_loc=6 & hp_loc=1 ~ 1,
-                     dist_loc=6 & hp_loc=2 ~ 2,
-                     dist_loc=6 & hp_loc=3 ~ 3,
-                     dist_loc=6 & hp_loc=4 ~ 2,
-                     dist_loc=6 & hp_loc=5 ~ 1,
-                     dist_loc=6 & hp_loc=6 ~ 0,
+           case_when(dist_loc==0 ~ 4,
+                     dist_loc==1 & hp_loc==1 ~ 0,
+                     dist_loc==1 & hp_loc==2 ~ 1,
+                     dist_loc==1 & hp_loc==3 ~ 2,
+                     dist_loc==1 & hp_loc==4 ~ 3,
+                     dist_loc==1 & hp_loc==5 ~ 2,
+                     dist_loc==1 & hp_loc==6 ~ 1,
+                     dist_loc==2 & hp_loc==1 ~ 1,
+                     dist_loc==2 & hp_loc==2 ~ 0,
+                     dist_loc==2 & hp_loc==3 ~ 1,
+                     dist_loc==2 & hp_loc==4 ~ 2,
+                     dist_loc==2 & hp_loc==5 ~ 3,
+                     dist_loc==2 & hp_loc==6 ~ 2,
+                     dist_loc==3 & hp_loc==1 ~ 2,
+                     dist_loc==3 & hp_loc==2 ~ 1,
+                     dist_loc==3 & hp_loc==3 ~ 0,
+                     dist_loc==3 & hp_loc==4 ~ 1,
+                     dist_loc==3 & hp_loc==5 ~ 2,
+                     dist_loc==3 & hp_loc==6 ~ 3,
+                     dist_loc==4 & hp_loc==1 ~ 3,
+                     dist_loc==4 & hp_loc==2 ~ 2,
+                     dist_loc==4 & hp_loc==3 ~ 1,
+                     dist_loc==4 & hp_loc==4 ~ 0,
+                     dist_loc==4 & hp_loc==5 ~ 1,
+                     dist_loc==4 & hp_loc==6 ~ 2,
+                     dist_loc==5 & hp_loc==1 ~ 2,
+                     dist_loc==5 & hp_loc==2 ~ 3,
+                     dist_loc==5 & hp_loc==3 ~ 2,
+                     dist_loc==5 & hp_loc==4 ~ 1,
+                     dist_loc==5 & hp_loc==5 ~ 0,
+                     dist_loc==5 & hp_loc==6 ~ 1,
+                     dist_loc==6 & hp_loc==1 ~ 1,
+                     dist_loc==6 & hp_loc==2 ~ 2,
+                     dist_loc==6 & hp_loc==3 ~ 3,
+                     dist_loc==6 & hp_loc==4 ~ 2,
+                     dist_loc==6 & hp_loc==5 ~ 1,
+                     dist_loc==6 & hp_loc==6 ~ 0,
            ))
 
 adults <- adults %>%
@@ -114,6 +118,17 @@ adults <- adults %>%
                      target_loc==6 & hp_loc==6 ~ 0,))
 
 
+adults$relative_target[adults$relative_target == 0] <- "high_prob"
+adults$relative_target[adults$relative_target == 1] <- "lp_1"
+adults$relative_target[adults$relative_target == 2] <- "lp_2"
+adults$relative_target[adults$relative_target == 3] <- "lp_3"
+
+adults$relative_hp_dist[adults$relative_hp_dist == 0] <- "high_prob"
+adults$relative_hp_dist[adults$relative_hp_dist == 1] <- "lp_1"
+adults$relative_hp_dist[adults$relative_hp_dist == 2] <- "lp_2"
+adults$relative_hp_dist[adults$relative_hp_dist == 3] <- "lp_3"
+adults$relative_hp_dist[adults$relative_hp_dist == 4] <- "absent"
+
 ```
 
 
@@ -142,6 +157,70 @@ statPrep <- trimmed %>% group_by(id, relative_hp_dist) %>% summarise(measurement
 ```
 
 
+
+### Examine response times
+
+Find means of each condition. 
+
+```{r create new df with mean rts}
+
+sum_stats <- trimmed%>%
+  group_by(relative_hp_dist)%>%
+  summarize(mean_rts=mean(rt),
+            sd_rt=sd(rt),
+            n_rt=28,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+sum_stats
+
+```
+
+Below is a plot of the mean response times depending on the location of the distractor. 
+
+```{r plot-rts}
+ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
+  #geom_point()+
+  geom_bar(stat = "identity", fill="blue", color='#000000') + ##9E7E38
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(700,1050))+
+  theme_classic()+
+  labs(x = "Distractor Location", y = "Response Time (ms)")+
+  labs(title = "Singleton Distractor Present")
+  #labs(caption = "An ANOVA test shows a difference in RT depending on distractor location, F(3.28,65.57)=33.3, p<.001.")+
+  #theme(axis.text=element_text(size=30),
+       # axis.title=element_text(size=40,face="bold"),
+      #  title = element_text(size = 40))+
+  #scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
+
+```
+
+Run ANOVA on 3 conditions first, and if significant, then run in on 5 conditions?
+
+
+Create a new data frame with the average RT for each relative distractor location per participant, so we can do a repeated measures ANOVA. 
+
+```{r smaller df for 1 line per condition per participant}
+
+space <- trimmed %>%
+  group_by(id, relative_hp_dist) %>%
+  summarize(rts = mean(rt)
+            )
+space
+  
+```
+
+Run an ANOVA on rts. 
+
+```{r last_anova_test}
+
+model_dist_rts <- aov_car(rts ~ relative_hp_dist + Error(id/relative_hp_dist), data=space)
+
+model_dist_rts
+
+
+```
 
 
 
