@@ -160,6 +160,8 @@ ggplot(df_mod, aes(relative_hp_dist, value, fill=relative_hp_dist)) +
 
 ```
 
+Run a 3x2 mixed design ANOVA with distractor location and age as independent variables and rt as the dependent variable. 
+
 ```{r ANOVA}
 
 model3 <- aov_car(value ~ age*relative_hp_dist + Error(id/relative_hp_dist), data=df_mod)
@@ -168,10 +170,106 @@ model3
 
 ```
 
-The effect of age was significant F(1,31)=8, p=.008
+The effect of age was significant F(1,31)=8, p=.008.The effect of distractor location was significant, F(2, ??)= 25.2, p<.001. The interaction was significant, F=4.28, p=.025.
+
+### Separate ANOVA for just adults
+
+```{r smaller df for 1 line per condition per participant}
+
+spaceA <- adults %>%
+  group_by(id, relative_hp_dist) %>%
+  summarize(rts = mean(rt)
+            )
+  
+```
+
+Run ANOVA on 3 conditions first, and if significant, then run in on 5 conditions?
+
+Need to reformat the above df to have a column for each relative_hp_dist/ID so we can average across low-probability locations. 
+
+```{r reformat}
+
+space_anovaA <- setDT(spaceA)
+space_anovaA <- dcast(space_anovaA,id~relative_hp_dist,value.var='rts')
+
+```
+
+```{r set up data for t-test for high and low conditions only}
+
+space_anovaA <- space_anovaA %>%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+```
+
+Now, I want to create a smaller graph with just 3 bars: one for the high-probability rts, average of low-probability rts, and no distractor. 
+
+```{r get_info_for_smaller_figure}
+
+df_modA <- subset(space_anovaA, select=c(id, high_prob, absent, low_prob))
+
+df_modA <- reshape2::melt(df_modA, id.var=c('id'), variable.name= "relative_hp_dist")
+
+```
+
+```{r ANOVA}
+
+modelA <- aov_car(value ~ relative_hp_dist + Error(id/relative_hp_dist), data=df_modA)
+
+modelA
+
+```
+
+The repeated measures ANOVA on just the adults was significant. 
+
+### Separate ANOVA for just kids
 
 
+```{r smaller df for 1 line per condition per participant}
 
+spaceK <- kids12 %>%
+  group_by(id,relative_hp_dist) %>%
+  summarize(rts = mean(rt)
+            )
+
+```
+
+Run ANOVA on 3 conditions first, and if significant, then run in on 5 conditions?
+
+Need to reformat the above df to have a column for each relative_hp_dist/ID so we can average across low-probability locations. 
+
+```{r reformat}
+
+space_anovaK <- setDT(spaceK)
+space_anovaK <- dcast(space_anovaK,id~relative_hp_dist,value.var='rts')
+
+```
+
+```{r set up data for t-test for high and low conditions only}
+
+space_anovaK <- space_anovaK %>%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+```
+
+Now, I want to create a smaller graph with just 3 bars: one for the high-probability rts, average of low-probability rts, and no distractor. 
+
+```{r get_info_for_smaller_figure}
+
+df_modK <- subset(space_anovaK, select=c(id,high_prob, absent, low_prob))
+
+df_modK <- reshape2::melt(df_modK, id.var=c('id'), variable.name= "relative_hp_dist")
+
+```
+
+```{r ANOVA}
+
+modelK <- aov_car(value ~ relative_hp_dist + Error(id/relative_hp_dist), data=df_modK)
+
+modelK
+
+```
+
+The repeated measures ANOVA on just the kids was also significant. 
 
 ### TO BE MOVED AT SOME POINT
 
