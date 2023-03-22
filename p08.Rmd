@@ -2,11 +2,15 @@
 title: "Portfolio 8"
 name: "Cat Seitz"
 date: "3.21.2023"
-data: "Thesis analysis - adult data - distractor location rt and accuracy"
+data: "Thesis analysis - adult & child data - distractor location rt "
 output: 
   html_document: 
     theme: cerulean
 ---
+
+The goal of this portfolio is to examine part of my thesis data. To recap, my thesis is examining distractor suppression in children and adults. Participants are shown a distractor in a location more frequently than other locations in a visual search array. Based on previous studies, we would expect adults to suppress their attention to the high-probability location, but we were unsure when in development children develop this ability. 
+
+
 
 ```{r load-packages, message=FALSE}
 library(tidyverse) 
@@ -110,7 +114,7 @@ all_data <- rbind(adults, kids12)
 
 Create a new data frame with the average RT for each relative distractor location per participant, so we can do a repeated measures ANOVA -- eventually -- maybe. 
 
-```{r smaller df for 1 line per condition per participant}
+```{r sum-stat-all}
 
 space <- all_data %>%
   group_by(age, id, relative_hp_dist) %>%
@@ -124,14 +128,14 @@ Run ANOVA on 3 conditions first, and if significant, then run in on 5 conditions
 
 Need to reformat the above df to have a column for each relative_hp_dist/ID so we can average across low-probability locations. 
 
-```{r reformat}
+```{r reformat-all}
 
 space_anova <- setDT(space)
 space_anova <- dcast(space_anova,id+age~relative_hp_dist,value.var='rts')
 
 ```
 
-```{r set up data for t-test for high and low conditions only}
+```{r avg-lp-all}
 
 space_anova <- space_anova %>%
   mutate(low_prob = (lp_1+lp_2+lp_3)/3)
@@ -162,7 +166,7 @@ ggplot(df_mod, aes(relative_hp_dist, value, fill=relative_hp_dist)) +
 
 Run a 3x2 mixed design ANOVA with distractor location and age as independent variables and rt as the dependent variable. 
 
-```{r ANOVA}
+```{r ANOVA-all}
 
 model3 <- aov_car(value ~ age*relative_hp_dist + Error(id/relative_hp_dist), data=df_mod)
 
@@ -174,7 +178,7 @@ The effect of age was significant F(1,31)=8, p=.008.The effect of distractor loc
 
 ### Separate ANOVA for just adults
 
-```{r smaller df for 1 line per condition per participant}
+```{r sum-stats-adults}
 
 spaceA <- adults %>%
   group_by(id, relative_hp_dist) %>%
@@ -187,14 +191,14 @@ Run ANOVA on 3 conditions first, and if significant, then run in on 5 conditions
 
 Need to reformat the above df to have a column for each relative_hp_dist/ID so we can average across low-probability locations. 
 
-```{r reformat}
+```{r reformat-adults}
 
 space_anovaA <- setDT(spaceA)
 space_anovaA <- dcast(space_anovaA,id~relative_hp_dist,value.var='rts')
 
 ```
 
-```{r set up data for t-test for high and low conditions only}
+```{r avg-lp-adults}
 
 space_anovaA <- space_anovaA %>%
   mutate(low_prob = (lp_1+lp_2+lp_3)/3)
@@ -203,7 +207,7 @@ space_anovaA <- space_anovaA %>%
 
 Now, I want to create a smaller graph with just 3 bars: one for the high-probability rts, average of low-probability rts, and no distractor. 
 
-```{r get_info_for_smaller_figure}
+```{r reshape-adults}
 
 df_modA <- subset(space_anovaA, select=c(id, high_prob, absent, low_prob))
 
@@ -211,7 +215,7 @@ df_modA <- reshape2::melt(df_modA, id.var=c('id'), variable.name= "relative_hp_d
 
 ```
 
-```{r ANOVA}
+```{r ANOVA-3adults}
 
 modelA <- aov_car(value ~ relative_hp_dist + Error(id/relative_hp_dist), data=df_modA)
 
@@ -221,7 +225,7 @@ modelA
 
 The repeated measures ANOVA on just the adults was significant. 
 
-```{r last_anova_test}
+```{r last_anova_test-adults}
 
 model_dist_rtsA <- aov_car(rts ~ relative_hp_dist + Error(id/relative_hp_dist), data=spaceA)
 
@@ -232,7 +236,7 @@ model_dist_rtsA
 
 Run t-test to determine significant differences between conditions. 
 
-```{r t-test}
+```{r t-test-adults}
 
 space_anovaA %>%
   t.test(x=space_anovaA$low_prob, y=space_anovaA$high_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
@@ -246,7 +250,7 @@ space_anovaA%>%
 ### Separate ANOVA for just kids
 
 
-```{r smaller df for 1 line per condition per participant}
+```{r sum-stat-kids}
 
 spaceK <- kids12 %>%
   group_by(id,relative_hp_dist) %>%
@@ -259,14 +263,14 @@ Run ANOVA on 3 conditions first, and if significant, then run in on 5 conditions
 
 Need to reformat the above df to have a column for each relative_hp_dist/ID so we can average across low-probability locations. 
 
-```{r reformat}
+```{r reformat-kids}
 
 space_anovaK <- setDT(spaceK)
 space_anovaK <- dcast(space_anovaK,id~relative_hp_dist,value.var='rts')
 
 ```
 
-```{r set up data for t-test for high and low conditions only}
+```{r avg-lp-kids}
 
 space_anovaK <- space_anovaK %>%
   mutate(low_prob = (lp_1+lp_2+lp_3)/3)
@@ -275,7 +279,7 @@ space_anovaK <- space_anovaK %>%
 
 Now, I want to create a smaller graph with just 3 bars: one for the high-probability rts, average of low-probability rts, and no distractor. 
 
-```{r get_info_for_smaller_figure}
+```{r reshape-kids}
 
 df_modK <- subset(space_anovaK, select=c(id,high_prob, absent, low_prob))
 
@@ -283,7 +287,7 @@ df_modK <- reshape2::melt(df_modK, id.var=c('id'), variable.name= "relative_hp_d
 
 ```
 
-```{r ANOVA}
+```{r ANOVA-3kids}
 
 modelK <- aov_car(value ~ relative_hp_dist + Error(id/relative_hp_dist), data=df_modK)
 
@@ -293,7 +297,7 @@ modelK
 
 The repeated measures ANOVA on just the kids was also significant.
 
-```{r last_anova_test}
+```{r last_anova_test-5kids}
 
 model_dist_rtsK <- aov_car(rts ~ relative_hp_dist + Error(id/relative_hp_dist), data=spaceK)
 
@@ -304,7 +308,7 @@ model_dist_rtsK
 
 Run t-test to determine significant differences between conditions. 
 
-```{r t-test}
+```{r t-test-kids}
 
 space_anovaK %>%
   t.test(x=space_anovaK$low_prob, y=space_anovaK$high_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
@@ -315,14 +319,53 @@ space_anovaK%>%
 
 ```
 
+```{r plot-2}
+ggplot(all_data, aes(relative_hp_dist, rt, fill=relative_hp_dist)) +
+  geom_bar(stat="summary", fun.y="mean", position="dodge") + 
+  facet_grid(.~age) +
+  xlab("Distractor Location") + ylab("Response Times (ms)") +
+  scale_fill_brewer(palette="Dark2") +
+  theme(legend.position="none")
 
-Run an ANOVA on rts for all 5 conditions if the ANOVA on the 3 conditions was significant. 
+```
+
+### Examine normalized rts
+
+```{r normalized-rts-df}
+
+write.csv(df_mod, "norm_data.csv", row.names=FALSE)
+
+```
+
+```{r import-norm-data}
+
+normrt <- read_csv("norm_data_new.csv", show_col_types = FALSE)
+normrt<- subset(normrt, select=c(id...1, age, relative_hp_dist, norm))
+
+```
+
+```{r ANOVA-norm}
+
+model_norm <- aov_car(norm ~ age*relative_hp_dist + Error(id...1/relative_hp_dist), data=normrt)
+
+model_norm
+
+```
 
 
 
 
 
 
-### Examine accuracies
 
-Due to participants having extremely high accuracy overall, I expect there to be no differences. 
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Portfolio 8</title>
+
+<script src="site_libs/header-attrs-2.19/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Portfolio</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="p01.html">Portfolio 1</a>
+</li>
+<li>
+  <a href="p02.html">Portfolio 2</a>
+</li>
+<li>
+  <a href="p03.html">Portfolio 3</a>
+</li>
+<li>
+  <a href="p04.html">Portfolio 4</a>
+</li>
+<li>
+  <a href="p05.html">Portfolio 5</a>
+</li>
+<li>
+  <a href="p06.html">Portfolio 6</a>
+</li>
+<li>
+  <a href="p07.html">Portfolio 7</a>
+</li>
+<li>
+  <a href="p08.html">Portfolio 8</a>
+</li>
+<li>
+  <a href="p09.html">Portfolio 9</a>
+</li>
+<li>
+  <a href="p10.html">Portfolio 10</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Portfolio 8</h1>
+<h4 class="date">3.21.2023</h4>
+
+</div>
+
+
+<p>The goal of this portfolio is to examine part of my thesis data. To
+recap, my thesis is examining distractor suppression in children and
+adults. Participants are shown a distractor in a location more
+frequently than other locations in a visual search array. Based on
+previous studies, we would expect adults to suppress their attention to
+the high-probability location, but we were unsure when in development
+children develop this ability.</p>
+<pre class="r"><code>library(tidyverse) 
+library(tidyr)
+library(rstatix)
+library(data.table)
+library(afex)
+library(emmeans)
+library(psych)
+library(ggprism)
+library(patchwork)
+library(magrittr)
+library(cowplot)</code></pre>
+<p>I put all the messy loading in of different data sets and adding in
+important columns to an R script instead of having it here.</p>
+<div id="trim-the-data" class="section level3">
+<h3>Trim the Data</h3>
+<p>Define trimming criteria according to Van Selst and Jolicoeur
+1994.</p>
+<pre class="r"><code>xsize &lt;- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
+             25, 30, 35, 50, 100)
+stds &lt;- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173, 
+            2.22, 2.246, 2.274, 2.31, 2.326, 2.391, 2.41, 2.4305, 
+            2.45, 2.48, 2.5)</code></pre>
+<p>Trim the data and compute the percent trimmed</p>
+<pre class="r"><code>trimmedA &lt;- adults[adults$acc==1, ] %&gt;% group_by(id, relative_hp_dist) %&gt;%
+           mutate(sdc = ifelse(length(rt)&gt;=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %&gt;%
+           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=.200) %&gt;%
+           select(id, relative_hp_dist, rt, block_num) %&gt;%  #keep these columns in the new data frame
+           as.data.frame()
+
+
+statPrep &lt;- trimmedA %&gt;% group_by(id, relative_hp_dist) %&gt;% summarise(measurement=mean(rt)) %&gt;% as.data.frame()</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>100-(nrow(trimmedA)/nrow(adults[adults$acc==1, ]))*100</code></pre>
+<pre><code>## [1] 2.875735</code></pre>
+<p>2.88% of trials were trimmed from the adult data set.</p>
+<pre class="r"><code>trimmedC12 &lt;- kids12[kids12$acc==1, ] %&gt;% group_by(id, relative_hp_dist) %&gt;%
+           mutate(sdc = ifelse(length(rt)&gt;=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %&gt;%
+           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=.200) %&gt;%
+           select(id, relative_hp_dist, rt, block_num1) %&gt;%  #keep these columns in the new data frame
+           as.data.frame()
+
+
+statPrep &lt;- trimmedC12 %&gt;% group_by(id, relative_hp_dist) %&gt;% summarise(measurement=mean(rt)) %&gt;% as.data.frame()</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>100-(nrow(trimmedC12)/nrow(kids12[kids12$acc==1, ]))*100</code></pre>
+<pre><code>## [1] 2.783843</code></pre>
+<p>2.78% of trials were trimmed from the older child data set.</p>
+<pre class="r"><code>trimmedC6 &lt;- kids6[kids6$acc==1, ] %&gt;% group_by(id, relative_hp_dist) %&gt;%
+           mutate(sdc = ifelse(length(rt)&gt;=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %&gt;%
+           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=.200) %&gt;%
+           select(id, relative_hp_dist, rt, block_num2) %&gt;%  #keep these columns in the new data frame
+           as.data.frame()
+
+
+statPrep &lt;- trimmedC6 %&gt;% group_by(id, relative_hp_dist) %&gt;% summarise(measurement=mean(rt)) %&gt;% as.data.frame()</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>100-(nrow(trimmedC6)/nrow(kids6[kids6$acc==1, ]))*100</code></pre>
+<pre><code>## [1] 6.074766</code></pre>
+<p>6.07% of trials were trimmed from the younger child data set.</p>
+</div>
+<div id="response-time-anova-for-3-conditions-and-2-ages"
+class="section level3">
+<h3>Response Time ANOVA for 3 conditions and 2 ages</h3>
+<pre class="r"><code>kids12&lt;- kids12 %&gt;%
+  rename(
+    block_num=block_num1,
+    age=age1
+  )
+
+kids6&lt;- kids6 %&gt;%
+  rename(
+    block_num=block_num2,
+    age=age2
+  )</code></pre>
+<pre class="r"><code>all_data &lt;- rbind(adults, kids12)</code></pre>
+<p>Create a new data frame with the average RT for each relative
+distractor location per participant, so we can do a repeated measures
+ANOVA – eventually – maybe.</p>
+<pre class="r"><code>space &lt;- all_data %&gt;%
+  group_by(age, id, relative_hp_dist) %&gt;%
+  summarize(rts = mean(rt)
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;, &#39;id&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<pre class="r"><code>space</code></pre>
+<pre><code>## # A tibble: 165 × 4
+## # Groups:   age, id [33]
+##    age      id relative_hp_dist   rts
+##    &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;
+##  1 adult    14 absent            775.
+##  2 adult    14 high_prob         858.
+##  3 adult    14 lp_1             1089.
+##  4 adult    14 lp_2              886.
+##  5 adult    14 lp_3              897.
+##  6 adult    15 absent            807.
+##  7 adult    15 high_prob         982.
+##  8 adult    15 lp_1             1082.
+##  9 adult    15 lp_2              942.
+## 10 adult    15 lp_3             1112.
+## # … with 155 more rows</code></pre>
+<p>Run ANOVA on 3 conditions first, and if significant, then run in on 5
+conditions?</p>
+<p>Need to reformat the above df to have a column for each
+relative_hp_dist/ID so we can average across low-probability
+locations.</p>
+<pre class="r"><code>space_anova &lt;- setDT(space)
+space_anova &lt;- dcast(space_anova,id+age~relative_hp_dist,value.var=&#39;rts&#39;)</code></pre>
+<pre class="r"><code>space_anova &lt;- space_anova %&gt;%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)</code></pre>
+<p>Now, I want to create a smaller graph with just 3 bars: one for the
+high-probability rts, average of low-probability rts, and no
+distractor.</p>
+<pre class="r"><code>df_mod &lt;- subset(space_anova, select=c(id, age, high_prob, absent, low_prob))
+
+df_mod &lt;- reshape2::melt(df_mod, id.var=c(&#39;id&#39;, &#39;age&#39;), variable.name= &quot;relative_hp_dist&quot;)</code></pre>
+<p>Plot data.</p>
+<pre class="r"><code>ggplot(df_mod, aes(relative_hp_dist, value, fill=relative_hp_dist)) +
+  geom_bar(stat=&quot;summary&quot;, fun.y=&quot;mean&quot;, position=&quot;dodge&quot;) + 
+  facet_grid(.~age) +
+  xlab(&quot;Distractor Location&quot;) + ylab(&quot;Response Times (ms)&quot;) +
+  scale_fill_brewer(palette=&quot;Dark2&quot;) +
+  theme(legend.position=&quot;none&quot;)</code></pre>
+<pre><code>## Warning in geom_bar(stat = &quot;summary&quot;, fun.y = &quot;mean&quot;, position = &quot;dodge&quot;):
+## Ignoring unknown parameters: `fun.y`</code></pre>
+<pre><code>## No summary function supplied, defaulting to `mean_se()`
+## No summary function supplied, defaulting to `mean_se()`</code></pre>
+<p><img src="p08_files/figure-html/plot-first-1.png" width="672" /></p>
+<p>Run a 3x2 mixed design ANOVA with distractor location and age as
+independent variables and rt as the dependent variable.</p>
+<pre class="r"><code>model3 &lt;- aov_car(value ~ age*relative_hp_dist + Error(id/relative_hp_dist), data=df_mod)</code></pre>
+<pre><code>## Converting to factor: age</code></pre>
+<pre><code>## Contrasts set to contr.sum for the following variables: age</code></pre>
+<pre class="r"><code>model3</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: value
+##                 Effect          df        MSE         F  ges p.value
+## 1                  age       1, 31 1205579.81   8.00 ** .201    .008
+## 2     relative_hp_dist 1.65, 51.18   21074.40 25.20 *** .022   &lt;.001
+## 3 age:relative_hp_dist 1.65, 51.18   21074.40    4.28 * .004    .025
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
+<p>The effect of age was significant F(1,31)=8, p=.008.The effect of
+distractor location was significant, F(2, ??)= 25.2, p&lt;.001. The
+interaction was significant, F=4.28, p=.025.</p>
+</div>
+<div id="separate-anova-for-just-adults" class="section level3">
+<h3>Separate ANOVA for just adults</h3>
+<pre class="r"><code>spaceA &lt;- adults %&gt;%
+  group_by(id, relative_hp_dist) %&gt;%
+  summarize(rts = mean(rt)
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<p>Run ANOVA on 3 conditions first, and if significant, then run in on 5
+conditions?</p>
+<p>Need to reformat the above df to have a column for each
+relative_hp_dist/ID so we can average across low-probability
+locations.</p>
+<pre class="r"><code>space_anovaA &lt;- setDT(spaceA)
+space_anovaA &lt;- dcast(space_anovaA,id~relative_hp_dist,value.var=&#39;rts&#39;)</code></pre>
+<pre class="r"><code>space_anovaA &lt;- space_anovaA %&gt;%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)</code></pre>
+<p>Now, I want to create a smaller graph with just 3 bars: one for the
+high-probability rts, average of low-probability rts, and no
+distractor.</p>
+<pre class="r"><code>df_modA &lt;- subset(space_anovaA, select=c(id, high_prob, absent, low_prob))
+
+df_modA &lt;- reshape2::melt(df_modA, id.var=c(&#39;id&#39;), variable.name= &quot;relative_hp_dist&quot;)</code></pre>
+<pre class="r"><code>modelA &lt;- aov_car(value ~ relative_hp_dist + Error(id/relative_hp_dist), data=df_modA)
+
+modelA</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: value
+##             Effect          df      MSE         F  ges p.value
+## 1 relative_hp_dist 1.38, 35.96 20428.77 27.81 *** .066   &lt;.001
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
+<p>The repeated measures ANOVA on just the adults was significant.</p>
+<pre class="r"><code>model_dist_rtsA &lt;- aov_car(rts ~ relative_hp_dist + Error(id/relative_hp_dist), data=spaceA)
+
+model_dist_rtsA</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: rts
+##             Effect          df      MSE        F  ges p.value
+## 1 relative_hp_dist 2.22, 57.78 54709.91 9.36 *** .048   &lt;.001
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
+<p>Run t-test to determine significant differences between
+conditions.</p>
+<pre class="r"><code>space_anovaA %&gt;%
+  t.test(x=space_anovaA$low_prob, y=space_anovaA$high_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  space_anovaA$low_prob and space_anovaA$high_prob
+## t = 2.1911, df = 26, p-value = 0.0188
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  11.31615      Inf
+## sample estimates:
+## mean difference 
+##         51.0714</code></pre>
+<pre class="r"><code>space_anovaA%&gt;%
+  t.test(x=space_anovaA$high_prob, y=space_anovaA$absent, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95) </code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  space_anovaA$high_prob and space_anovaA$absent
+## t = 6.0301, df = 26, p-value = 1.139e-06
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  128.1138      Inf
+## sample estimates:
+## mean difference 
+##        178.6435</code></pre>
+<pre class="r"><code>space_anovaA%&gt;%
+  t.test(x=space_anovaA$low_prob, y=space_anovaA$absent, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95)</code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  space_anovaA$low_prob and space_anovaA$absent
+## t = 5.542, df = 26, p-value = 4.044e-06
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  159.0168      Inf
+## sample estimates:
+## mean difference 
+##        229.7149</code></pre>
+</div>
+<div id="separate-anova-for-just-kids" class="section level3">
+<h3>Separate ANOVA for just kids</h3>
+<pre class="r"><code>spaceK &lt;- kids12 %&gt;%
+  group_by(id,relative_hp_dist) %&gt;%
+  summarize(rts = mean(rt)
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<p>Run ANOVA on 3 conditions first, and if significant, then run in on 5
+conditions?</p>
+<p>Need to reformat the above df to have a column for each
+relative_hp_dist/ID so we can average across low-probability
+locations.</p>
+<pre class="r"><code>space_anovaK &lt;- setDT(spaceK)
+space_anovaK &lt;- dcast(space_anovaK,id~relative_hp_dist,value.var=&#39;rts&#39;)</code></pre>
+<pre class="r"><code>space_anovaK &lt;- space_anovaK %&gt;%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)</code></pre>
+<p>Now, I want to create a smaller graph with just 3 bars: one for the
+high-probability rts, average of low-probability rts, and no
+distractor.</p>
+<pre class="r"><code>df_modK &lt;- subset(space_anovaK, select=c(id,high_prob, absent, low_prob))
+
+df_modK &lt;- reshape2::melt(df_modK, id.var=c(&#39;id&#39;), variable.name= &quot;relative_hp_dist&quot;)</code></pre>
+<pre class="r"><code>modelK &lt;- aov_car(value ~ relative_hp_dist + Error(id/relative_hp_dist), data=df_modK)
+
+modelK</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: value
+##             Effect         df      MSE      F  ges p.value
+## 1 relative_hp_dist 1.34, 6.71 51262.59 6.57 * .016    .033
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
+<p>The repeated measures ANOVA on just the kids was also
+significant.</p>
+<pre class="r"><code>model_dist_rtsK &lt;- aov_car(rts ~ relative_hp_dist + Error(id/relative_hp_dist), data=spaceK)
+
+model_dist_rtsK</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: rts
+##             Effect         df       MSE      F  ges p.value
+## 1 relative_hp_dist 1.71, 8.56 118692.62 4.60 * .018    .048
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
+<p>Run t-test to determine significant differences between
+conditions.</p>
+<pre class="r"><code>space_anovaK %&gt;%
+  t.test(x=space_anovaK$low_prob, y=space_anovaK$high_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  space_anovaK$low_prob and space_anovaK$high_prob
+## t = 2.2016, df = 5, p-value = 0.03947
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  25.16014      Inf
+## sample estimates:
+## mean difference 
+##        296.9573</code></pre>
+<pre class="r"><code>space_anovaK%&gt;%
+  t.test(x=space_anovaK$high_prob, y=space_anovaK$absent, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95) </code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  space_anovaK$high_prob and space_anovaK$absent
+## t = 1.0373, df = 5, p-value = 0.1736
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  -64.19536       Inf
+## sample estimates:
+## mean difference 
+##         68.1101</code></pre>
+<pre class="r"><code>space_anovaK%&gt;%
+  t.test(x=space_anovaK$low_prob, y=space_anovaK$absent, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95)</code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  space_anovaK$low_prob and space_anovaK$absent
+## t = 3.3457, df = 5, p-value = 0.01021
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  145.1958      Inf
+## sample estimates:
+## mean difference 
+##        365.0675</code></pre>
+<pre class="r"><code>ggplot(all_data, aes(relative_hp_dist, rt, fill=relative_hp_dist)) +
+  geom_bar(stat=&quot;summary&quot;, fun.y=&quot;mean&quot;, position=&quot;dodge&quot;) + 
+  facet_grid(.~age) +
+  xlab(&quot;Distractor Location&quot;) + ylab(&quot;Response Times (ms)&quot;) +
+  scale_fill_brewer(palette=&quot;Dark2&quot;) +
+  theme(legend.position=&quot;none&quot;)</code></pre>
+<pre><code>## Warning in geom_bar(stat = &quot;summary&quot;, fun.y = &quot;mean&quot;, position = &quot;dodge&quot;):
+## Ignoring unknown parameters: `fun.y`</code></pre>
+<pre><code>## No summary function supplied, defaulting to `mean_se()`
+## No summary function supplied, defaulting to `mean_se()`</code></pre>
+<p><img src="p08_files/figure-html/plot-2-1.png" width="672" /></p>
+</div>
+<div id="examine-normalized-rts" class="section level3">
+<h3>Examine normalized rts</h3>
+<pre class="r"><code>write.csv(df_mod, &quot;norm_data.csv&quot;, row.names=FALSE)</code></pre>
+<pre class="r"><code>normrt &lt;- read_csv(&quot;norm_data_new.csv&quot;, show_col_types = FALSE)</code></pre>
+<pre><code>## New names:
+## • `id` -&gt; `id...1`
+## • `` -&gt; `...6`
+## • `` -&gt; `...7`
+## • `id` -&gt; `id...8`</code></pre>
+<pre class="r"><code>normrt&lt;- subset(normrt, select=c(id...1, age, relative_hp_dist, norm))</code></pre>
+<pre class="r"><code>model_norm &lt;- aov_car(norm ~ age*relative_hp_dist + Error(id...1/relative_hp_dist), data=normrt)</code></pre>
+<pre><code>## Converting to factor: age</code></pre>
+<pre><code>## Contrasts set to contr.sum for the following variables: age</code></pre>
+<pre class="r"><code>model_norm</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: norm
+##                 Effect          df   MSE         F   ges p.value
+## 1                  age       1, 31 -0.00     -0.00 &lt;.001   &gt;.999
+## 2     relative_hp_dist 1.88, 58.30  0.01 32.37 ***  .511   &lt;.001
+## 3 age:relative_hp_dist 1.88, 58.30  0.01      1.80  .055    .176
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
