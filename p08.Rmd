@@ -168,6 +168,7 @@ model3
 
 ```
 
+The effect of age was significant F(1,31)=8, p=.008
 
 
 
