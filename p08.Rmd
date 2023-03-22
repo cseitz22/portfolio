@@ -221,6 +221,19 @@ modelA
 
 The repeated measures ANOVA on just the adults was significant. 
 
+Run t-test to determine significant differences between conditions. 
+
+```{r t-test}
+
+space_anovaA %>%
+  t.test(x=space_anovaA$low_prob, y=space_anovaA$high_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
+space_anovaA%>%
+  t.test(x=space_anovaA$high_prob, y=space_anovaA$absent, alternative="greater", mu=0, paired =TRUE, conf.level = .95) 
+space_anovaA%>%
+  t.test(x=space_anovaA$low_prob, y=space_anovaA$absent, alternative="greater", mu=0, paired =TRUE, conf.level = .95)
+
+```
+
 ### Separate ANOVA for just kids
 
 
@@ -269,7 +282,20 @@ modelK
 
 ```
 
-The repeated measures ANOVA on just the kids was also significant. 
+The repeated measures ANOVA on just the kids was also significant.
+
+Run t-test to determine significant differences between conditions. 
+
+```{r t-test}
+
+space_anovaK %>%
+  t.test(x=space_anovaK$low_prob, y=space_anovaK$high_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
+space_anovaK%>%
+  t.test(x=space_anovaK$high_prob, y=space_anovaK$absent, alternative="greater", mu=0, paired =TRUE, conf.level = .95) 
+space_anovaK%>%
+  t.test(x=space_anovaK$low_prob, y=space_anovaK$absent, alternative="greater", mu=0, paired =TRUE, conf.level = .95)
+
+```
 
 ### TO BE MOVED AT SOME POINT
 
@@ -328,14 +354,6 @@ sum_stats2
 
 ```
 
-
-```{r 3_loc_anova_test}
-
-model3 <- aov_car(value ~ relative_hp_dist + Error(id/relative_hp_dist), data=df_mod)
-
-model3
-
-```
 
 
 Run t-test to determine significant differences between conditions. 
