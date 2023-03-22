@@ -1,5 +1,87 @@
 ---
 title: "Portfolio 9"
+name: "Cat Seitz"
+date: "3.21.2023"
+data: "Thesis analysis - adult & child data - distractor location accuracy"
+output: 
+  html_document: 
+    theme: cerulean
 ---
 
-> The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
+The goal of this portfolio is to examine part of my thesis data. To recap, my thesis is examining distractor suppression in children and adults. Participants are shown a distractor in a location more frequently than other locations in a visual search array. Based on previous studies, we would expect adults to suppress their attention to the high-probability location, but we were unsure when in development children develop this ability. 
+
+
+```{r load-packages, message=FALSE}
+library(tidyverse) 
+library(tidyr)
+library(rstatix)
+library(data.table)
+library(afex)
+library(emmeans)
+library(psych)
+library(ggprism)
+library(patchwork)
+library(magrittr)
+library(cowplot)
+```
+
+I put all the messy loading in of different data sets and adding in important columns to an R script instead of having it here. 
+```{r, include=FALSE}
+
+source("load_data.R", local = knitr::knit_global())
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

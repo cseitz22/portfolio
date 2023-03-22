@@ -353,8 +353,87 @@ model_norm
 ```
 
 
+### Examine block-by-block learning of distractor location
+
+The goal of this section is to examine individual blocks of trials for learning. I'll be taking the difference between response times when the distractor is presented in the low probability locations and response times when the distractor is presented in the high probability location in each block to see roughly how quickly individuals are learning the regularity.
 
 
+```{r create_new_df_to_transform}
+space_block <- all_data %>%
+  group_by(id, age, block_num, relative_hp_dist) %>%
+  summarize(rts = mean(rt),
+            )
+space_block
+```
+
+```{r transform_df}
+
+space_block <- setDT(space_block)
+space_block <- dcast(space_block,id+age+block_num~relative_hp_dist,value.var='rts')
+
+```
+
+Below, I added the average rt for the low probability locations and the difference between the low probability and high probability locations ignoring n/a values. 
+
+```{r add_avg_col}
+
+space_block <- space_block %>%
+  mutate(low_prob = rowMeans(select(space_block, c(lp_1,lp_2,lp_3)),na.rm=TRUE)) %>%
+  mutate(difference = (low_prob-high_prob))
+
+
+```
+
+
+```{r line_plot}
+ggplot(data = space_block,aes(x=block_num, y=difference, group=id))+
+  geom_line(aes(color=age))+
+  labs(title = "Difference in Response Times", subtitle = "for distractor presentation at the low-probability locations and high-probability location by block")+
+  theme_classic()+
+  labs(x = "Block Number", y = "Difference in RT (ms)")
+
+```
+
+
+Positive differences indicate that participants were faster when the distractor was presented in the high probability location compared to when it was presented in the low probability locations. The average across all participants is plotted below. These results indicate that the individuals are learning within the first block where the distractor is likely to appear. 
+
+```{r create_df_to_transform}
+space2 <- space_block %>%
+  group_by(age, block_num) %>%
+  summarize(rts = mean(difference, na.rm = TRUE),
+            sd_rt=sd(difference, na.rm = TRUE),
+            n_rt=21,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=rts+se,
+            lower_limit=rts-se
+            )
+space2
+
+```
+
+```{r line_plot_avg, fig.height=4, fig.width=12}
+ggplot(data = space2,aes(x=block_num, y=rts))+
+  geom_line(aes(color=age))+
+  geom_point()+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  labs(title = "Singleton Distractor Present")+
+  xlab("Block number")+
+  ylab(expression(atop("Suppression effect (ms)", paste("(high prob. - low prob.)"))))+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=14,face="bold"),
+        title = element_text(size = 16))
+
+```
+
+
+```{r anova_test_by_block}
+
+model4 <- aov_car(difference ~ age*block_num + Error(id/block_num), data=space_block)
+
+summary(model4)
+model4
+
+```
 
 
 
