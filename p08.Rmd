@@ -35,6 +35,17 @@ source("load_data.R", local = knitr::knit_global())
 
 ### Trim the Data
 
+```{r find-means}
+
+aggregate(rt ~ acc, data = adults, FUN = mean)
+aggregate(rt ~ acc, data = adults, FUN = sd)
+aggregate(rt ~ acc, data = kids12, FUN = mean)
+aggregate(rt ~ acc, data = kids12, FUN = sd)
+aggregate(rt ~ acc, data = kids6, FUN = mean)
+aggregate(rt ~ acc, data = kids6, FUN = sd)
+
+```
+
 Define trimming criteria according to Van Selst and Jolicoeur 1994.
 ```{r set_stds_depending_on_set_size}
 xsize <- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
@@ -48,34 +59,34 @@ Trim the data and compute the percent trimmed
 ```{r trimming-adults}
 trimmedA <- adults[adults$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
            mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
-           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=.200) %>%
-           select(id, relative_hp_dist, rt, block_num) %>%  #keep these columns in the new data frame
+           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=200 & rt<=2500) %>% #exact upper limit =2464.175
+           select(id, age, relative_hp_dist, rt, block_num) %>%  #keep these columns in the new data frame
            as.data.frame()
 
 
 statPrep <- trimmedA %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
 100-(nrow(trimmedA)/nrow(adults[adults$acc==1, ]))*100
 ```
-2.88% of trials were trimmed from the adult data set. 
+5.10% of trials were trimmed from the adult data set. 
 
 ```{r trimming-child12}
 trimmedC12 <- kids12[kids12$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
            mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
-           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=.200) %>%
-           select(id, relative_hp_dist, rt, block_num1) %>%  #keep these columns in the new data frame
+           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=200 & rt<=7590) %>%  #exact upper limit =7586.794
+           select(id, age1, relative_hp_dist, rt, block_num1) %>%  #keep these columns in the new data frame
            as.data.frame()
 
 
 statPrep <- trimmedC12 %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
 100-(nrow(trimmedC12)/nrow(kids12[kids12$acc==1, ]))*100
 ```
-2.78% of trials were trimmed from the older child data set. 
+4.64% of trials were trimmed from the older child data set. 
 
 ```{r trimming-child6}
 trimmedC6 <- kids6[kids6$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
            mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
-           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=.200) %>%
-           select(id, relative_hp_dist, rt, block_num2) %>%  #keep these columns in the new data frame
+           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=200 & rt<=18950) %>% #exact upper limit =18929.79
+           select(id, age2, relative_hp_dist, rt, block_num2) %>%  #keep these columns in the new data frame
            as.data.frame()
 
 
@@ -89,13 +100,13 @@ statPrep <- trimmedC6 %>% group_by(id, relative_hp_dist) %>% summarise(measureme
 
 ```{r change-column-names}
 
-kids12<- kids12 %>%
+trimmedC12<- trimmedC12 %>%
   rename(
     block_num=block_num1,
     age=age1
   )
 
-kids6<- kids6 %>%
+trimmedC6<- trimmedC6 %>%
   rename(
     block_num=block_num2,
     age=age2
@@ -108,7 +119,7 @@ kids6<- kids6 %>%
  
 ```{r combine-columns}
 
-all_data <- rbind(adults, kids12)
+all_data <- rbind(trimmedA, trimmedC12)
  
 ```
 
@@ -174,13 +185,15 @@ model3
 
 ```
 
-The effect of age was significant F(1,31)=8, p=.008.The effect of distractor location was significant, F(2, ??)= 25.2, p<.001. The interaction was significant, F=4.28, p=.025.
+The effect of age was significant F(1,31)=8, p=.008.The effect of distractor location was significant, F(2, 62)= 25.2, p<.001. The interaction was significant, F(2,62)=4.28, p=.025.
+
+
 
 ### Separate ANOVA for just adults
 
 ```{r sum-stats-adults}
 
-spaceA <- adults %>%
+spaceA <- trimmedA %>%
   group_by(id, relative_hp_dist) %>%
   summarize(rts = mean(rt)
             )
@@ -223,6 +236,9 @@ modelA
 
 ```
 
+There is a different in rt when presenting the distractor in different locations, F(2,52)=27.81, p<.001. 
+
+
 The repeated measures ANOVA on just the adults was significant. 
 
 ```{r last_anova_test-adults}
@@ -252,7 +268,7 @@ space_anovaA%>%
 
 ```{r sum-stat-kids}
 
-spaceK <- kids12 %>%
+spaceK <- trimmedC12 %>%
   group_by(id,relative_hp_dist) %>%
   summarize(rts = mean(rt)
             )
@@ -402,7 +418,7 @@ space2 <- space_block %>%
   group_by(age, block_num) %>%
   summarize(rts = mean(difference, na.rm = TRUE),
             sd_rt=sd(difference, na.rm = TRUE),
-            n_rt=21,
+            n_rt=33,
             se=sd_rt/sqrt(n_rt),
             upper_limit=rts+se,
             lower_limit=rts-se
@@ -430,18 +446,33 @@ ggplot(data = space2,aes(x=block_num, y=rts))+
 
 model4 <- aov_car(difference ~ age*block_num + Error(id/block_num), data=space_block)
 
-summary(model4)
 model4
 
 ```
 
+Not sure the below is important -- need to update if what to use
 
+```{r normalized-block-df}
 
+write.csv(space_block, "space_block.csv", row.names=FALSE)
 
+```
 
+```{r import-norm-data-block}
 
+normy <- read_csv("space_block_norm.csv", show_col_types = FALSE)
+normy<- subset(normy, select=c(id, age, block_num, diff_norm))
 
+```
 
+```{r line_plot-norm-block}
+ggplot(data = normy,aes(x=block_num, y=diff_norm, group=id))+
+  geom_line(aes(color=age))+
+  labs(title = "Difference in Response Times", subtitle = "for distractor presentation at the low-probability locations and high-probability location by block")+
+  theme_classic()+
+  labs(x = "Block Number", y = "Difference in RT (ms)")
+
+```
 
 
 
