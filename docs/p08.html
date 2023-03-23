@@ -318,6 +318,30 @@ library(cowplot)</code></pre>
 important columns to an R script instead of having it here.</p>
 <div id="trim-the-data" class="section level3">
 <h3>Trim the Data</h3>
+<pre class="r"><code>aggregate(rt ~ acc, data = adults, FUN = mean)</code></pre>
+<pre><code>##   acc       rt
+## 1   0 1036.116
+## 2   1 1126.754</code></pre>
+<pre class="r"><code>aggregate(rt ~ acc, data = adults, FUN = sd)</code></pre>
+<pre><code>##   acc       rt
+## 1   0 610.4570
+## 2   1 668.7103</code></pre>
+<pre class="r"><code>aggregate(rt ~ acc, data = kids12, FUN = mean)</code></pre>
+<pre><code>##   acc        rt
+## 1   0  851.4179
+## 2   1 2130.8040</code></pre>
+<pre class="r"><code>aggregate(rt ~ acc, data = kids12, FUN = sd)</code></pre>
+<pre><code>##   acc       rt
+## 1   0 1357.789
+## 2   1 2727.995</code></pre>
+<pre class="r"><code>aggregate(rt ~ acc, data = kids6, FUN = mean)</code></pre>
+<pre><code>##   acc        rt
+## 1   0  211.3377
+## 2   1 3650.6007</code></pre>
+<pre class="r"><code>aggregate(rt ~ acc, data = kids6, FUN = sd)</code></pre>
+<pre><code>##   acc       rt
+## 1   0 1255.450
+## 2   1 7639.596</code></pre>
 <p>Define trimming criteria according to Van Selst and Jolicoeur
 1994.</p>
 <pre class="r"><code>xsize &lt;- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
@@ -328,8 +352,8 @@ stds &lt;- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173,
 <p>Trim the data and compute the percent trimmed</p>
 <pre class="r"><code>trimmedA &lt;- adults[adults$acc==1, ] %&gt;% group_by(id, relative_hp_dist) %&gt;%
            mutate(sdc = ifelse(length(rt)&gt;=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %&gt;%
-           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=.200) %&gt;%
-           select(id, relative_hp_dist, rt, block_num) %&gt;%  #keep these columns in the new data frame
+           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=200 &amp; rt&lt;=2500) %&gt;% #exact upper limit =2464.175
+           select(id, age, relative_hp_dist, rt, block_num) %&gt;%  #keep these columns in the new data frame
            as.data.frame()
 
 
@@ -337,12 +361,12 @@ statPrep &lt;- trimmedA %&gt;% group_by(id, relative_hp_dist) %&gt;% summarise(m
 <pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using the `.groups`
 ## argument.</code></pre>
 <pre class="r"><code>100-(nrow(trimmedA)/nrow(adults[adults$acc==1, ]))*100</code></pre>
-<pre><code>## [1] 2.875735</code></pre>
-<p>2.88% of trials were trimmed from the adult data set.</p>
+<pre><code>## [1] 5.100756</code></pre>
+<p>5.10% of trials were trimmed from the adult data set.</p>
 <pre class="r"><code>trimmedC12 &lt;- kids12[kids12$acc==1, ] %&gt;% group_by(id, relative_hp_dist) %&gt;%
            mutate(sdc = ifelse(length(rt)&gt;=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %&gt;%
-           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=.200) %&gt;%
-           select(id, relative_hp_dist, rt, block_num1) %&gt;%  #keep these columns in the new data frame
+           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=200 &amp; rt&lt;=7590) %&gt;%  #exact upper limit =7586.794
+           select(id, age1, relative_hp_dist, rt, block_num1) %&gt;%  #keep these columns in the new data frame
            as.data.frame()
 
 
@@ -350,12 +374,12 @@ statPrep &lt;- trimmedC12 %&gt;% group_by(id, relative_hp_dist) %&gt;% summarise
 <pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using the `.groups`
 ## argument.</code></pre>
 <pre class="r"><code>100-(nrow(trimmedC12)/nrow(kids12[kids12$acc==1, ]))*100</code></pre>
-<pre><code>## [1] 2.783843</code></pre>
-<p>2.78% of trials were trimmed from the older child data set.</p>
+<pre><code>## [1] 4.639738</code></pre>
+<p>4.64% of trials were trimmed from the older child data set.</p>
 <pre class="r"><code>trimmedC6 &lt;- kids6[kids6$acc==1, ] %&gt;% group_by(id, relative_hp_dist) %&gt;%
            mutate(sdc = ifelse(length(rt)&gt;=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %&gt;%
-           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=.200) %&gt;%
-           select(id, relative_hp_dist, rt, block_num2) %&gt;%  #keep these columns in the new data frame
+           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=200 &amp; rt&lt;=18950) %&gt;% #exact upper limit =18929.79
+           select(id, age2, relative_hp_dist, rt, block_num2) %&gt;%  #keep these columns in the new data frame
            as.data.frame()
 
 
@@ -369,18 +393,18 @@ statPrep &lt;- trimmedC6 %&gt;% group_by(id, relative_hp_dist) %&gt;% summarise(
 <div id="response-time-anova-for-3-conditions-and-2-ages"
 class="section level3">
 <h3>Response Time ANOVA for 3 conditions and 2 ages</h3>
-<pre class="r"><code>kids12&lt;- kids12 %&gt;%
+<pre class="r"><code>trimmedC12&lt;- trimmedC12 %&gt;%
   rename(
     block_num=block_num1,
     age=age1
   )
 
-kids6&lt;- kids6 %&gt;%
+trimmedC6&lt;- trimmedC6 %&gt;%
   rename(
     block_num=block_num2,
     age=age2
   )</code></pre>
-<pre class="r"><code>all_data &lt;- rbind(adults, kids12)</code></pre>
+<pre class="r"><code>all_data &lt;- rbind(trimmedA, trimmedC12)</code></pre>
 <p>Create a new data frame with the average RT for each relative
 distractor location per participant, so we can do a repeated measures
 ANOVA – eventually – maybe.</p>
@@ -395,14 +419,14 @@ ANOVA – eventually – maybe.</p>
 ## # Groups:   age, id [33]
 ##    age      id relative_hp_dist   rts
 ##    &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;
-##  1 adult    14 absent            775.
-##  2 adult    14 high_prob         858.
-##  3 adult    14 lp_1             1089.
-##  4 adult    14 lp_2              886.
-##  5 adult    14 lp_3              897.
-##  6 adult    15 absent            807.
-##  7 adult    15 high_prob         982.
-##  8 adult    15 lp_1             1082.
+##  1 adult    14 absent            762.
+##  2 adult    14 high_prob         840.
+##  3 adult    14 lp_1             1033.
+##  4 adult    14 lp_2              903.
+##  5 adult    14 lp_3              851.
+##  6 adult    15 absent            779.
+##  7 adult    15 high_prob         936.
+##  8 adult    15 lp_1             1060.
 ##  9 adult    15 lp_2              942.
 ## 10 adult    15 lp_3             1112.
 ## # … with 155 more rows</code></pre>
@@ -442,21 +466,21 @@ independent variables and rt as the dependent variable.</p>
 <pre><code>## Anova Table (Type 3 tests)
 ## 
 ## Response: value
-##                 Effect          df        MSE         F  ges p.value
-## 1                  age       1, 31 1205579.81   8.00 ** .201    .008
-## 2     relative_hp_dist 1.65, 51.18   21074.40 25.20 *** .022   &lt;.001
-## 3 age:relative_hp_dist 1.65, 51.18   21074.40    4.28 * .004    .025
+##                 Effect          df       MSE         F  ges p.value
+## 1                  age       1, 31 395159.04 22.11 *** .408   &lt;.001
+## 2     relative_hp_dist 1.72, 53.22   8023.81 57.19 *** .059   &lt;.001
+## 3 age:relative_hp_dist 1.72, 53.22   8023.81 11.58 *** .012   &lt;.001
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
 ## Sphericity correction method: GG</code></pre>
 <p>The effect of age was significant F(1,31)=8, p=.008.The effect of
-distractor location was significant, F(2, ??)= 25.2, p&lt;.001. The
-interaction was significant, F=4.28, p=.025.</p>
+distractor location was significant, F(2, 62)= 25.2, p&lt;.001. The
+interaction was significant, F(2,62)=4.28, p=.025.</p>
 </div>
 <div id="separate-anova-for-just-adults" class="section level3">
 <h3>Separate ANOVA for just adults</h3>
-<pre class="r"><code>spaceA &lt;- adults %&gt;%
+<pre class="r"><code>spaceA &lt;- trimmedA %&gt;%
   group_by(id, relative_hp_dist) %&gt;%
   summarize(rts = mean(rt)
             )</code></pre>
@@ -483,12 +507,14 @@ modelA</code></pre>
 <pre><code>## Anova Table (Type 3 tests)
 ## 
 ## Response: value
-##             Effect          df      MSE         F  ges p.value
-## 1 relative_hp_dist 1.38, 35.96 20428.77 27.81 *** .066   &lt;.001
+##             Effect          df     MSE         F  ges p.value
+## 1 relative_hp_dist 1.87, 48.49 3661.44 57.25 *** .074   &lt;.001
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
 ## Sphericity correction method: GG</code></pre>
+<p>There is a different in rt when presenting the distractor in
+different locations, F(2,52)=27.81, p&lt;.001.</p>
 <p>The repeated measures ANOVA on just the adults was significant.</p>
 <pre class="r"><code>model_dist_rtsA &lt;- aov_car(rts ~ relative_hp_dist + Error(id/relative_hp_dist), data=spaceA)
 
@@ -496,8 +522,8 @@ model_dist_rtsA</code></pre>
 <pre><code>## Anova Table (Type 3 tests)
 ## 
 ## Response: rts
-##             Effect          df      MSE        F  ges p.value
-## 1 relative_hp_dist 2.22, 57.78 54709.91 9.36 *** .048   &lt;.001
+##             Effect          df      MSE         F  ges p.value
+## 1 relative_hp_dist 2.92, 75.85 10653.87 17.50 *** .059   &lt;.001
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
@@ -510,43 +536,43 @@ conditions.</p>
 ##  Paired t-test
 ## 
 ## data:  space_anovaA$low_prob and space_anovaA$high_prob
-## t = 2.1911, df = 26, p-value = 0.0188
+## t = 2.2753, df = 26, p-value = 0.01569
 ## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
-##  11.31615      Inf
+##  7.805396      Inf
 ## sample estimates:
 ## mean difference 
-##         51.0714</code></pre>
+##        31.17554</code></pre>
 <pre class="r"><code>space_anovaA%&gt;%
   t.test(x=space_anovaA$high_prob, y=space_anovaA$absent, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95) </code></pre>
 <pre><code>## 
 ##  Paired t-test
 ## 
 ## data:  space_anovaA$high_prob and space_anovaA$absent
-## t = 6.0301, df = 26, p-value = 1.139e-06
+## t = 7.4368, df = 26, p-value = 3.38e-08
 ## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
-##  128.1138      Inf
+##  99.64446      Inf
 ## sample estimates:
 ## mean difference 
-##        178.6435</code></pre>
+##        129.2987</code></pre>
 <pre class="r"><code>space_anovaA%&gt;%
   t.test(x=space_anovaA$low_prob, y=space_anovaA$absent, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95)</code></pre>
 <pre><code>## 
 ##  Paired t-test
 ## 
 ## data:  space_anovaA$low_prob and space_anovaA$absent
-## t = 5.542, df = 26, p-value = 4.044e-06
+## t = 9.7882, df = 26, p-value = 1.652e-10
 ## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
-##  159.0168      Inf
+##  132.5113      Inf
 ## sample estimates:
 ## mean difference 
-##        229.7149</code></pre>
+##        160.4743</code></pre>
 </div>
 <div id="separate-anova-for-just-kids" class="section level3">
 <h3>Separate ANOVA for just kids</h3>
-<pre class="r"><code>spaceK &lt;- kids12 %&gt;%
+<pre class="r"><code>spaceK &lt;- trimmedC12 %&gt;%
   group_by(id,relative_hp_dist) %&gt;%
   summarize(rts = mean(rt)
             )</code></pre>
@@ -574,7 +600,7 @@ modelK</code></pre>
 ## 
 ## Response: value
 ##             Effect         df      MSE      F  ges p.value
-## 1 relative_hp_dist 1.34, 6.71 51262.59 6.57 * .016    .033
+## 1 relative_hp_dist 1.37, 6.83 36522.69 9.86 * .060    .013
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
@@ -587,8 +613,8 @@ model_dist_rtsK</code></pre>
 <pre><code>## Anova Table (Type 3 tests)
 ## 
 ## Response: rts
-##             Effect         df       MSE      F  ges p.value
-## 1 relative_hp_dist 1.71, 8.56 118692.62 4.60 * .018    .048
+##             Effect          df       MSE      F  ges p.value
+## 1 relative_hp_dist 2.16, 10.79 104617.82 4.32 * .058    .040
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
@@ -601,39 +627,39 @@ conditions.</p>
 ##  Paired t-test
 ## 
 ## data:  space_anovaK$low_prob and space_anovaK$high_prob
-## t = 2.2016, df = 5, p-value = 0.03947
+## t = 2.5789, df = 5, p-value = 0.02475
 ## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
-##  25.16014      Inf
+##  47.39111      Inf
 ## sample estimates:
 ## mean difference 
-##        296.9573</code></pre>
+##        216.7492</code></pre>
 <pre class="r"><code>space_anovaK%&gt;%
   t.test(x=space_anovaK$high_prob, y=space_anovaK$absent, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95) </code></pre>
 <pre><code>## 
 ##  Paired t-test
 ## 
 ## data:  space_anovaK$high_prob and space_anovaK$absent
-## t = 1.0373, df = 5, p-value = 0.1736
+## t = 2.9148, df = 5, p-value = 0.01661
 ## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
-##  -64.19536       Inf
+##  57.99337      Inf
 ## sample estimates:
 ## mean difference 
-##         68.1101</code></pre>
+##        187.8796</code></pre>
 <pre class="r"><code>space_anovaK%&gt;%
   t.test(x=space_anovaK$low_prob, y=space_anovaK$absent, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95)</code></pre>
 <pre><code>## 
 ##  Paired t-test
 ## 
 ## data:  space_anovaK$low_prob and space_anovaK$absent
-## t = 3.3457, df = 5, p-value = 0.01021
+## t = 3.4539, df = 5, p-value = 0.009081
 ## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
-##  145.1958      Inf
+##  168.5605      Inf
 ## sample estimates:
 ## mean difference 
-##        365.0675</code></pre>
+##        404.6288</code></pre>
 <pre class="r"><code>ggplot(all_data, aes(relative_hp_dist, rt, fill=relative_hp_dist)) +
   geom_bar(stat=&quot;summary&quot;, fun.y=&quot;mean&quot;, position=&quot;dodge&quot;) + 
   facet_grid(.~age) +
@@ -663,14 +689,133 @@ conditions.</p>
 <pre><code>## Anova Table (Type 3 tests)
 ## 
 ## Response: norm
-##                 Effect          df   MSE         F   ges p.value
-## 1                  age       1, 31 -0.00     -0.00 &lt;.001   &gt;.999
-## 2     relative_hp_dist 1.88, 58.30  0.01 32.37 ***  .511   &lt;.001
-## 3 age:relative_hp_dist 1.88, 58.30  0.01      1.80  .055    .176
+##                 Effect          df  MSE         F   ges p.value
+## 1                  age       1, 31 0.00      0.24 &lt;.001    .627
+## 2     relative_hp_dist 1.92, 59.67 0.00 55.02 ***  .640   &lt;.001
+## 3 age:relative_hp_dist 1.92, 59.67 0.00      2.34  .070    .107
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
 ## Sphericity correction method: GG</code></pre>
+</div>
+<div id="examine-block-by-block-learning-of-distractor-location"
+class="section level3">
+<h3>Examine block-by-block learning of distractor location</h3>
+<p>The goal of this section is to examine individual blocks of trials
+for learning. I’ll be taking the difference between response times when
+the distractor is presented in the low probability locations and
+response times when the distractor is presented in the high probability
+location in each block to see roughly how quickly individuals are
+learning the regularity.</p>
+<pre class="r"><code>space_block &lt;- all_data %&gt;%
+  group_by(id, age, block_num, relative_hp_dist) %&gt;%
+  summarize(rts = mean(rt),
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;, &#39;age&#39;, &#39;block_num&#39;. You can override
+## using the `.groups` argument.</code></pre>
+<pre class="r"><code>space_block</code></pre>
+<pre><code>## # A tibble: 966 × 5
+## # Groups:   id, age, block_num [195]
+##       id age   block_num relative_hp_dist   rts
+##    &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;
+##  1    14 adult         1 absent            966.
+##  2    14 adult         1 high_prob        1026.
+##  3    14 adult         1 lp_1             1173.
+##  4    14 adult         1 lp_2             1009.
+##  5    14 adult         1 lp_3             1072.
+##  6    14 adult         2 absent            770.
+##  7    14 adult         2 high_prob         895.
+##  8    14 adult         2 lp_1             1169.
+##  9    14 adult         2 lp_2             1020.
+## 10    14 adult         2 lp_3              923.
+## # … with 956 more rows</code></pre>
+<pre class="r"><code>space_block &lt;- setDT(space_block)
+space_block &lt;- dcast(space_block,id+age+block_num~relative_hp_dist,value.var=&#39;rts&#39;)</code></pre>
+<p>Below, I added the average rt for the low probability locations and
+the difference between the low probability and high probability
+locations ignoring n/a values.</p>
+<pre class="r"><code>space_block &lt;- space_block %&gt;%
+  mutate(low_prob = rowMeans(select(space_block, c(lp_1,lp_2,lp_3)),na.rm=TRUE)) %&gt;%
+  mutate(difference = (low_prob-high_prob))</code></pre>
+<pre class="r"><code>ggplot(data = space_block,aes(x=block_num, y=difference, group=id))+
+  geom_line(aes(color=age))+
+  labs(title = &quot;Difference in Response Times&quot;, subtitle = &quot;for distractor presentation at the low-probability locations and high-probability location by block&quot;)+
+  theme_classic()+
+  labs(x = &quot;Block Number&quot;, y = &quot;Difference in RT (ms)&quot;)</code></pre>
+<p><img src="p08_files/figure-html/line_plot-1.png" width="672" /></p>
+<p>Positive differences indicate that participants were faster when the
+distractor was presented in the high probability location compared to
+when it was presented in the low probability locations. The average
+across all participants is plotted below. These results indicate that
+the individuals are learning within the first block where the distractor
+is likely to appear.</p>
+<pre class="r"><code>space2 &lt;- space_block %&gt;%
+  group_by(age, block_num) %&gt;%
+  summarize(rts = mean(difference, na.rm = TRUE),
+            sd_rt=sd(difference, na.rm = TRUE),
+            n_rt=33,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=rts+se,
+            lower_limit=rts-se
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>space2</code></pre>
+<pre><code>## # A tibble: 12 × 8
+## # Groups:   age [2]
+##    age   block_num     rts sd_rt  n_rt    se upper_limit lower_limit
+##    &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+##  1 adult         1 -24.6    225.    33  39.2        14.5      -63.8 
+##  2 adult         2  -0.743  213.    33  37.1        36.3      -37.8 
+##  3 adult         3  90.2    162.    33  28.3       119.        62.0 
+##  4 adult         4  68.0    131.    33  22.8        90.8       45.3 
+##  5 adult         5  19.0    161.    33  28.0        47.1       -9.01
+##  6 adult         6  33.4    160.    33  27.9        61.3        5.55
+##  7 child         1  36.7    223.    33  38.9        75.6       -2.25
+##  8 child         2 252.     544.    33  94.7       347.       157.  
+##  9 child         3 292.     144.    33  25.0       317.       267.  
+## 10 child         4  95.2    201.    33  35.0       130.        60.2 
+## 11 child         5 353.     346.    33  60.2       413.       292.  
+## 12 child         6 358.     234.    33  40.7       399.       317.</code></pre>
+<pre class="r"><code>ggplot(data = space2,aes(x=block_num, y=rts))+
+  geom_line(aes(color=age))+
+  geom_point()+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  labs(title = &quot;Singleton Distractor Present&quot;)+
+  xlab(&quot;Block number&quot;)+
+  ylab(expression(atop(&quot;Suppression effect (ms)&quot;, paste(&quot;(high prob. - low prob.)&quot;))))+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=14,face=&quot;bold&quot;),
+        title = element_text(size = 16))</code></pre>
+<p><img src="p08_files/figure-html/line_plot_avg-1.png" width="1152" /></p>
+<pre class="r"><code>model4 &lt;- aov_car(difference ~ age*block_num + Error(id/block_num), data=space_block)</code></pre>
+<pre><code>## Converting to factor: age</code></pre>
+<pre><code>## Warning: Missing values for following ID(s):
+## 26
+## Removing those cases from the analysis.</code></pre>
+<pre><code>## Contrasts set to contr.sum for the following variables: age</code></pre>
+<pre class="r"><code>model4</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: difference
+##          Effect          df      MSE         F  ges p.value
+## 1           age       1, 30 59087.64 19.76 *** .139   &lt;.001
+## 2     block_num 3.30, 99.11 55381.66    3.08 * .072    .027
+## 3 age:block_num 3.30, 99.11 55381.66    2.65 * .063    .048
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
+<p>Not sure the below is important – need to update if what to use</p>
+<pre class="r"><code>write.csv(space_block, &quot;space_block.csv&quot;, row.names=FALSE)</code></pre>
+<pre class="r"><code>normy &lt;- read_csv(&quot;space_block_norm.csv&quot;, show_col_types = FALSE)
+normy&lt;- subset(normy, select=c(id, age, block_num, diff_norm))</code></pre>
+<pre class="r"><code>ggplot(data = normy,aes(x=block_num, y=diff_norm, group=id))+
+  geom_line(aes(color=age))+
+  labs(title = &quot;Difference in Response Times&quot;, subtitle = &quot;for distractor presentation at the low-probability locations and high-probability location by block&quot;)+
+  theme_classic()+
+  labs(x = &quot;Block Number&quot;, y = &quot;Difference in RT (ms)&quot;)</code></pre>
+<p><img src="p08_files/figure-html/line_plot-norm-block-1.png" width="672" /></p>
 </div>
 
 
