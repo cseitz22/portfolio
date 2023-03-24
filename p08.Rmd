@@ -450,6 +450,9 @@ model4
 
 ```
 
+Maybe will need to separate out by age and see if suppression effect by block is significant.
+
+
 Not sure the below is important -- need to update if what to use
 
 ```{r normalized-block-df}

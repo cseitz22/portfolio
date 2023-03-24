@@ -33,30 +33,245 @@ source("load_data.R", local = knitr::knit_global())
 ```
 
 
+### Trim the Data
 
 
+Define trimming criteria according to Van Selst and Jolicoeur 1994.
+```{r set_stds_depending_on_set_size}
+xsize <- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
+             25, 30, 35, 50, 100)
+stds <- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173, 
+            2.22, 2.246, 2.274, 2.31, 2.326, 2.391, 2.41, 2.4305, 
+            2.45, 2.48, 2.5)
+```
+
+Trim the data and compute the percent trimmed
+```{r trimming-adults}
+trimmedA <- adults[adults$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
+           mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
+           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=200 & rt<=2500) %>% #exact upper limit =2464.175
+           select(id, age, relative_hp_dist, rt, block_num) %>%  #keep these columns in the new data frame
+           as.data.frame()
 
 
+statPrep <- trimmedA %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
+100-(nrow(trimmedA)/nrow(adults[adults$acc==1, ]))*100
+```
+5.10% of trials were trimmed from the adult data set. 
+
+```{r trimming-child12}
+trimmedC12 <- kids12[kids12$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
+           mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
+           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=200 & rt<=7590) %>%  #exact upper limit =7586.794
+           select(id, age1, relative_hp_dist, rt, block_num1) %>%  #keep these columns in the new data frame
+           as.data.frame()
 
 
+statPrep <- trimmedC12 %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
+100-(nrow(trimmedC12)/nrow(kids12[kids12$acc==1, ]))*100
+```
+4.64% of trials were trimmed from the older child data set. 
+
+```{r trimming-child6}
+trimmedC6 <- kids6[kids6$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
+           mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
+           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=200 & rt<=18950) %>% #exact upper limit =18929.79
+           select(id, age2, relative_hp_dist, rt, block_num2) %>%  #keep these columns in the new data frame
+           as.data.frame()
 
 
+statPrep <- trimmedC6 %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
+100-(nrow(trimmedC6)/nrow(kids6[kids6$acc==1, ]))*100
+```
+6.07% of trials were trimmed from the younger child data set.
+
+```{r change-column-names}
+
+trimmedC12<- trimmedC12 %>%
+  rename(
+    block_num=block_num1,
+    age=age1
+  )
+
+trimmedC6<- trimmedC6 %>%
+  rename(
+    block_num=block_num2,
+    age=age2
+  )
+kids12<- kids12 %>%
+  rename(
+    block_num=block_num1,
+    age=age1
+  )
+
+kids6<- kids6 %>%
+  rename(
+    block_num=block_num2,
+    age=age2
+  )
+
+```
+
+ 
+```{r combine-columns}
+
+acc_data <- rbind(adults, kids12)
+all_data <- rbind(trimmedA, trimmedC12)
+ 
+```
+
+### Examine Accuracy Effects
+
+```{r take-out}
+
+acc_data<- acc_data%>%
+  filter(id != 26)
+
+acc_data<-acc_data%>%
+  mutate(acc=acc*100)
+
+```
+
+```{r create_accuracy_df}
+
+distacc <- acc_data %>%
+  group_by(age,relative_hp_dist) %>%
+  summarize(accuracy = mean(acc),
+            sd_rt=sd(acc),
+            n_rt=32,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=accuracy+se,
+            lower_limit=accuracy-se
+            )
+
+```
+```{r set-up-plot}
+
+space <- acc_data %>%
+  group_by(age, id, relative_hp_dist) %>%
+  summarize(acc = mean(acc)
+            )
+
+space_anova <- setDT(space)
+space_anova <- dcast(space_anova,id+age~relative_hp_dist,value.var='acc')
+
+space_anova <- space_anova %>%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+df_mod <- subset(space_anova, select=c(id, age, high_prob, absent, low_prob))
+df_mod <- reshape2::melt(df_mod, id.var=c('id', 'age'), variable.name= "relative_hp_dist")
+
+```
 
 
+```{r plot-first}
+ggplot(df_mod, aes(relative_hp_dist, value, fill=relative_hp_dist)) +
+  geom_bar(stat="summary", position="dodge") + 
+  facet_grid(.~age) +
+  xlab("Distractor Location") + ylab("Accuracy (%)") +
+  scale_fill_brewer(palette="Dark2") +
+  theme(legend.position="none")+
+  coord_cartesian(ylim = c(85,105))
+
+```
+
+Run the 3x2 ANOVA on accuracy data. 
+```{r ANOVA-all}
+
+model3 <- aov_car(value ~ age*relative_hp_dist + Error(id/relative_hp_dist), data=df_mod)
+
+model3
+
+```
+Main effect of age is significant -- Main effect of distractor location is significant -- interaction is not significant. 
+
+Since the interaction was not significant, we'll exclude age and test the distractor location effect on accuracy across the 5 conditions. 
+
+```{r ANOVA-5-merge-age}
+
+model4 <- aov_car(acc ~ relative_hp_dist + Error(id/relative_hp_dist), data=acc_data)
+
+model4
+
+```
+Accuracy is different across all locations. 
+
+```{r plot-first5}
+ggplot(acc_data, aes(relative_hp_dist, acc, fill=relative_hp_dist)) +
+  geom_bar(stat="summary", position="dodge") + 
+  facet_grid(.~age) +
+  xlab("Distractor Location") + ylab("Response Times (ms)") +
+  scale_fill_brewer(palette="Dark2") +
+  theme(legend.position="none")+
+  coord_cartesian(ylim = c(85,105))
+
+```
+
+For the 3 locations (HP, LP, and absent), run t-tests. 
+
+```{r t-test-adults}
+
+space_anova %>%
+  t.test(x=space_anova$low_prob, y=space_anova$high_prob, alternative="less", mu=0,paired = TRUE, conf.level = .95) 
+space_anova%>%
+  t.test(x=space_anova$high_prob, y=space_anova$absent, alternative="less", mu=0, paired =TRUE, conf.level = .95) 
+space_anova%>%
+  t.test(x=space_anova$low_prob, y=space_anova$absent, alternative="less", mu=0, paired =TRUE, conf.level = .95)
+
+```
 
 
+```{r plot-collapse}
+ggplot(df_mod, aes(relative_hp_dist, value, fill=relative_hp_dist)) +
+  geom_bar(stat="summary", position="dodge") +
+  xlab("Distractor Location") + ylab("Response Times (ms)") +
+  scale_fill_brewer(palette="Dark2") +
+  theme(legend.position="none")+
+  coord_cartesian(ylim = c(85,105))
+
+```
 
 
+```{r set-up-plot-target}
+
+spaceT <- acc_data %>%
+  group_by(age, id, relative_target) %>%
+  summarize(acc = mean(acc)
+            )
+
+space_anovaT <- setDT(spaceT)
+space_anovaT <- dcast(space_anovaT,id+age~relative_target,value.var='acc')
+
+space_anovaT <- space_anovaT %>%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+df_mod_targ <- subset(space_anovaT, select=c(id, age, high_prob, low_prob))
+df_mod_targ <- reshape2::melt(df_mod_targ, id.var=c('id', 'age'), variable.name= "relative_target")
+
+```
 
 
+```{r plot-first-target}
+ggplot(df_mod_targ, aes(relative_target, value, fill=relative_target)) +
+  geom_bar(stat="summary", position="dodge") + 
+  facet_grid(.~age) +
+  xlab("Distractor Location") + ylab("Accuracy (%)") +
+  scale_fill_brewer(palette="Dark2") +
+  theme(legend.position="none")+
+  coord_cartesian(ylim = c(85,105))
 
+```
 
+Run the 3x2 ANOVA on accuracy data. 
+```{r ANOVA-all-target}
 
+model3 <- aov_car(value ~ age*relative_target + Error(id/relative_target), data=df_mod_targ)
 
+model3
 
+```
 
-
-
+For target location accuracy, there is only a main effect of age. 
 
 
 
