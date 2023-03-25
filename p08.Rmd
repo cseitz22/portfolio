@@ -178,6 +178,12 @@ sum_stats
 
 ```
 
+```{r order-bars}
+sum_stats$relative_hp_dist <- factor(sum_stats$relative_hp_dist,              # Change ordering manually
+                  levels = c("high_prob", "low_prob", "absent"))
+
+```
+
 Plot data. 
 
 ```{r plot-first}
