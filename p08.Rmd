@@ -163,15 +163,35 @@ df_mod <- reshape2::melt(df_mod, id.var=c('id', 'age'), variable.name= "relative
 
 ```
 
+```{r set-up-data-for-plot}
+
+sum_stats <- df_mod%>%
+  group_by(age, relative_hp_dist)%>%
+  summarize(mean_rts=mean(value),
+            sd_rt=sd(value),
+            n_rt=33,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+sum_stats
+
+```
+
 Plot data. 
 
 ```{r plot-first}
-ggplot(df_mod, aes(relative_hp_dist, value, fill=relative_hp_dist)) +
-  geom_bar(stat="summary", fun.y="mean", position="dodge") + 
+
+ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
+  geom_bar(stat = "identity")+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  #coord_cartesian(ylim = c(700,1050))+ 
   facet_grid(.~age) +
-  xlab("Distractor Location") + ylab("Response Times (ms)") +
-  scale_fill_brewer(palette="Dark2") +
-  theme(legend.position="none")
+  theme_classic()+
+  labs(x = "Distractor Location", y = "Response Time (ms)")+
+  labs(title = "Singleton Distractor Present")+
+  scale_fill_brewer(palette="Dark2") 
+  #scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
 
 ```
 

@@ -445,18 +445,40 @@ distractor.</p>
 <pre class="r"><code>df_mod &lt;- subset(space_anova, select=c(id, age, high_prob, absent, low_prob))
 
 df_mod &lt;- reshape2::melt(df_mod, id.var=c(&#39;id&#39;, &#39;age&#39;), variable.name= &quot;relative_hp_dist&quot;)</code></pre>
+<pre class="r"><code>sum_stats &lt;- df_mod%&gt;%
+  group_by(age, relative_hp_dist)%&gt;%
+  summarize(mean_rts=mean(value),
+            sd_rt=sd(value),
+            n_rt=33,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>sum_stats</code></pre>
+<pre><code>## # A tibble: 6 × 8
+## # Groups:   age [2]
+##   age   relative_hp_dist mean_rts sd_rt  n_rt    se upper_limit lower_limit
+##   &lt;chr&gt; &lt;fct&gt;               &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1 adult high_prob           1099.  269.    33  46.9       1146.       1052.
+## 2 adult absent               970.  233.    33  40.6       1011.        929.
+## 3 adult low_prob            1130.  249.    33  43.3       1174.       1087.
+## 4 child high_prob           1827.  676.    33 118.        1945.       1710.
+## 5 child absent              1639.  612.    33 107.        1746.       1533.
+## 6 child low_prob            2044.  850.    33 148.        2192.       1896.</code></pre>
 <p>Plot data.</p>
-<pre class="r"><code>ggplot(df_mod, aes(relative_hp_dist, value, fill=relative_hp_dist)) +
-  geom_bar(stat=&quot;summary&quot;, fun.y=&quot;mean&quot;, position=&quot;dodge&quot;) + 
+<pre class="r"><code>ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
+  geom_bar(stat = &quot;identity&quot;)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  #coord_cartesian(ylim = c(700,1050))+ 
   facet_grid(.~age) +
-  xlab(&quot;Distractor Location&quot;) + ylab(&quot;Response Times (ms)&quot;) +
-  scale_fill_brewer(palette=&quot;Dark2&quot;) +
-  theme(legend.position=&quot;none&quot;)</code></pre>
-<pre><code>## Warning in geom_bar(stat = &quot;summary&quot;, fun.y = &quot;mean&quot;, position = &quot;dodge&quot;):
-## Ignoring unknown parameters: `fun.y`</code></pre>
-<pre><code>## No summary function supplied, defaulting to `mean_se()`
-## No summary function supplied, defaulting to `mean_se()`</code></pre>
+  theme_classic()+
+  labs(x = &quot;Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
+  labs(title = &quot;Singleton Distractor Present&quot;)+
+  scale_fill_brewer(palette=&quot;Dark2&quot;) </code></pre>
 <p><img src="p08_files/figure-html/plot-first-1.png" width="672" /></p>
+<pre class="r"><code>  #scale_x_discrete(labels= c(&quot;no_dist&quot;=&quot;no-dist&quot;,&quot;dist_0&quot;=&quot;dist-0&quot;,&quot;dist_1&quot;=&quot;dist-1&quot;,&quot;dist_2&quot;=&quot;dist-2&quot;,&quot;dist_3&quot;=&quot;dist-3&quot;))</code></pre>
 <p>Run a 3x2 mixed design ANOVA with distractor location and age as
 independent variables and rt as the dependent variable.</p>
 <pre class="r"><code>model3 &lt;- aov_car(value ~ age*relative_hp_dist + Error(id/relative_hp_dist), data=df_mod)</code></pre>
@@ -806,6 +828,8 @@ is likely to appear.</p>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
 ## Sphericity correction method: GG</code></pre>
+<p>Maybe will need to separate out by age and see if suppression effect
+by block is significant.</p>
 <p>Not sure the below is important – need to update if what to use</p>
 <pre class="r"><code>write.csv(space_block, &quot;space_block.csv&quot;, row.names=FALSE)</code></pre>
 <pre class="r"><code>normy &lt;- read_csv(&quot;space_block_norm.csv&quot;, show_col_types = FALSE)
