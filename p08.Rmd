@@ -504,6 +504,46 @@ ggplot(data = normy,aes(x=block_num, y=diff_norm, group=id))+
 ```
 
 
+### Younger children Analyses
+
+Now, let's examine the partial data from children ages 6-7 years old. 
+
+```{r create_new_df_to_transform-kids6}
+space_block6 <- trimmedC6 %>%
+  group_by(id, block_num, relative_hp_dist) %>%
+  summarize(rts = mean(rt),
+            )
+
+```
+
+```{r transform_df-kids6}
+
+space_block6 <- setDT(space_block6)
+space_block6 <- dcast(space_block6,id+block_num~relative_hp_dist,value.var='rts')
+
+```
+
+```{r add_avg_col-kids6}
+
+space_block6 <- space_block6 %>%
+  mutate(low_prob = rowMeans(select(space_block6, c(lp_1,lp_2,lp_3)),na.rm=TRUE)) %>%
+  mutate(difference = (low_prob-high_prob))
+
+
+```
+
+
+```{r line_plot-kids6}
+ggplot(data = space_block6,aes(x=block_num, y=difference, group=id))+
+  geom_line()+
+  labs(title = "Difference in Response Times", subtitle = "for distractor presentation at the low-probability locations and high-probability location by block")+
+  theme_classic()+
+  labs(x = "Block Number", y = "Difference in RT (ms)")
+
+```
+
+
+
 
 
 

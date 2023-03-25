@@ -139,7 +139,7 @@ Accuracy is different across all locations.
 ggplot(acc_data, aes(relative_hp_dist, acc, fill=relative_hp_dist)) +
   geom_bar(stat="summary", position="dodge") + 
   facet_grid(.~age) +
-  xlab("Distractor Location") + ylab("Response Times (ms)") +
+  xlab("Distractor Location") + ylab("Accuracy (%)") +
   scale_fill_brewer(palette="Dark2") +
   theme(legend.position="none")+
   coord_cartesian(ylim = c(85,105))
@@ -174,6 +174,12 @@ sum_statsD
 
 ```
 
+```{r order-bars}
+sum_statsD$relative_hp_dist <- factor(sum_statsD$relative_hp_dist,              # Change ordering manually
+                  levels = c("high_prob", "low_prob", "absent"))
+
+```
+
 ```{r plot-dist-acc}
 
 ggplot(data = sum_statsD, aes(x = relative_hp_dist, y = mean_acc, fill=relative_hp_dist)) +
@@ -182,7 +188,7 @@ ggplot(data = sum_statsD, aes(x = relative_hp_dist, y = mean_acc, fill=relative_
   coord_cartesian(ylim = c(85,100))+ 
   facet_grid(.~age) +
   theme_classic()+
-  labs(x = "Distractor Location", y = "Response Time (ms)")+
+  labs(x = "Distractor Location", y = "Accuracy (%)")+
   labs(title = "Singleton Distractor Present")+
   scale_fill_brewer(palette="Dark2") 
   #scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
@@ -231,7 +237,7 @@ ggplot(data = sum_statsT, aes(x = relative_target, y = mean_acc, fill=relative_t
   coord_cartesian(ylim = c(85,100))+ 
   facet_grid(.~age) +
   theme_classic()+
-  labs(x = "Distractor Location", y = "Response Time (ms)")+
+  labs(x = "Distractor Location", y = "Accuracy (%)")+
   labs(title = "Singleton Distractor Present")+
   scale_fill_brewer(palette="Dark2") 
   #scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
@@ -253,19 +259,77 @@ For target location accuracy, there is only a main effect of age.
 
 
 
+### Children ages 6-7 Accuracy -- Only 3 kids
+
+```{r adjust-data}
+
+kids6<- kids6%>%
+  filter(id != 30, block_num2 != 3, block_num2 != 4, block_num2 != 5,block_num2 != 6)
+
+kids6<-kids6%>%
+  mutate(acc=acc*100)
+
+```
+
+```{r create_new_df_to_transform-kids6}
+space_block6 <- kids6 %>%
+  group_by(id, block_num2, relative_hp_dist) %>%
+  summarize(accs = mean(acc),
+            )
+
+```
+
+```{r transform_df-kids6}
+
+space_block6 <- setDT(space_block6)
+space_block6 <- dcast(space_block6,id+block_num2~relative_hp_dist,value.var='accs')
+
+```
+
+```{r add_avg_col-kids6}
+
+space_block6 <- space_block6 %>%
+  mutate(low_prob = rowMeans(select(space_block6, c(lp_1,lp_2,lp_3)),na.rm=TRUE)) %>%
+  mutate(difference = (low_prob-high_prob))
 
 
+```
 
 
+```{r line_plot-kids6}
+ggplot(data = space_block6,aes(x=block_num2, y=difference, group=id))+
+  geom_line()+
+  labs(title = "Difference in Accuracies", subtitle = "for distractor presentation at the low-probability locations and high-probability location by block")+
+  theme_classic()+
+  labs(x = "Block Number", y = "Difference in Accuracy (%)")
+
+```
 
 
+```{r create_df_to_transform}
+space2 <- space_block6 %>%
+  group_by(block_num2) %>%
+  summarize(rts = mean(difference, na.rm = TRUE),
+            sd_rt=sd(difference, na.rm = TRUE),
+            n_rt=3,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=rts+se,
+            lower_limit=rts-se
+            )
+space2
 
+```
 
+```{r line_plot_avg}
+ggplot(data = space2,aes(x=block_num2, y=rts))+
+  geom_line()+
+  geom_point()+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  labs(title = "Singleton Distractor Present")+
+  xlab("Block number")+
+  ylab(expression(atop("Suppression effect (ms)", paste("(high prob. - low prob.)"))))
 
-
-
-
-
+```
 
 
 

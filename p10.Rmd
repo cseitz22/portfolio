@@ -47,40 +47,221 @@ stds <- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173,
 
 Trim the data and compute the percent trimmed
 ```{r trimming-adults}
-trimmedA <- adults[adults$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
+trimmedA <- adults[adults$acc==1, ] %>% group_by(id, relative_target) %>%
            mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
            filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=200 & rt<=2500) %>% #exact upper limit =2464.175
-           select(id, age, relative_hp_dist, rt, block_num) %>%  #keep these columns in the new data frame
+           select(id, age, relative_target, relative_hp_dist, rt, block_num) %>%  #keep these columns in the new data frame
            as.data.frame()
 
 
-statPrep <- trimmedA %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
+statPrep <- trimmedA %>% group_by(id, relative_target) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
 100-(nrow(trimmedA)/nrow(adults[adults$acc==1, ]))*100
 ```
-5.10% of trials were trimmed from the adult data set. 
+5.06% of trials were trimmed from the adult data set. 
 
 ```{r trimming-child12}
-trimmedC12 <- kids12[kids12$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
+trimmedC12 <- kids12[kids12$acc==1, ] %>% group_by(id, relative_target) %>%
            mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
            filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=200 & rt<=7590) %>%  #exact upper limit =7586.794
-           select(id, age1, relative_hp_dist, rt, block_num1) %>%  #keep these columns in the new data frame
+           select(id, age1, relative_target, , relative_hp_dist, rt, block_num1) %>%  #keep these columns in the new data frame
            as.data.frame()
 
 
-statPrep <- trimmedC12 %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
+statPrep <- trimmedC12 %>% group_by(id, relative_target) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
 100-(nrow(trimmedC12)/nrow(kids12[kids12$acc==1, ]))*100
 ```
-4.64% of trials were trimmed from the older child data set. 
+4.53% of trials were trimmed from the older child data set. 
 
 ```{r trimming-child6}
-trimmedC6 <- kids6[kids6$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
+trimmedC6 <- kids6[kids6$acc==1, ] %>% group_by(id, relative_target) %>%
            mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
            filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=200 & rt<=18950) %>% #exact upper limit =18929.79
-           select(id, age2, relative_hp_dist, rt, block_num2) %>%  #keep these columns in the new data frame
+           select(id, age2, relative_target, , relative_hp_dist, rt, block_num2) %>%  #keep these columns in the new data frame
            as.data.frame()
 
 
-statPrep <- trimmedC6 %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
+statPrep <- trimmedC6 %>% group_by(id, relative_target) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
 100-(nrow(trimmedC6)/nrow(kids6[kids6$acc==1, ]))*100
 ```
+
+4.21% of trials were trimmed from the younger child data set. 
+
+```{r change-column-names}
+
+trimmedC12<- trimmedC12 %>%
+  rename(
+    block_num=block_num1,
+    age=age1
+  )
+
+trimmedC6<- trimmedC6 %>%
+  rename(
+    block_num=block_num2,
+    age=age2
+  )
+
+
+```
+
+
+```{r combine-columns}
+
+all_data <- rbind(trimmedA, trimmedC12)
+ 
+```
+
+Create a new data frame with the average RT for each relative distractor location per participant, so we can do a repeated measures ANOVA -- eventually -- maybe. 
+
+```{r sum-stat-all}
+  
+space <- all_data %>%
+  subset(relative_hp_dist=="absent")%>%
+  group_by(age, id, relative_target) %>%
+  summarize(rts = mean(rt)
+            )
+space
+  
+```
+
+Run ANOVA on 3 conditions first, and if significant, then run in on 5 conditions?
+
+Need to reformat the above df to have a column for each relative_hp_dist/ID so we can average across low-probability locations. 
+
+```{r reformat-all}
+
+space_anova <- setDT(space)
+space_anova <- dcast(space_anova,id+age~relative_target,value.var='rts')
+
+```
+
+```{r avg-lp-all}
+
+space_anova <- space_anova %>%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+```
+
+Now, I want to create a smaller graph with just 3 bars: one for the high-probability rts, average of low-probability rts, and no distractor. 
+
+```{r get_info_for_smaller_figure}
+
+df_mod <- subset(space_anova, select=c(id, age, high_prob, low_prob))
+
+df_mod <- reshape2::melt(df_mod, id.var=c('id', 'age'), variable.name= "relative_target")
+
+```
+
+```{r set-up-data-for-plot}
+
+sum_stats <- df_mod%>%
+  group_by(age, relative_target)%>%
+  summarize(mean_rts=mean(value),
+            sd_rt=sd(value),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+sum_stats
+
+```
+
+
+Plot data. 
+
+```{r plot-first}
+
+ggplot(data = sum_stats, aes(x = relative_target, y = mean_rts, fill=relative_target)) +
+  geom_bar(stat = "identity")+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  #coord_cartesian(ylim = c(700,1050))+ 
+  facet_grid(.~age) +
+  theme_classic()+
+  labs(x = "Distractor Location", y = "Response Time (ms)")+
+  labs(title = "Singleton Distractor Present")+
+  scale_fill_brewer(palette="Dark2") 
+  #scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
+
+```
+
+
+Run a 3x2 mixed design ANOVA with distractor location and age as independent variables and rt as the dependent variable. 
+
+```{r ANOVA-all}
+
+model3 <- aov_car(value ~ age*relative_target + Error(id/relative_target), data=df_mod)
+
+model3
+
+```
+
+Since the interaction is trending towards being significant, I will break apart the age groups and run a t-test for HP and LP locations. 
+
+```{r sum-stat-adults}
+  
+spaceA <- trimmedA %>%
+  subset(relative_hp_dist=="absent")%>%
+  group_by(id, relative_target) %>%
+  summarize(rts = mean(rt)
+  )
+  
+```
+
+```{r reformat-adults}
+
+space_anovaA <- setDT(spaceA)
+space_anovaA <- dcast(space_anovaA,id~relative_target,value.var='rts')
+
+```
+
+```{r avg-lp-adults}
+
+space_anovaA <- space_anovaA %>%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+```
+
+
+```{r adult-t-test}
+
+space_anovaA %>%
+  t.test(x=space_anovaA$high_prob, y=space_anovaA$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
+
+```
+
+
+Same for the kids:
+
+```{r sum-stat-kids}
+  
+spaceK <- trimmedC12 %>%
+  subset(relative_hp_dist=="absent")%>%
+  group_by(id, relative_target) %>%
+  summarize(rts = mean(rt)
+  )
+  
+```
+
+```{r reformat-kids}
+
+space_anovaK <- setDT(spaceK)
+space_anovaK <- dcast(space_anovaK,id~relative_target,value.var='rts')
+
+```
+
+```{r avg-lp-kids}
+
+space_anovaK <- space_anovaK %>%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+```
+
+
+```{r kids-t-test}
+
+space_anovaK %>%
+  t.test(x=space_anovaK$low_prob, y=space_anovaK$high_prob, alternative="less", mu=0,paired = TRUE, conf.level = .95) 
+
+```
+
 
