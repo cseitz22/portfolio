@@ -159,14 +159,33 @@ space_anova%>%
 
 ```
 
+```{r set-up-data-for-plot-acc}
 
-```{r plot-collapse}
-ggplot(df_mod, aes(relative_hp_dist, value, fill=relative_hp_dist)) +
-  geom_bar(stat="summary", position="dodge") +
-  xlab("Distractor Location") + ylab("Response Times (ms)") +
-  scale_fill_brewer(palette="Dark2") +
-  theme(legend.position="none")+
-  coord_cartesian(ylim = c(85,105))
+sum_statsD <- df_mod%>%
+  group_by(age, relative_hp_dist)%>%
+  summarize(mean_acc=mean(value),
+            sd_rt=sd(value),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_acc+se,
+            lower_limit=mean_acc-se
+  )
+sum_statsD
+
+```
+
+```{r plot-dist-acc}
+
+ggplot(data = sum_statsD, aes(x = relative_hp_dist, y = mean_acc, fill=relative_hp_dist)) +
+  geom_bar(stat = "identity")+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(85,100))+ 
+  facet_grid(.~age) +
+  theme_classic()+
+  labs(x = "Distractor Location", y = "Response Time (ms)")+
+  labs(title = "Singleton Distractor Present")+
+  scale_fill_brewer(palette="Dark2") 
+  #scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
 
 ```
 
@@ -189,16 +208,33 @@ df_mod_targ <- subset(space_anovaT, select=c(id, age, high_prob, low_prob))
 df_mod_targ <- reshape2::melt(df_mod_targ, id.var=c('id', 'age'), variable.name= "relative_target")
 
 ```
+```{r set-up-data-for-plot}
 
+sum_statsT <- df_mod_targ%>%
+  group_by(age, relative_target)%>%
+  summarize(mean_acc=mean(value),
+            sd_rt=sd(value),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_acc+se,
+            lower_limit=mean_acc-se
+  )
+sum_statsT
+
+```
 
 ```{r plot-first-target}
-ggplot(df_mod_targ, aes(relative_target, value, fill=relative_target)) +
-  geom_bar(stat="summary", position="dodge") + 
+
+ggplot(data = sum_statsT, aes(x = relative_target, y = mean_acc, fill=relative_target)) +
+  geom_bar(stat = "identity")+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(85,100))+ 
   facet_grid(.~age) +
-  xlab("Distractor Location") + ylab("Accuracy (%)") +
-  scale_fill_brewer(palette="Dark2") +
-  theme(legend.position="none")+
-  coord_cartesian(ylim = c(85,105))
+  theme_classic()+
+  labs(x = "Distractor Location", y = "Response Time (ms)")+
+  labs(title = "Singleton Distractor Present")+
+  scale_fill_brewer(palette="Dark2") 
+  #scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
 
 ```
 

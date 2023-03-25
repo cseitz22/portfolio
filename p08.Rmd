@@ -169,7 +169,7 @@ sum_stats <- df_mod%>%
   group_by(age, relative_hp_dist)%>%
   summarize(mean_rts=mean(value),
             sd_rt=sd(value),
-            n_rt=33,
+            n_rt=n(),
             se=sd_rt/sqrt(n_rt),
             upper_limit=mean_rts+se,
             lower_limit=mean_rts-se
