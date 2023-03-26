@@ -1,58 +1,228 @@
 ---
 title: "Portfolio 7"
 name: "Cat Seitz"
-date: "03.16.2023"
-data: "Tidy Tuesday Rent"
+date: "03.25.2023"
+data: "Thesis Data - Suppression effect correlation with visual working memory capacity"
 output: 
   html_document: 
     theme: cerulean
 ---
 
-Goal: Keep examining the tidy tuesday dataset on San Francisco Rent
-Product: 
-Data: San Francisco Rent
-Interpretation:  
+The goal of this portfolio is to examine part of my thesis data. To recap, my thesis is examining distractor suppression in children and adults. Participants are shown a distractor in a location more frequently than other locations in a visual search array. Based on previous studies, we would expect adults to suppress their attention to the high-probability location, but we were unsure when in development children develop this ability. 
+
 
 
 ```{r load-packages, message=FALSE}
 library(tidyverse) 
 library(tidyr)
-library(tidytuesdayR)
-library(tidymodels)
-library(openintro)
-library(broom)
+library(rstatix)
+library(data.table)
+library(afex)
+library(emmeans)
+library(psych)
+library(ggprism)
+library(patchwork)
+library(magrittr)
+library(cowplot)
 ```
 
+I put all the messy loading in of different data sets and adding in important columns to an R script instead of having it here. 
+```{r, include=FALSE}
 
-```{r import-data}
-
-tuesdata <- tidytuesdayR::tt_load('2022-07-05')
-tuesdata <- tidytuesdayR::tt_load(2022, week = 27)
-
-rent <- tuesdata$rent
-```
-
-
-```{r drop-columns&rows}
-
-rent <- rent %>%
-  drop_na(beds)%>%
-  drop_na(baths) %>%
-  drop_na(sqft)
-
-rent<-rent[rent$room_in_apt != 1, ]
-
-rent<- subset(rent, select = -c(address,lat, lon,descr, room_in_apt, details) )
+source("load_data.R", local = knitr::knit_global())
 
 ```
 
-This got us down to around 14,000 from 200,000 observations. 
+```{r cdt-load}
 
-Point plot price by sqft -- with bed/bath as colors?
+cdt <- read_csv("RawDataCDT.csv", show_col_types = FALSE)
+
+```
+
+### Data Management of Change Detection Task Data
+
+```{r add-cases}
+cdt <- cdt %>%
+  mutate(outcome=
+           case_when(Accurate==1 & Change==1 ~ "hit",
+                     Accurate==1 & Change==0 ~ "cor_rej",
+                     Accurate==0 & Change==1 ~ "miss",
+                     Accurate==0 & Change==0 ~ "f_alarm",
+           ))
+
+```
+
+```{r count-cases}
+
+cdt<-cdt%>%
+  group_by(SubID, SetSize)%>%
+  count(outcome)
+
+```
+
+Reformat to have column for each outcome
+
+```{r reformat-cdt}
+
+cdt1 <- setDT(cdt)
+cdt1 <- dcast(cdt1,SubID+SetSize~outcome,value.var='n')
+
+```
+
+Get rid of participants without enough data
+
+```{r delete-and-zeros}
+cdt1<- cdt1%>%
+  filter(SubID != 55, SubID != 76)
+
+cdt1[is.na(cdt1)] <- 0
+
+cdt1 <- cdt1 %>% 
+  select(-c("NA"))
+
+```
+
+```{r calc-hit-rate}
+
+cdt1<-cdt1 %>%
+  mutate(hit_rate = hit/(hit+miss))
+
+```
+
+```{r calc-false-alarm-rate}
+
+cdt1<-cdt1 %>%
+  mutate(fa_rate = f_alarm/(f_alarm+cor_rej))
+
+```
+
+```{r calc-capacity}
+
+cdt1<-cdt1 %>%
+  mutate(K = SetSize*(hit_rate-fa_rate))
+
+```
+
+### Trim the RT Data
+
+```{r find-means}
+
+aggregate(rt ~ acc, data = adults, FUN = mean)
+aggregate(rt ~ acc, data = adults, FUN = sd)
+aggregate(rt ~ acc, data = kids12, FUN = mean)
+aggregate(rt ~ acc, data = kids12, FUN = sd)
+aggregate(rt ~ acc, data = kids6, FUN = mean)
+aggregate(rt ~ acc, data = kids6, FUN = sd)
+
+```
+
+Define trimming criteria according to Van Selst and Jolicoeur 1994.
+```{r set_stds_depending_on_set_size}
+xsize <- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
+             25, 30, 35, 50, 100)
+stds <- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173, 
+            2.22, 2.246, 2.274, 2.31, 2.326, 2.391, 2.41, 2.4305, 
+            2.45, 2.48, 2.5)
+```
+
+Trim the data and compute the percent trimmed
+```{r trimming-adults}
+trimmedA <- adults[adults$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
+           mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
+           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=200 & rt<=2500) %>% #exact upper limit =2464.175
+           select(id, age, relative_hp_dist, rt, block_num) %>%  #keep these columns in the new data frame
+           as.data.frame()
 
 
+statPrep <- trimmedA %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
+100-(nrow(trimmedA)/nrow(adults[adults$acc==1, ]))*100
+```
+5.10% of trials were trimmed from the adult data set. 
+
+```{r trimming-child12}
+trimmedC12 <- kids12[kids12$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
+           mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
+           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=200 & rt<=7590) %>%  #exact upper limit =7586.794
+           select(id, age1, relative_hp_dist, rt, block_num1) %>%  #keep these columns in the new data frame
+           as.data.frame()
 
 
+statPrep <- trimmedC12 %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
+100-(nrow(trimmedC12)/nrow(kids12[kids12$acc==1, ]))*100
+```
+4.64% of trials were trimmed from the older child data set. 
+
+```{r trimming-child6}
+trimmedC6 <- kids6[kids6$acc==1, ] %>% group_by(id, relative_hp_dist) %>%
+           mutate(sdc = ifelse(length(rt)>=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %>%
+           filter(rt <= sdc*stdev+avg & rt >=avg-(sdc*stdev) & rt >=200 & rt<=18950) %>% #exact upper limit =18929.79
+           select(id, age2, relative_hp_dist, rt, block_num2) %>%  #keep these columns in the new data frame
+           as.data.frame()
 
 
+statPrep <- trimmedC6 %>% group_by(id, relative_hp_dist) %>% summarise(measurement=mean(rt)) %>% as.data.frame()
+100-(nrow(trimmedC6)/nrow(kids6[kids6$acc==1, ]))*100
+```
 
+
+```{r change-column-names}
+
+trimmedC12<- trimmedC12 %>%
+  rename(
+    block_num=block_num1,
+    age=age1
+  )
+
+trimmedC6<- trimmedC6 %>%
+  rename(
+    block_num=block_num2,
+    age=age2
+  )
+
+
+```
+
+
+ 
+```{r combine-columns}
+
+all_data <- rbind(trimmedA, trimmedC12)
+ 
+```
+
+
+```{r create_new_df_to_transform}
+space_block <- all_data %>%
+  group_by(id, age, block_num, relative_hp_dist) %>%
+  summarize(rts = mean(rt)
+  )
+
+```
+
+```{r transform_df}
+
+space_block <- setDT(space_block)
+space_block <- dcast(space_block,id+age+block_num~relative_hp_dist,value.var='rts')
+
+```
+
+Below, I added the average rt for the low probability locations and the difference between the low probability and high probability locations ignoring n/a values. 
+
+```{r add_avg_col}
+
+space_block <- space_block %>%
+  mutate(low_prob = rowMeans(select(space_block, c(lp_1,lp_2,lp_3)),na.rm=TRUE)) %>%
+  mutate(difference = (low_prob-high_prob))
+
+
+```
+
+```{r suppression-effect}
+
+supp <- space_block %>%
+  group_by(id)%>%
+  summarize(effect = mean(difference, na.rm = TRUE))
+
+supp
+
+```

@@ -503,6 +503,17 @@ ggplot(data = normy,aes(x=block_num, y=diff_norm, group=id))+
 
 ```
 
+### Correlation of suppression effect and visual working memory capacity
+
+```{r suppression-effect}
+
+supp <- space_block %>%
+  group_by(id)%>%
+  summarize(effect = mean(difference, na.rm = TRUE))
+
+supp
+
+```
 
 ### Younger children Analyses
 
