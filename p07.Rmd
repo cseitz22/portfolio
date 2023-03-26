@@ -69,7 +69,7 @@ cdt1 <- dcast(cdt1,SubID+SetSize~outcome,value.var='n')
 
 ```
 
-Get rid of participants without enough data
+Get rid of participants without enough data and fill na values with zeros.
 
 ```{r delete-and-zeros}
 cdt1<- cdt1%>%
@@ -100,6 +100,25 @@ cdt1<-cdt1 %>%
 
 cdt1<-cdt1 %>%
   mutate(K = SetSize*(hit_rate-fa_rate))
+
+```
+
+Need to make a new data frame with the average capacity per participant. 
+
+```{r avg-K}
+
+capacity <- cdt1 %>%
+  group_by(SubID) %>%
+  summarize(avg_k = mean(K))
+
+```
+
+From this, we find out that ppt 104 was pressing keys for the tasks backwards. Delete them?
+
+```{r delete-104}
+
+capacity <- capacity %>%
+  filter(SubID != 104)
 
 ```
 
@@ -226,3 +245,46 @@ supp <- space_block %>%
 supp
 
 ```
+
+```{r delete-unwanted-ppts}
+
+supp <- supp %>%
+  filter(id != 104, id != 53, id != 54, id != 55, id != 76, id != 26)
+
+```
+
+### Merge Data Frames and correlate?
+
+
+```{r merge}
+
+df <- cbind(supp, capacity)
+
+df <- df %>% 
+  select(-c("SubID"))
+
+```
+
+```{r correlation}
+
+cor.test(df$effect, df$avg_k)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
