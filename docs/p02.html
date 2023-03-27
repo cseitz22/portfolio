@@ -744,7 +744,7 @@ pilot_targacc &lt;- pilot %&gt;%
         axis.title=element_text(size=16,face=&quot;bold&quot;),
         title = element_text(size = 16))+
   scale_x_discrete(labels= c(&quot;no_dist&quot;=&quot;no-dist&quot;,&quot;dist_0&quot;=&quot;dist-0&quot;,&quot;dist_1&quot;=&quot;dist-1&quot;,&quot;dist_2&quot;=&quot;dist-2&quot;,&quot;dist_3&quot;=&quot;dist-3&quot;))</code></pre>
-<p><img src="p02_files/figure-html/-%20graph%20distractor%20location%20effects%20on%20accuracy-1.png" width="576" /></p>
+<p><img src="p02_files/figure-html/-%20graph%20distractor%20location%20effects%20on%20accuracy-1.png" width="672" /></p>
 <pre class="r"><code>d&lt;-ggplot(data = pilot_targacc, aes(x = relative_target, y = accuracy, fill=relative_target)) +
   geom_bar(stat = &quot;identity&quot;, show.legend = FALSE) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+

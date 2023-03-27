@@ -398,7 +398,7 @@ pilot_targacc <- pilot %>%
 
 ```
 
-```{r - graph distractor location effects on accuracy, fig.height=9, fig.width=6}
+```{r - graph distractor location effects on accuracy}
 ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy)) +
   geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
