@@ -150,17 +150,18 @@ This figure displays the mean response times depending on the location of the ta
 
 
 ```{r - graph 1 - distractor location effect on rt, fig.height=9, fig.width=12}
-c<-ggplot(data = target_means, aes(x = relative_target, y = mean_rts)) +
-  geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
+c<-ggplot(data = target_means, aes(x = relative_target, y = mean_rts, fill=relative_target)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(700,1000))+
   theme_classic()+
+  scale_fill_brewer(palette="Dark2")+
   labs(x = "Target Location", y = "Response Time (ms)")+
   labs(title = "Singleton Distractor Absent")+
   theme(axis.text=element_text(size=30),
     axis.title=element_text(size=40,face="bold"),
     title = element_text(size = 40))+
-  scale_x_discrete(labels= c("high_prob"="dist-0","lp_1"="dist-1", "lp_2"="dist-2", "lp_3"="dist-3"))
+  scale_x_discrete(labels= c("high_prob"="HP loc","lp_1"="dist-1", "lp_2"="dist-2", "lp_3"="dist-3"))
   
 ```
 
@@ -413,17 +414,18 @@ ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy)) +
 ```
 
 ```{r - graph target location effects on accuracy, fig.height=9, fig.width=6}
-d<-ggplot(data = pilot_targacc, aes(x = relative_target, y = accuracy)) +
-  geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
+d<-ggplot(data = pilot_targacc, aes(x = relative_target, y = accuracy, fill=relative_target)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(85,105))+
   theme_classic()+
+  scale_fill_brewer(palette="Dark2")+
   labs(x = "Target Location", y = "Accuracy (%)")+
   #labs(title = "Target Location Effect on Accuracy")+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=40,face="bold"),
         title = element_text(size = 40))+
-  scale_x_discrete(labels= c("high_prob"="dist-0","lp_1"="dist-1","lp_2"="dist-2","lp_3"="dist-3"))
+  scale_x_discrete(labels= c("high_prob"="HP loc","lp_1"="1","lp_2"="2","lp_3"="3"))
   
 ```
 
@@ -431,7 +433,7 @@ Created the below plot for NC Cognition Poster.
 
 ```{r join-2-figures, fig.height=11, fig.width=22}
 
-plot_grid(c,d,labels = c('A','B'), label_size=20, rel_widths = c(2,1))
+plot_grid(c,d,labels = c('C','D'), label_size=40, rel_widths = c(2,1))
 
 
 ```

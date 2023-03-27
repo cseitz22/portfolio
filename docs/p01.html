@@ -386,19 +386,20 @@ sum_stats</code></pre>
 <p>This figure displays the mean response times depending on the
 location of the distractor relative to the high probability location. I
 chose those particular colors based on Wake Forest’s color scheme.</p>
-<pre class="r"><code>a&lt;-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
+<pre class="r"><code>a&lt;-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
   #geom_point()+
-  geom_bar(stat = &quot;identity&quot;, fill=&quot;blue&quot;, color=&#39;#000000&#39;) + ##9E7E38
+  geom_bar(stat = &quot;identity&quot;, show.legend = FALSE) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(700,1050))+
   theme_classic()+
+  scale_fill_brewer(palette=&quot;Dark2&quot;) +
   labs(x = &quot;Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
   labs(title = &quot;Singleton Distractor Present&quot;)+
   #labs(caption = &quot;An ANOVA test shows a difference in RT depending on distractor location, F(3.28,65.57)=33.3, p&lt;.001.&quot;)+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=40,face=&quot;bold&quot;),
         title = element_text(size = 40))+
-  scale_x_discrete(labels= c(&quot;no_dist&quot;=&quot;no-dist&quot;,&quot;dist_0&quot;=&quot;dist-0&quot;,&quot;dist_1&quot;=&quot;dist-1&quot;,&quot;dist_2&quot;=&quot;dist-2&quot;,&quot;dist_3&quot;=&quot;dist-3&quot;))</code></pre>
+  scale_x_discrete(labels= c(&quot;no_dist&quot;=&quot;Absent&quot;,&quot;dist_0&quot;=&quot;HP loc&quot;,&quot;dist_1&quot;=&quot;dist-1&quot;,&quot;dist_2&quot;=&quot;dist-2&quot;,&quot;dist_3&quot;=&quot;dist-3&quot;))</code></pre>
 <p>Create a new data frame with the average RT for each relative
 distractor location per participant, so we can do a repeated measures
 ANOVA.</p>
@@ -699,19 +700,20 @@ model3</code></pre>
             lower_limit=accuracy-se
             )
 
-b&lt;-ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy)) +
-  geom_bar(stat = &quot;identity&quot;, fill=&quot;#9E7E38&quot;, color=&#39;#000000&#39;) +
+b&lt;-ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy, fill=relative_hp_dist)) +
+  geom_bar(stat = &quot;identity&quot;, show.legend = FALSE) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(85,105))+
   theme_classic()+
+  scale_fill_brewer(palette=&quot;Dark2&quot;)+
   labs(x = &quot;Distractor Location&quot;, y = &quot;Accuracy (%)&quot;)+
   #labs(title = &quot;Distractor Location Effect on Accuracy&quot;)+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=40,face=&quot;bold&quot;),
         title = element_text(size = 24))+
-  scale_x_discrete(labels= c(&quot;no_dist&quot;=&quot;no-dist&quot;,&quot;dist_0&quot;=&quot;dist-0&quot;,&quot;dist_1&quot;=&quot;1&quot;,&quot;dist_2&quot;=&quot;2&quot;,&quot;dist_3&quot;=&quot;3&quot;))</code></pre>
+  scale_x_discrete(labels= c(&quot;no_dist&quot;=&quot;Absent&quot;,&quot;dist_0&quot;=&quot;HP loc&quot;,&quot;dist_1&quot;=&quot;1&quot;,&quot;dist_2&quot;=&quot;2&quot;,&quot;dist_3&quot;=&quot;3&quot;))</code></pre>
 <pre class="r"><code>#
-plot_grid(a,b,labels = c(&#39;A&#39;,&#39;B&#39;), label_size=20, rel_widths = c(2,1))</code></pre>
+plot_grid(a,b,labels = c(&#39;A&#39;,&#39;B&#39;), label_size=40, rel_widths = c(2,1))</code></pre>
 <p><img src="p01_files/figure-html/dist_2-plots-1.png" width="2112" /></p>
 </div>
 <div id="examine-block-by-block-learning-of-distractor-location"
