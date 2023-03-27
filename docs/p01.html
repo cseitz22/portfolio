@@ -388,7 +388,7 @@ location of the distractor relative to the high probability location. I
 chose those particular colors based on Wake Forest’s color scheme.</p>
 <pre class="r"><code>a&lt;-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts)) +
   #geom_point()+
-  geom_bar(stat = &quot;identity&quot;, fill=&quot;#9E7E38&quot;, color=&#39;#000000&#39;) +
+  geom_bar(stat = &quot;identity&quot;, fill=&quot;blue&quot;, color=&#39;#000000&#39;) + ##9E7E38
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(700,1050))+
   theme_classic()+
@@ -825,6 +825,71 @@ summary(model4)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
 ## Sphericity correction method: GG</code></pre>
+</div>
+<div id="cdt-correlation-with-suppression-effect"
+class="section level3">
+<h3>CDT correlation with suppression effect</h3>
+<pre class="r"><code>cdt &lt;- read_csv(&quot;RawData_pilot_CDT.csv&quot;, show_col_types = FALSE)</code></pre>
+<pre class="r"><code>cdt &lt;- cdt %&gt;%
+  mutate(outcome=
+           case_when(Accurate==1 &amp; Change==1 ~ &quot;hit&quot;,
+                     Accurate==1 &amp; Change==0 ~ &quot;cor_rej&quot;,
+                     Accurate==0 &amp; Change==1 ~ &quot;miss&quot;,
+                     Accurate==0 &amp; Change==0 ~ &quot;f_alarm&quot;,
+           ))</code></pre>
+<pre class="r"><code>cdt&lt;-cdt%&gt;%
+  group_by(SubID, SetSize)%&gt;%
+  count(outcome)</code></pre>
+<p>Reformat to have column for each outcome</p>
+<pre class="r"><code>cdt1 &lt;- setDT(cdt)
+cdt1 &lt;- dcast(cdt1,SubID+SetSize~outcome,value.var=&#39;n&#39;)</code></pre>
+<pre class="r"><code>cdt1[is.na(cdt1)] &lt;- 0</code></pre>
+<pre class="r"><code>cdt1&lt;-cdt1 %&gt;%
+  mutate(hit_rate = hit/(hit+miss))</code></pre>
+<pre class="r"><code>cdt1&lt;-cdt1 %&gt;%
+  mutate(fa_rate = f_alarm/(f_alarm+cor_rej))</code></pre>
+<pre class="r"><code>cdt1&lt;-cdt1 %&gt;%
+  mutate(K = SetSize*(hit_rate-fa_rate))</code></pre>
+<p>Need to make a new data frame with the average capacity per
+participant.</p>
+<pre class="r"><code>capacity &lt;- cdt1 %&gt;%
+  group_by(SubID) %&gt;%
+  summarize(avg_k = mean(K))</code></pre>
+<pre class="r"><code>supp &lt;- space_block %&gt;%
+  group_by(ID)%&gt;%
+  summarize(effect = mean(difference, na.rm = TRUE))
+
+supp</code></pre>
+<pre><code>## # A tibble: 21 × 2
+##       ID  effect
+##    &lt;dbl&gt;   &lt;dbl&gt;
+##  1    11  11.4  
+##  2    12  57.7  
+##  3    13  60.0  
+##  4    14  -0.224
+##  5    15  38.4  
+##  6    16  43.6  
+##  7    17  87.9  
+##  8    18  55.3  
+##  9    19 125.   
+## 10    20 -55.3  
+## # … with 11 more rows</code></pre>
+<pre class="r"><code>df &lt;- cbind(capacity, supp)
+
+df &lt;- df %&gt;% 
+  select(-c(&quot;ID&quot;))</code></pre>
+<pre class="r"><code>cor.test(df$effect, df$avg_k)</code></pre>
+<pre><code>## 
+##  Pearson&#39;s product-moment correlation
+## 
+## data:  df$effect and df$avg_k
+## t = 0.90013, df = 19, p-value = 0.3793
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.2513980  0.5830237
+## sample estimates:
+##       cor 
+## 0.2022365</code></pre>
 </div>
 
 

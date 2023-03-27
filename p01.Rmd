@@ -458,3 +458,104 @@ model4
 
 ```
 
+### CDT correlation with suppression effect
+
+```{r cdt-load}
+
+cdt <- read_csv("RawData_pilot_CDT.csv", show_col_types = FALSE)
+
+```
+
+
+```{r add-cases}
+cdt <- cdt %>%
+  mutate(outcome=
+           case_when(Accurate==1 & Change==1 ~ "hit",
+                     Accurate==1 & Change==0 ~ "cor_rej",
+                     Accurate==0 & Change==1 ~ "miss",
+                     Accurate==0 & Change==0 ~ "f_alarm",
+           ))
+
+```
+
+```{r count-cases}
+
+cdt<-cdt%>%
+  group_by(SubID, SetSize)%>%
+  count(outcome)
+
+```
+
+Reformat to have column for each outcome
+
+```{r reformat-cdt}
+
+cdt1 <- setDT(cdt)
+cdt1 <- dcast(cdt1,SubID+SetSize~outcome,value.var='n')
+
+```
+
+```{r NA-to-zero}
+
+cdt1[is.na(cdt1)] <- 0
+
+
+```
+
+
+```{r calc-hit-rate}
+
+cdt1<-cdt1 %>%
+  mutate(hit_rate = hit/(hit+miss))
+
+```
+
+```{r calc-false-alarm-rate}
+
+cdt1<-cdt1 %>%
+  mutate(fa_rate = f_alarm/(f_alarm+cor_rej))
+
+```
+
+```{r calc-capacity}
+
+cdt1<-cdt1 %>%
+  mutate(K = SetSize*(hit_rate-fa_rate))
+
+```
+
+Need to make a new data frame with the average capacity per participant. 
+
+```{r avg-K}
+
+capacity <- cdt1 %>%
+  group_by(SubID) %>%
+  summarize(avg_k = mean(K))
+
+```
+
+```{r suppression-effect}
+
+supp <- space_block %>%
+  group_by(ID)%>%
+  summarize(effect = mean(difference, na.rm = TRUE))
+
+supp
+
+```
+
+```{r merge}
+
+df <- cbind(capacity, supp)
+
+df <- df %>% 
+  select(-c("ID"))
+
+```
+
+```{r correlation}
+
+cor.test(df$effect, df$avg_k)
+
+```
+

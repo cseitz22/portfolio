@@ -593,6 +593,3 @@ aov_car(accuracy ~ relative_target + Error(ID/relative_target), data=pilot_targ3
 
 
 
-
-
-
