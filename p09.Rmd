@@ -103,14 +103,53 @@ df_mod <- reshape2::melt(df_mod, id.var=c('id', 'age'), variable.name= "relative
 ```
 
 
+```{r set-up-sum-stats-dist}
+
+sum_stats <- df_mod%>%
+  group_by(age, relative_hp_dist)%>%
+  summarize(mean_acc=mean(value),
+            sd_rt=sd(value),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_acc+se,
+            lower_limit=mean_acc-se
+  )
+sum_stats
+
+```
+
+
+```{r order-bars}
+sum_stats$relative_hp_dist <- factor(sum_stats$relative_hp_dist,              # Change ordering manually
+                  levels = c("high_prob", "low_prob", "absent"))
+
+```
+
 ```{r plot-first}
-ggplot(df_mod, aes(relative_hp_dist, value, fill=relative_hp_dist)) +
-  geom_bar(stat="summary", position="dodge") + 
-  facet_grid(.~age) +
-  xlab("Distractor Location") + ylab("Accuracy (%)") +
-  scale_fill_brewer(palette="Dark2") +
-  theme(legend.position="none")+
-  coord_cartesian(ylim = c(85,105))
+
+supp.labs <- c("Adults", "Children")
+names(supp.labs) <- c("adult", "child")
+
+a<-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_acc, fill=relative_hp_dist)) +
+  geom_bar(stat = "identity", show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(85,100))+ 
+  facet_grid(.~age, labeller = labeller(age=supp.labs)) +
+  theme_classic()+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face="bold"),
+        title = element_text(size = 24),
+        strip.text.x = element_text(size=30)) +
+  labs(x = "Distractor Location", y = "Accuracy (%)")+
+  labs(title = "Singleton Distractor Present")+
+  scale_fill_manual(values=c('#1b9e77', '#d95f02', '#66a61e')) +
+  scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc","absent"="Absent"))
+
+plot_grid(a,labels = c('A'), label_size=40)
+  
+
+
+
 
 ```
 
@@ -159,41 +198,7 @@ space_anova%>%
 
 ```
 
-```{r set-up-data-for-plot-acc}
 
-sum_statsD <- df_mod%>%
-  group_by(age, relative_hp_dist)%>%
-  summarize(mean_acc=mean(value),
-            sd_rt=sd(value),
-            n_rt=n(),
-            se=sd_rt/sqrt(n_rt),
-            upper_limit=mean_acc+se,
-            lower_limit=mean_acc-se
-  )
-sum_statsD
-
-```
-
-```{r order-bars}
-sum_statsD$relative_hp_dist <- factor(sum_statsD$relative_hp_dist,              # Change ordering manually
-                  levels = c("high_prob", "low_prob", "absent"))
-
-```
-
-```{r plot-dist-acc}
-
-ggplot(data = sum_statsD, aes(x = relative_hp_dist, y = mean_acc, fill=relative_hp_dist)) +
-  geom_bar(stat = "identity")+
-  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(85,100))+ 
-  facet_grid(.~age) +
-  theme_classic()+
-  labs(x = "Distractor Location", y = "Accuracy (%)")+
-  labs(title = "Singleton Distractor Present")+
-  scale_fill_brewer(palette="Dark2") 
-  #scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
-
-```
 
 Second, examine target location effects on accuracy. 
 
@@ -229,18 +234,25 @@ sum_statsT
 
 ```
 
-```{r plot-first-target}
+```{r plot-first-target, fig.height=22, fig.width=22}
 
-ggplot(data = sum_statsT, aes(x = relative_target, y = mean_acc, fill=relative_target)) +
-  geom_bar(stat = "identity")+
+b<-ggplot(data = sum_statsT, aes(x = relative_target, y = mean_acc, fill=relative_target)) +
+  geom_bar(stat = "identity", show.legend = FALSE)+
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(85,100))+ 
-  facet_grid(.~age) +
+  facet_grid(.~age, labeller = labeller(age=supp.labs)) +
   theme_classic()+
-  labs(x = "Distractor Location", y = "Accuracy (%)")+
-  labs(title = "Singleton Distractor Present")+
-  scale_fill_brewer(palette="Dark2") 
-  #scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face="bold"),
+        title = element_text(size = 24),
+        strip.text.x = element_text(size=30)) +
+  labs(x = "Target Location", y = "Accuracy (%)")+
+  labs(title = "Singleton Distractor Absent")+
+  scale_fill_manual(values=c('#1b9e77', '#d95f02', '#66a61e')) +
+  scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc"))
+
+
+plot_grid(a, b,labels = c('A','B'), label_size=40, ncol=1)
 
 ```
 
@@ -273,7 +285,7 @@ kids6<-kids6%>%
 
 ```{r create_new_df_to_transform-kids6}
 space_block6 <- kids6 %>%
-  group_by(id, block_num2, relative_hp_dist) %>%
+  group_by(id, block_num, relative_hp_dist) %>%
   summarize(accs = mean(acc),
             )
 
@@ -282,7 +294,7 @@ space_block6 <- kids6 %>%
 ```{r transform_df-kids6}
 
 space_block6 <- setDT(space_block6)
-space_block6 <- dcast(space_block6,id+block_num2~relative_hp_dist,value.var='accs')
+space_block6 <- dcast(space_block6,id+block_num~relative_hp_dist,value.var='accs')
 
 ```
 
@@ -297,7 +309,7 @@ space_block6 <- space_block6 %>%
 
 
 ```{r line_plot-kids6}
-ggplot(data = space_block6,aes(x=block_num2, y=difference, group=id))+
+ggplot(data = space_block6,aes(x=block_num, y=difference, group=id))+
   geom_line()+
   labs(title = "Difference in Accuracies", subtitle = "for distractor presentation at the low-probability locations and high-probability location by block")+
   theme_classic()+
@@ -308,7 +320,7 @@ ggplot(data = space_block6,aes(x=block_num2, y=difference, group=id))+
 
 ```{r create_df_to_transform}
 space2 <- space_block6 %>%
-  group_by(block_num2) %>%
+  group_by(block_num) %>%
   summarize(rts = mean(difference, na.rm = TRUE),
             sd_rt=sd(difference, na.rm = TRUE),
             n_rt=3,
@@ -321,7 +333,7 @@ space2
 ```
 
 ```{r line_plot_avg}
-ggplot(data = space2,aes(x=block_num2, y=rts))+
+ggplot(data = space2,aes(x=block_num, y=rts))+
   geom_line()+
   geom_point()+
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+

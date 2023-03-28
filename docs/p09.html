@@ -316,67 +316,7 @@ library(magrittr)
 library(cowplot)</code></pre>
 <p>I put all the messy loading in of different data sets and adding in
 important columns to an R script instead of having it here.</p>
-<div id="trim-the-data" class="section level3">
-<h3>Trim the Data</h3>
-<p>Define trimming criteria according to Van Selst and Jolicoeur
-1994.</p>
-<pre class="r"><code>xsize &lt;- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
-             25, 30, 35, 50, 100)
-stds &lt;- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173, 
-            2.22, 2.246, 2.274, 2.31, 2.326, 2.391, 2.41, 2.4305, 
-            2.45, 2.48, 2.5)</code></pre>
-<p>Trim the data and compute the percent trimmed</p>
-<pre class="r"><code>trimmedA &lt;- adults[adults$acc==1, ] %&gt;% group_by(id, relative_hp_dist) %&gt;%
-           mutate(sdc = ifelse(length(rt)&gt;=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %&gt;%
-           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=200 &amp; rt&lt;=2500) %&gt;% #exact upper limit =2464.175
-           select(id, age, relative_hp_dist, rt, block_num) %&gt;%  #keep these columns in the new data frame
-           as.data.frame()
-
-
-statPrep &lt;- trimmedA %&gt;% group_by(id, relative_hp_dist) %&gt;% summarise(measurement=mean(rt)) %&gt;% as.data.frame()</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using the `.groups`
-## argument.</code></pre>
-<pre class="r"><code>100-(nrow(trimmedA)/nrow(adults[adults$acc==1, ]))*100</code></pre>
-<pre><code>## [1] 5.100756</code></pre>
-<p>5.10% of trials were trimmed from the adult data set.</p>
-<pre class="r"><code>trimmedC12 &lt;- kids12[kids12$acc==1, ] %&gt;% group_by(id, relative_hp_dist) %&gt;%
-           mutate(sdc = ifelse(length(rt)&gt;=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %&gt;%
-           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=200 &amp; rt&lt;=7590) %&gt;%  #exact upper limit =7586.794
-           select(id, age1, relative_hp_dist, rt, block_num1) %&gt;%  #keep these columns in the new data frame
-           as.data.frame()
-
-
-statPrep &lt;- trimmedC12 %&gt;% group_by(id, relative_hp_dist) %&gt;% summarise(measurement=mean(rt)) %&gt;% as.data.frame()</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using the `.groups`
-## argument.</code></pre>
-<pre class="r"><code>100-(nrow(trimmedC12)/nrow(kids12[kids12$acc==1, ]))*100</code></pre>
-<pre><code>## [1] 4.639738</code></pre>
-<p>4.64% of trials were trimmed from the older child data set.</p>
-<pre class="r"><code>trimmedC6 &lt;- kids6[kids6$acc==1, ] %&gt;% group_by(id, relative_hp_dist) %&gt;%
-           mutate(sdc = ifelse(length(rt)&gt;=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %&gt;%
-           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=200 &amp; rt&lt;=18950) %&gt;% #exact upper limit =18929.79
-           select(id, age2, relative_hp_dist, rt, block_num2) %&gt;%  #keep these columns in the new data frame
-           as.data.frame()
-
-
-statPrep &lt;- trimmedC6 %&gt;% group_by(id, relative_hp_dist) %&gt;% summarise(measurement=mean(rt)) %&gt;% as.data.frame()</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using the `.groups`
-## argument.</code></pre>
-<pre class="r"><code>100-(nrow(trimmedC6)/nrow(kids6[kids6$acc==1, ]))*100</code></pre>
-<pre><code>## [1] 6.074766</code></pre>
-<p>6.07% of trials were trimmed from the younger child data set.</p>
-<pre class="r"><code>trimmedC12&lt;- trimmedC12 %&gt;%
-  rename(
-    block_num=block_num1,
-    age=age1
-  )
-
-trimmedC6&lt;- trimmedC6 %&gt;%
-  rename(
-    block_num=block_num2,
-    age=age2
-  )
-kids12&lt;- kids12 %&gt;%
+<pre class="r"><code>kids12&lt;- kids12 %&gt;%
   rename(
     block_num=block_num1,
     age=age1
@@ -387,9 +327,7 @@ kids6&lt;- kids6 %&gt;%
     block_num=block_num2,
     age=age2
   )</code></pre>
-<pre class="r"><code>acc_data &lt;- rbind(adults, kids12)
-all_data &lt;- rbind(trimmedA, trimmedC12)</code></pre>
-</div>
+<pre class="r"><code>acc_data &lt;- rbind(adults, kids12)</code></pre>
 <div id="examine-accuracy-effects" class="section level3">
 <h3>Examine Accuracy Effects</h3>
 <pre class="r"><code>acc_data&lt;- acc_data%&gt;%
@@ -397,6 +335,7 @@ all_data &lt;- rbind(trimmedA, trimmedC12)</code></pre>
 
 acc_data&lt;-acc_data%&gt;%
   mutate(acc=acc*100)</code></pre>
+<p>First, examine distractor location effects on accuracy.</p>
 <pre class="r"><code>distacc &lt;- acc_data %&gt;%
   group_by(age,relative_hp_dist) %&gt;%
   summarize(accuracy = mean(acc),
@@ -422,15 +361,49 @@ space_anova &lt;- space_anova %&gt;%
 
 df_mod &lt;- subset(space_anova, select=c(id, age, high_prob, absent, low_prob))
 df_mod &lt;- reshape2::melt(df_mod, id.var=c(&#39;id&#39;, &#39;age&#39;), variable.name= &quot;relative_hp_dist&quot;)</code></pre>
-<pre class="r"><code>ggplot(df_mod, aes(relative_hp_dist, value, fill=relative_hp_dist)) +
-  geom_bar(stat=&quot;summary&quot;, position=&quot;dodge&quot;) + 
-  facet_grid(.~age) +
-  xlab(&quot;Distractor Location&quot;) + ylab(&quot;Accuracy (%)&quot;) +
-  scale_fill_brewer(palette=&quot;Dark2&quot;) +
-  theme(legend.position=&quot;none&quot;)+
-  coord_cartesian(ylim = c(85,105))</code></pre>
-<pre><code>## No summary function supplied, defaulting to `mean_se()`
-## No summary function supplied, defaulting to `mean_se()`</code></pre>
+<pre class="r"><code>sum_stats &lt;- df_mod%&gt;%
+  group_by(age, relative_hp_dist)%&gt;%
+  summarize(mean_acc=mean(value),
+            sd_rt=sd(value),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_acc+se,
+            lower_limit=mean_acc-se
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>sum_stats</code></pre>
+<pre><code>## # A tibble: 6 × 8
+## # Groups:   age [2]
+##   age   relative_hp_dist mean_acc sd_rt  n_rt    se upper_limit lower_limit
+##   &lt;chr&gt; &lt;fct&gt;               &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1 adult high_prob            97.4  2.97    27 0.572        98.0        96.9
+## 2 adult absent               98.8  1.29    27 0.248        99.0        98.5
+## 3 adult low_prob             96.3  4.15    27 0.798        97.1        95.5
+## 4 child high_prob            90.7  8.26     5 3.69         94.4        87.0
+## 5 child absent               93.2  7.55     5 3.38         96.6        89.8
+## 6 child low_prob             90.9 11.0      5 4.92         95.8        86.0</code></pre>
+<pre class="r"><code>sum_stats$relative_hp_dist &lt;- factor(sum_stats$relative_hp_dist,              # Change ordering manually
+                  levels = c(&quot;high_prob&quot;, &quot;low_prob&quot;, &quot;absent&quot;))</code></pre>
+<pre class="r"><code>supp.labs &lt;- c(&quot;Adults&quot;, &quot;Children&quot;)
+names(supp.labs) &lt;- c(&quot;adult&quot;, &quot;child&quot;)
+
+a&lt;-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_acc, fill=relative_hp_dist)) +
+  geom_bar(stat = &quot;identity&quot;, show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(85,100))+ 
+  facet_grid(.~age, labeller = labeller(age=supp.labs)) +
+  theme_classic()+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face=&quot;bold&quot;),
+        title = element_text(size = 24),
+        strip.text.x = element_text(size=30)) +
+  labs(x = &quot;Distractor Location&quot;, y = &quot;Accuracy (%)&quot;)+
+  labs(title = &quot;Singleton Distractor Present&quot;)+
+  scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;, &#39;#66a61e&#39;)) +
+  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;,&quot;absent&quot;=&quot;Absent&quot;))
+
+plot_grid(a,labels = c(&#39;A&#39;), label_size=40)</code></pre>
 <p><img src="p09_files/figure-html/plot-first-1.png" width="672" /></p>
 <p>Run the 3x2 ANOVA on accuracy data.</p>
 <pre class="r"><code>model3 &lt;- aov_car(value ~ age*relative_hp_dist + Error(id/relative_hp_dist), data=df_mod)</code></pre>
@@ -469,7 +442,7 @@ the distractor location effect on accuracy across the 5 conditions.</p>
 <pre class="r"><code>ggplot(acc_data, aes(relative_hp_dist, acc, fill=relative_hp_dist)) +
   geom_bar(stat=&quot;summary&quot;, position=&quot;dodge&quot;) + 
   facet_grid(.~age) +
-  xlab(&quot;Distractor Location&quot;) + ylab(&quot;Response Times (ms)&quot;) +
+  xlab(&quot;Distractor Location&quot;) + ylab(&quot;Accuracy (%)&quot;) +
   scale_fill_brewer(palette=&quot;Dark2&quot;) +
   theme(legend.position=&quot;none&quot;)+
   coord_cartesian(ylim = c(85,105))</code></pre>
@@ -516,14 +489,7 @@ the distractor location effect on accuracy across the 5 conditions.</p>
 ## sample estimates:
 ## mean difference 
 ##       -2.443136</code></pre>
-<pre class="r"><code>ggplot(df_mod, aes(relative_hp_dist, value, fill=relative_hp_dist)) +
-  geom_bar(stat=&quot;summary&quot;, position=&quot;dodge&quot;) +
-  xlab(&quot;Distractor Location&quot;) + ylab(&quot;Response Times (ms)&quot;) +
-  scale_fill_brewer(palette=&quot;Dark2&quot;) +
-  theme(legend.position=&quot;none&quot;)+
-  coord_cartesian(ylim = c(85,105))</code></pre>
-<pre><code>## No summary function supplied, defaulting to `mean_se()`</code></pre>
-<p><img src="p09_files/figure-html/plot-collapse-1.png" width="672" /></p>
+<p>Second, examine target location effects on accuracy.</p>
 <pre class="r"><code>spaceT &lt;- acc_data %&gt;%
   group_by(age, id, relative_target) %&gt;%
   summarize(acc = mean(acc)
@@ -538,16 +504,44 @@ space_anovaT &lt;- space_anovaT %&gt;%
 
 df_mod_targ &lt;- subset(space_anovaT, select=c(id, age, high_prob, low_prob))
 df_mod_targ &lt;- reshape2::melt(df_mod_targ, id.var=c(&#39;id&#39;, &#39;age&#39;), variable.name= &quot;relative_target&quot;)</code></pre>
-<pre class="r"><code>ggplot(df_mod_targ, aes(relative_target, value, fill=relative_target)) +
-  geom_bar(stat=&quot;summary&quot;, position=&quot;dodge&quot;) + 
-  facet_grid(.~age) +
-  xlab(&quot;Distractor Location&quot;) + ylab(&quot;Accuracy (%)&quot;) +
-  scale_fill_brewer(palette=&quot;Dark2&quot;) +
-  theme(legend.position=&quot;none&quot;)+
-  coord_cartesian(ylim = c(85,105))</code></pre>
-<pre><code>## No summary function supplied, defaulting to `mean_se()`
-## No summary function supplied, defaulting to `mean_se()`</code></pre>
-<p><img src="p09_files/figure-html/plot-first-target-1.png" width="672" /></p>
+<pre class="r"><code>sum_statsT &lt;- df_mod_targ%&gt;%
+  group_by(age, relative_target)%&gt;%
+  summarize(mean_acc=mean(value),
+            sd_rt=sd(value),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_acc+se,
+            lower_limit=mean_acc-se
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>sum_statsT</code></pre>
+<pre><code>## # A tibble: 4 × 8
+## # Groups:   age [2]
+##   age   relative_target mean_acc sd_rt  n_rt    se upper_limit lower_limit
+##   &lt;chr&gt; &lt;fct&gt;              &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1 adult high_prob           97.4  2.71    27 0.521        97.9        96.9
+## 2 adult low_prob            98.2  1.85    27 0.356        98.5        97.8
+## 3 child high_prob           92.7 10.3      5 4.61         97.3        88.1
+## 4 child low_prob            92.5  7.85     5 3.51         96.0        89.0</code></pre>
+<pre class="r"><code>b&lt;-ggplot(data = sum_statsT, aes(x = relative_target, y = mean_acc, fill=relative_target)) +
+  geom_bar(stat = &quot;identity&quot;, show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(85,100))+ 
+  facet_grid(.~age, labeller = labeller(age=supp.labs)) +
+  theme_classic()+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face=&quot;bold&quot;),
+        title = element_text(size = 24),
+        strip.text.x = element_text(size=30)) +
+  labs(x = &quot;Target Location&quot;, y = &quot;Accuracy (%)&quot;)+
+  labs(title = &quot;Singleton Distractor Absent&quot;)+
+  scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;, &#39;#66a61e&#39;)) +
+  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;))
+
+
+plot_grid(a, b,labels = c(&#39;A&#39;,&#39;B&#39;), label_size=40, ncol=1)</code></pre>
+<p><img src="p09_files/figure-html/plot-first-target-1.png" width="2112" /></p>
 <p>Run the 3x2 ANOVA on accuracy data.</p>
 <pre class="r"><code>model3 &lt;- aov_car(value ~ age*relative_target + Error(id/relative_target), data=df_mod_targ)</code></pre>
 <pre><code>## Converting to factor: age</code></pre>
@@ -563,6 +557,54 @@ df_mod_targ &lt;- reshape2::melt(df_mod_targ, id.var=c(&#39;id&#39;, &#39;age&#3
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>For target location accuracy, there is only a main effect of age.</p>
+</div>
+<div id="children-ages-6-7-accuracy-only-3-kids" class="section level3">
+<h3>Children ages 6-7 Accuracy – Only 3 kids</h3>
+<pre class="r"><code>kids6&lt;- kids6%&gt;%
+  filter(id != 30, block_num2 != 3, block_num2 != 4, block_num2 != 5,block_num2 != 6)
+
+kids6&lt;-kids6%&gt;%
+  mutate(acc=acc*100)</code></pre>
+<pre class="r"><code>space_block6 &lt;- kids6 %&gt;%
+  group_by(id, block_num, relative_hp_dist) %&gt;%
+  summarize(accs = mean(acc),
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;, &#39;block_num&#39;. You can override using
+## the `.groups` argument.</code></pre>
+<pre class="r"><code>space_block6 &lt;- setDT(space_block6)
+space_block6 &lt;- dcast(space_block6,id+block_num~relative_hp_dist,value.var=&#39;accs&#39;)</code></pre>
+<pre class="r"><code>space_block6 &lt;- space_block6 %&gt;%
+  mutate(low_prob = rowMeans(select(space_block6, c(lp_1,lp_2,lp_3)),na.rm=TRUE)) %&gt;%
+  mutate(difference = (low_prob-high_prob))</code></pre>
+<pre class="r"><code>ggplot(data = space_block6,aes(x=block_num, y=difference, group=id))+
+  geom_line()+
+  labs(title = &quot;Difference in Accuracies&quot;, subtitle = &quot;for distractor presentation at the low-probability locations and high-probability location by block&quot;)+
+  theme_classic()+
+  labs(x = &quot;Block Number&quot;, y = &quot;Difference in Accuracy (%)&quot;)</code></pre>
+<p><img src="p09_files/figure-html/line_plot-kids6-1.png" width="672" /></p>
+<pre class="r"><code>space2 &lt;- space_block6 %&gt;%
+  group_by(block_num) %&gt;%
+  summarize(rts = mean(difference, na.rm = TRUE),
+            sd_rt=sd(difference, na.rm = TRUE),
+            n_rt=3,
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=rts+se,
+            lower_limit=rts-se
+            )
+space2</code></pre>
+<pre><code>## # A tibble: 2 × 7
+##   block_num    rts sd_rt  n_rt    se upper_limit lower_limit
+##       &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1         1 -14.8   17.5     3  10.1       -4.67      -24.9 
+## 2         2   3.84  19.8     3  11.4       15.2        -7.57</code></pre>
+<pre class="r"><code>ggplot(data = space2,aes(x=block_num, y=rts))+
+  geom_line()+
+  geom_point()+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  labs(title = &quot;Singleton Distractor Present&quot;)+
+  xlab(&quot;Block number&quot;)+
+  ylab(expression(atop(&quot;Suppression effect (ms)&quot;, paste(&quot;(high prob. - low prob.)&quot;))))</code></pre>
+<p><img src="p09_files/figure-html/line_plot_avg-1.png" width="672" /></p>
 </div>
 
 

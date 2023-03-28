@@ -184,7 +184,7 @@ a<-ggplot(data = sum_stats, aes(x = relative_target, y = mean_rts, fill=relative
         axis.title=element_text(size=40,face="bold"),
         title = element_text(size = 24),
         strip.text.x = element_text(size=30)) +
-  labs(x = "Distractor Location", y = "Response Time (ms)")+
+  labs(x = "Target Location", y = "Response Time (ms)")+
   labs(title = "Singleton Distractor Absent")+
  scale_fill_manual(values=c('#1b9e77', '#d95f02')) +
   scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc"))
