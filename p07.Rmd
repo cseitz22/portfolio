@@ -287,4 +287,3 @@ cor.test(df$effect, df$avg_k)
 
 
 
-

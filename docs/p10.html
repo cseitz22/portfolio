@@ -459,7 +459,7 @@ a&lt;-ggplot(data = sum_stats, aes(x = relative_target, y = mean_rts, fill=relat
 
 plot_grid(a,labels = c(&#39;B&#39;), label_size=40)</code></pre>
 <p><img src="p10_files/figure-html/plot-first-1.png" width="2112" /></p>
-<p>Run a 3x2 mixed design ANOVA with distractor location and age as
+<p>Run a 2x2 mixed design ANOVA with distractor location and age as
 independent variables and rt as the dependent variable.</p>
 <pre class="r"><code>model3 &lt;- aov_car(value ~ age*relative_target + Error(id/relative_target), data=df_mod)</code></pre>
 <pre><code>## Converting to factor: age</code></pre>
@@ -525,6 +525,103 @@ space_anovaK &lt;- dcast(space_anovaK,id~relative_target,value.var=&#39;rts&#39;
 ## sample estimates:
 ## mean difference 
 ##         29.7292</code></pre>
+</div>
+<div id="examine-normalized-rts" class="section level3">
+<h3>Examine normalized rts</h3>
+<pre class="r"><code>write.csv(df_mod, &quot;norm_data_target.csv&quot;, row.names=FALSE)</code></pre>
+<pre class="r"><code>normrt &lt;- read_csv(&quot;norm_data_target_new.csv&quot;, show_col_types = FALSE)</code></pre>
+<pre class="r"><code>model_norm &lt;- aov_car(norm ~ age*relative_target + Error(id/relative_target), data=normrt)</code></pre>
+<pre><code>## Converting to factor: age</code></pre>
+<pre><code>## Contrasts set to contr.sum for the following variables: age</code></pre>
+<pre class="r"><code>model_norm</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: norm
+##                Effect    df   MSE     F   ges p.value
+## 1                 age 1, 31 -0.00 -0.00 &lt;.001   &gt;.999
+## 2     relative_target 1, 31  0.00  0.34  .011    .561
+## 3 age:relative_target 1, 31  0.00  2.74  .081    .108
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Since the interaction is trending, I’ll explore that further.</p>
+<pre class="r"><code>norm_adults &lt;- normrt %&gt;%
+  filter(age==&quot;adult&quot;)
+
+norm_child &lt;- normrt %&gt;%
+  filter(age==&quot;child&quot;)</code></pre>
+<pre class="r"><code>aov_car(norm ~ relative_target + Error(id/relative_target), data=norm_adults)</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: norm
+##            Effect    df  MSE      F  ges p.value
+## 1 relative_target 1, 26 0.00 7.15 * .216    .013
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>aov_car(norm ~ relative_target + Error(id/relative_target), data=norm_child)</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: norm
+##            Effect   df  MSE    F  ges p.value
+## 1 relative_target 1, 5 0.00 0.29 .056    .611
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Re-running with the age group separately showed that adults have a
+significant difference between the locations and the children do
+not.</p>
+<pre class="r"><code>reform &lt;- setDT(norm_adults)
+reform &lt;- dcast(reform,id~relative_target,value.var=&#39;norm&#39;)</code></pre>
+<pre class="r"><code>reform %&gt;%
+  t.test(x=reform$high_prob, y=reform$low_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  reform$high_prob and reform$low_prob
+## t = 2.6749, df = 26, p-value = 0.006378
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  0.01018487        Inf
+## sample estimates:
+## mean difference 
+##      0.02810732</code></pre>
+<p>Set up normalized data plot.</p>
+<pre class="r"><code>sum_stats_norm &lt;- normrt%&gt;%
+  group_by(age,relative_target)%&gt;%
+  summarize(mean_rts=mean(norm),
+            sd_rt=sd(norm),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>sum_stats_norm</code></pre>
+<pre><code>## # A tibble: 4 × 8
+## # Groups:   age [2]
+##   age   relative_target mean_rts  sd_rt  n_rt      se upper_limit lower_limit
+##   &lt;chr&gt; &lt;chr&gt;              &lt;dbl&gt;  &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1 adult high_prob          1.01  0.0273    27 0.00525       1.02        1.01 
+## 2 adult low_prob           0.986 0.0273    27 0.00525       0.991       0.981
+## 3 child high_prob          0.993 0.0302     6 0.0123        1.01        0.981
+## 4 child low_prob           1.01  0.0302     6 0.0123        1.02        0.994</code></pre>
+<pre class="r"><code>a&lt;-ggplot(data = sum_stats_norm, aes(x = relative_target, y = mean_rts, fill=relative_target)) +
+  geom_bar(stat = &quot;identity&quot;, show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  facet_grid(.~age, labeller = labeller(age=supp.labs)) +
+  coord_cartesian(ylim = c(.85,1.1))+ 
+  theme_classic()+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face=&quot;bold&quot;),
+        title = element_text(size = 40),
+        strip.text.x = element_text(size=30)) +
+  labs(x = &quot;Target Location&quot;, y = &quot;Normalized Response Time (%)&quot;)+
+  labs(title = &quot;Singleton Distractor Absent&quot;)+
+  scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;)) +
+  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;))
+
+
+  plot_grid(a,labels = c(&#39;B&#39;), label_size=40)</code></pre>
+<p><img src="p10_files/figure-html/plot-first-norm-1.png" width="2112" /></p>
 </div>
 
 

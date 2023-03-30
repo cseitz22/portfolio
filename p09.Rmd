@@ -77,7 +77,7 @@ distacc <- acc_data %>%
   group_by(age,relative_hp_dist) %>%
   summarize(accuracy = mean(acc),
             sd_rt=sd(acc),
-            n_rt=32,
+            n_rt=n(),
             se=sd_rt/sqrt(n_rt),
             upper_limit=accuracy+se,
             lower_limit=accuracy-se
@@ -138,7 +138,7 @@ a<-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_acc, fill=relativ
   theme_classic()+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=40,face="bold"),
-        title = element_text(size = 24),
+        title = element_text(size = 45),
         strip.text.x = element_text(size=30)) +
   labs(x = "Distractor Location", y = "Accuracy (%)")+
   labs(title = "Singleton Distractor Present")+
@@ -177,7 +177,7 @@ Accuracy is different across all locations.
 ```{r plot-first5}
 ggplot(acc_data, aes(relative_hp_dist, acc, fill=relative_hp_dist)) +
   geom_bar(stat="summary", position="dodge") + 
-  facet_grid(.~age) +
+  #facet_grid(.~age) +
   xlab("Distractor Location") + ylab("Accuracy (%)") +
   scale_fill_brewer(palette="Dark2") +
   theme(legend.position="none")+
@@ -190,11 +190,11 @@ For the 3 locations (HP, LP, and absent), run t-tests.
 ```{r t-test-adults}
 
 space_anova %>%
-  t.test(x=space_anova$low_prob, y=space_anova$high_prob, alternative="less", mu=0,paired = TRUE, conf.level = .95) 
+  t.test(x=space_anova$high_prob, y=space_anova$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
 space_anova%>%
-  t.test(x=space_anova$high_prob, y=space_anova$absent, alternative="less", mu=0, paired =TRUE, conf.level = .95) 
+  t.test(x=space_anova$absent, y=space_anova$high_prob, alternative="greater", mu=0, paired =TRUE, conf.level = .95) 
 space_anova%>%
-  t.test(x=space_anova$low_prob, y=space_anova$absent, alternative="less", mu=0, paired =TRUE, conf.level = .95)
+  t.test(x=space_anova$absent, y=space_anova$low_prob, alternative="greater", mu=0, paired =TRUE, conf.level = .95)
 
 ```
 
@@ -244,7 +244,7 @@ b<-ggplot(data = sum_statsT, aes(x = relative_target, y = mean_acc, fill=relativ
   theme_classic()+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=40,face="bold"),
-        title = element_text(size = 24),
+        title = element_text(size = 45),
         strip.text.x = element_text(size=30)) +
   labs(x = "Target Location", y = "Accuracy (%)")+
   labs(title = "Singleton Distractor Absent")+

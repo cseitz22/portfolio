@@ -340,7 +340,7 @@ acc_data&lt;-acc_data%&gt;%
   group_by(age,relative_hp_dist) %&gt;%
   summarize(accuracy = mean(acc),
             sd_rt=sd(acc),
-            n_rt=32,
+            n_rt=n(),
             se=sd_rt/sqrt(n_rt),
             upper_limit=accuracy+se,
             lower_limit=accuracy-se
@@ -396,7 +396,7 @@ a&lt;-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_acc, fill=rela
   theme_classic()+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=40,face=&quot;bold&quot;),
-        title = element_text(size = 24),
+        title = element_text(size = 45),
         strip.text.x = element_text(size=30)) +
   labs(x = &quot;Distractor Location&quot;, y = &quot;Accuracy (%)&quot;)+
   labs(title = &quot;Singleton Distractor Present&quot;)+
@@ -441,54 +441,53 @@ the distractor location effect on accuracy across the 5 conditions.</p>
 <p>Accuracy is different across all locations.</p>
 <pre class="r"><code>ggplot(acc_data, aes(relative_hp_dist, acc, fill=relative_hp_dist)) +
   geom_bar(stat=&quot;summary&quot;, position=&quot;dodge&quot;) + 
-  facet_grid(.~age) +
+  #facet_grid(.~age) +
   xlab(&quot;Distractor Location&quot;) + ylab(&quot;Accuracy (%)&quot;) +
   scale_fill_brewer(palette=&quot;Dark2&quot;) +
   theme(legend.position=&quot;none&quot;)+
   coord_cartesian(ylim = c(85,105))</code></pre>
-<pre><code>## No summary function supplied, defaulting to `mean_se()`
-## No summary function supplied, defaulting to `mean_se()`</code></pre>
+<pre><code>## No summary function supplied, defaulting to `mean_se()`</code></pre>
 <p><img src="p09_files/figure-html/plot-first5-1.png" width="672" /></p>
 <p>For the 3 locations (HP, LP, and absent), run t-tests.</p>
 <pre class="r"><code>space_anova %&gt;%
-  t.test(x=space_anova$low_prob, y=space_anova$high_prob, alternative=&quot;less&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
+  t.test(x=space_anova$high_prob, y=space_anova$low_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
 <pre><code>## 
 ##  Paired t-test
 ## 
-## data:  space_anova$low_prob and space_anova$high_prob
-## t = -1.7892, df = 31, p-value = 0.04168
-## alternative hypothesis: true mean difference is less than 0
+## data:  space_anova$high_prob and space_anova$low_prob
+## t = 1.7892, df = 31, p-value = 0.04168
+## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
-##         -Inf -0.04780453
+##  0.04780453        Inf
 ## sample estimates:
 ## mean difference 
-##      -0.9128781</code></pre>
+##       0.9128781</code></pre>
 <pre class="r"><code>space_anova%&gt;%
-  t.test(x=space_anova$high_prob, y=space_anova$absent, alternative=&quot;less&quot;, mu=0, paired =TRUE, conf.level = .95) </code></pre>
+  t.test(x=space_anova$absent, y=space_anova$high_prob, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95) </code></pre>
 <pre><code>## 
 ##  Paired t-test
 ## 
-## data:  space_anova$high_prob and space_anova$absent
-## t = -3.2767, df = 31, p-value = 0.001295
-## alternative hypothesis: true mean difference is less than 0
+## data:  space_anova$absent and space_anova$high_prob
+## t = 3.2767, df = 31, p-value = 0.001295
+## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
-##        -Inf -0.7384317
+##  0.7384317       Inf
 ## sample estimates:
 ## mean difference 
-##       -1.530258</code></pre>
+##        1.530258</code></pre>
 <pre class="r"><code>space_anova%&gt;%
-  t.test(x=space_anova$low_prob, y=space_anova$absent, alternative=&quot;less&quot;, mu=0, paired =TRUE, conf.level = .95)</code></pre>
+  t.test(x=space_anova$absent, y=space_anova$low_prob, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95)</code></pre>
 <pre><code>## 
 ##  Paired t-test
 ## 
-## data:  space_anova$low_prob and space_anova$absent
-## t = -3.6668, df = 31, p-value = 0.0004568
-## alternative hypothesis: true mean difference is less than 0
+## data:  space_anova$absent and space_anova$low_prob
+## t = 3.6668, df = 31, p-value = 0.0004568
+## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
-##       -Inf -1.313422
+##  1.313422      Inf
 ## sample estimates:
 ## mean difference 
-##       -2.443136</code></pre>
+##        2.443136</code></pre>
 <p>Second, examine target location effects on accuracy.</p>
 <pre class="r"><code>spaceT &lt;- acc_data %&gt;%
   group_by(age, id, relative_target) %&gt;%
@@ -532,7 +531,7 @@ df_mod_targ &lt;- reshape2::melt(df_mod_targ, id.var=c(&#39;id&#39;, &#39;age&#3
   theme_classic()+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=40,face=&quot;bold&quot;),
-        title = element_text(size = 24),
+        title = element_text(size = 45),
         strip.text.x = element_text(size=30)) +
   labs(x = &quot;Target Location&quot;, y = &quot;Accuracy (%)&quot;)+
   labs(title = &quot;Singleton Distractor Absent&quot;)+

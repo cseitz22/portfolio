@@ -473,22 +473,35 @@ df_mod &lt;- reshape2::melt(df_mod, id.var=c(&#39;id&#39;, &#39;age&#39;), varia
 <pre class="r"><code>supp.labs &lt;- c(&quot;Adults&quot;, &quot;Children&quot;)
 names(supp.labs) &lt;- c(&quot;adult&quot;, &quot;child&quot;)
 
-a&lt;-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
+a&lt;-ggplot(subset(sum_stats, age %in% c(&quot;adult&quot;)),aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
   geom_bar(stat = &quot;identity&quot;, show.legend = FALSE)+
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  #coord_cartesian(ylim = c(700,1050))+ 
-  facet_grid(.~age, labeller = labeller(age=supp.labs)) +
+  coord_cartesian(ylim = c(800, 1200))+ 
+  #facet_grid(~age, scales=&quot;free&quot;, labeller = labeller(age=supp.labs)) +
   theme_classic()+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=40,face=&quot;bold&quot;),
-        title = element_text(size = 24),
-        strip.text.x = element_text(size=30)) +
+        title = element_text(size = 45)) +
   labs(x = &quot;Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
-  labs(title = &quot;Singleton Distractor Present&quot;)+
- scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;, &#39;#66a61e&#39;)) +
+  labs(subtitle = &quot;Adults&quot;, tag = &quot;A&quot;)+
+  scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;, &#39;#66a61e&#39;)) +
   scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;,&quot;absent&quot;=&quot;Absent&quot;))
 
-plot_grid(a,labels = c(&#39;A&#39;), label_size=40)</code></pre>
+b&lt;-ggplot(subset(sum_stats, age %in% c(&quot;child&quot;)),aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
+  geom_bar(stat = &quot;identity&quot;, show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(1200, 2500))+ 
+  #facet_grid(~age, scales=&quot;free&quot;, labeller = labeller(age=supp.labs)) +
+  theme_classic()+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face=&quot;bold&quot;),
+        title = element_text(size = 45)) +
+  labs(x = &quot;Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
+  labs(subtitle = &quot;Children&quot;, tag = &quot; &quot;)+
+  scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;, &#39;#66a61e&#39;)) +
+  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;,&quot;absent&quot;=&quot;Absent&quot;))
+
+plot_grid(a, b, align=c(&quot;hv&quot;), label_size=40) </code></pre>
 <p><img src="p08_files/figure-html/plot-first-1.png" width="2112" /></p>
 <p>Run a 3x2 mixed design ANOVA with distractor location and age as
 independent variables and rt as the dependent variable.</p>
@@ -730,6 +743,83 @@ conditions.</p>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
 ## Sphericity correction method: GG</code></pre>
+<pre class="r"><code>reform &lt;- setDT(normrt)
+reform &lt;- dcast(reform,id...1+age~relative_hp_dist,value.var=&#39;norm&#39;)</code></pre>
+<pre class="r"><code>reform %&gt;%
+  t.test(x=reform$low_prob, y=reform$high_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  reform$low_prob and reform$high_prob
+## t = 3.6948, df = 32, p-value = 0.0004093
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  0.02574339        Inf
+## sample estimates:
+## mean difference 
+##      0.04753666</code></pre>
+<pre class="r"><code>reform%&gt;%
+  t.test(x=reform$high_prob, y=reform$absent, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95) </code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  reform$high_prob and reform$absent
+## t = 8.4017, df = 32, p-value = 6.688e-10
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  0.09259618        Inf
+## sample estimates:
+## mean difference 
+##        0.115979</code></pre>
+<pre class="r"><code>reform%&gt;%
+  t.test(x=reform$low_prob, y=reform$absent, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95)</code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  reform$low_prob and reform$absent
+## t = 11.182, df = 32, p-value = 6.881e-13
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  0.1387456       Inf
+## sample estimates:
+## mean difference 
+##       0.1635157</code></pre>
+<p>Set up normalized data plot.</p>
+<pre class="r"><code>sum_stats_norm &lt;- normrt%&gt;%
+  group_by(relative_hp_dist)%&gt;%
+  summarize(mean_rts=mean(norm),
+            sd_rt=sd(norm),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+sum_stats_norm</code></pre>
+<pre><code>## # A tibble: 3 × 7
+##   relative_hp_dist mean_rts  sd_rt  n_rt      se upper_limit lower_limit
+##   &lt;chr&gt;               &lt;dbl&gt;  &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1 absent              0.907 0.0486    33 0.00845       0.915       0.898
+## 2 high_prob           1.02  0.0427    33 0.00744       1.03        1.02 
+## 3 low_prob            1.07  0.0456    33 0.00795       1.08        1.06</code></pre>
+<pre class="r"><code>sum_stats_norm$relative_hp_dist &lt;- factor(sum_stats_norm$relative_hp_dist,              # Change ordering manually
+                  levels = c(&quot;high_prob&quot;, &quot;low_prob&quot;, &quot;absent&quot;))</code></pre>
+<p>Plot data.</p>
+<pre class="r"><code>a&lt;-ggplot(data = sum_stats_norm, aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
+  geom_bar(stat = &quot;identity&quot;, show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(.85,1.1))+ 
+  theme_classic()+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face=&quot;bold&quot;),
+        title = element_text(size = 40),
+        strip.text.x = element_text(size=30)) +
+  labs(x = &quot;Distractor Location&quot;, y = &quot;Normalized Response Time (%)&quot;)+
+  labs(title = &quot;Singleton Distractor Present&quot;)+
+  scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;, &#39;#66a61e&#39;)) +
+  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;,&quot;absent&quot;=&quot;Absent&quot;))
+
+plot_grid(a,labels = c(&#39;A&#39;), label_size=40)</code></pre>
+<p><img src="p08_files/figure-html/plot-first-norm-1.png" width="2112" /></p>
 </div>
 <div id="examine-block-by-block-learning-of-distractor-location"
 class="section level3">
@@ -786,7 +876,7 @@ is likely to appear.</p>
   group_by(age, block_num) %&gt;%
   summarize(rts = mean(difference, na.rm = TRUE),
             sd_rt=sd(difference, na.rm = TRUE),
-            n_rt=33,
+            n_rt=n(),
             se=sd_rt/sqrt(n_rt),
             upper_limit=rts+se,
             lower_limit=rts-se
@@ -797,30 +887,31 @@ is likely to appear.</p>
 <pre><code>## # A tibble: 12 × 8
 ## # Groups:   age [2]
 ##    age   block_num     rts sd_rt  n_rt    se upper_limit lower_limit
-##    &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
-##  1 adult         1 -24.6    225.    33  39.2        14.5      -63.8 
-##  2 adult         2  -0.743  213.    33  37.1        36.3      -37.8 
-##  3 adult         3  90.2    162.    33  28.3       119.        62.0 
-##  4 adult         4  68.0    131.    33  22.8        90.8       45.3 
-##  5 adult         5  19.0    161.    33  28.0        47.1       -9.01
-##  6 adult         6  33.4    160.    33  27.9        61.3        5.55
-##  7 child         1  36.7    223.    33  38.9        75.6       -2.25
-##  8 child         2 252.     544.    33  94.7       347.       157.  
-##  9 child         3 292.     144.    33  25.0       317.       267.  
-## 10 child         4  95.2    201.    33  35.0       130.        60.2 
-## 11 child         5 353.     346.    33  60.2       413.       292.  
-## 12 child         6 358.     234.    33  40.7       399.       317.</code></pre>
-<pre class="r"><code>ggplot(data = space2,aes(x=block_num, y=rts))+
-  geom_line(aes(color=age))+
+##    &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+##  1 adult         1 -24.6    225.    27  43.3        18.7      -67.9 
+##  2 adult         2  -0.743  213.    27  41.0        40.3      -41.7 
+##  3 adult         3  90.2    162.    27  31.3       122.        59.0 
+##  4 adult         4  68.0    131.    27  25.2        93.2       42.9 
+##  5 adult         5  19.0    161.    27  31.0        50.0      -12.0 
+##  6 adult         6  33.4    160.    27  30.8        64.3        2.61
+##  7 child         1  36.7    223.     6  91.2       128.       -54.6 
+##  8 child         2 252.     544.     6 222.        474.        30.1 
+##  9 child         3 292.     144.     6  58.6       350.       233.  
+## 10 child         4  95.2    201.     5  90.0       185.         5.22
+## 11 child         5 353.     346.     5 155.        507.       198.  
+## 12 child         6 358.     234.     5 105.        462.       253.</code></pre>
+<pre class="r"><code>z&lt;-ggplot(data = space2,aes(x=block_num, y=rts))+
+  geom_line(aes(color=age, linewidth=1))+
   geom_point()+
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  labs(title = &quot;Singleton Distractor Present&quot;)+
+  labs(title = &quot;Raw RTs&quot;)+
   xlab(&quot;Block number&quot;)+
   ylab(expression(atop(&quot;Suppression effect (ms)&quot;, paste(&quot;(high prob. - low prob.)&quot;))))+
-  theme(axis.text=element_text(size=14),
-        axis.title=element_text(size=14,face=&quot;bold&quot;),
-        title = element_text(size = 16))</code></pre>
-<p><img src="p08_files/figure-html/line_plot_avg-1.png" width="1152" /></p>
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face=&quot;bold&quot;),
+        title = element_text(size = 45),
+        legend.text=element_text(size = 30))+
+  guides(linewidth=&quot;none&quot;)</code></pre>
 <pre class="r"><code>model4 &lt;- aov_car(difference ~ age*block_num + Error(id/block_num), data=space_block)</code></pre>
 <pre><code>## Converting to factor: age</code></pre>
 <pre><code>## Warning: Missing values for following ID(s):
@@ -841,6 +932,38 @@ is likely to appear.</p>
 ## Sphericity correction method: GG</code></pre>
 <p>Maybe will need to separate out by age and see if suppression effect
 by block is significant.</p>
+<pre class="r"><code>block_adult &lt;- space_block %&gt;%
+  filter(age==&quot;adult&quot;)
+
+model5 &lt;- aov_car(difference ~ block_num + Error(id/block_num), data=block_adult)
+
+model5</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: difference
+##      Effect          df      MSE    F  ges p.value
+## 1 block_num 3.67, 95.44 43911.34 1.53 .047    .204
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
+<pre class="r"><code>block_child &lt;- space_block %&gt;%
+  filter(age==&quot;child&quot;)
+
+model6 &lt;- aov_car(difference ~ block_num + Error(id/block_num), data=block_child)</code></pre>
+<pre><code>## Warning: Missing values for following ID(s):
+## 26
+## Removing those cases from the analysis.</code></pre>
+<pre class="r"><code>model6</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: difference
+##      Effect    df      MSE    F  ges p.value
+## 1 block_num 5, 20 64904.70 1.77 .201    .164
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
 <p>Not sure the below is important – need to update if what to use</p>
 <pre class="r"><code>write.csv(space_block, &quot;space_block.csv&quot;, row.names=FALSE)</code></pre>
 <pre class="r"><code>normy &lt;- read_csv(&quot;space_block_norm.csv&quot;, show_col_types = FALSE)
@@ -851,6 +974,49 @@ normy&lt;- subset(normy, select=c(id, age, block_num, diff_norm))</code></pre>
   theme_classic()+
   labs(x = &quot;Block Number&quot;, y = &quot;Difference in RT (ms)&quot;)</code></pre>
 <p><img src="p08_files/figure-html/line_plot-norm-block-1.png" width="672" /></p>
+<pre class="r"><code>space_norm &lt;- normy %&gt;%
+  group_by(age, block_num) %&gt;%
+  summarize(rts = mean(diff_norm, na.rm = TRUE),
+            sd_rt=sd(diff_norm, na.rm = TRUE),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=rts+se,
+            lower_limit=rts-se
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>space_norm</code></pre>
+<pre><code>## # A tibble: 12 × 8
+## # Groups:   age [2]
+##    age   block_num       rts sd_rt  n_rt     se upper_limit lower_limit
+##    &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;  &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+##  1 adult         1 -0.00115  0.195    27 0.0376   0.0364        -0.0387
+##  2 adult         2  0.0342   0.322    27 0.0619   0.0961        -0.0276
+##  3 adult         3 -0.0680   0.200    27 0.0385  -0.0294        -0.106 
+##  4 adult         4 -0.0688   0.121    27 0.0234  -0.0455        -0.0922
+##  5 adult         5 -0.0375   0.195    27 0.0375   0.0000351     -0.0750
+##  6 adult         6 -0.112    0.317    27 0.0609  -0.0508        -0.173 
+##  7 child         1 -0.0639   0.104     6 0.0425  -0.0214        -0.106 
+##  8 child         2 -0.0700   0.392     6 0.160    0.0900        -0.230 
+##  9 child         3 -0.151    0.101     6 0.0412  -0.110         -0.192 
+## 10 child         4  0.000611 0.127     6 0.0520   0.0526        -0.0514
+## 11 child         5 -0.328    0.475     6 0.194   -0.134         -0.522 
+## 12 child         6 -0.0996   0.154     6 0.0630  -0.0366        -0.163</code></pre>
+<pre class="r"><code>y&lt;-ggplot(data = space_norm,aes(x=block_num, y=rts))+
+  geom_line(aes(color=age, linewidth=1))+
+  geom_point()+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  labs(title=&quot;Normalized RTs&quot;)+
+  xlab(&quot;Block number&quot;)+
+  ylab(expression(atop(&quot;Suppression effect (%)&quot;, paste(&quot;(high prob. - low prob.)&quot;))))+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face=&quot;bold&quot;),
+        title = element_text(size = 45),
+        legend.text=element_text(size = 30))+
+  guides(linewidth=&quot;none&quot;)
+
+plot_grid(z,y,labels = c(&#39;A&#39;, &#39;B&#39;), label_size=40, ncol=1)</code></pre>
+<p><img src="p08_files/figure-html/line_plot_avg-norm-1.png" width="2112" /></p>
 </div>
 <div
 id="correlation-of-suppression-effect-and-visual-working-memory-capacity"

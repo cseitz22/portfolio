@@ -191,26 +191,40 @@ Plot data.
 supp.labs <- c("Adults", "Children")
 names(supp.labs) <- c("adult", "child")
 
-a<-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
+a<-ggplot(subset(sum_stats, age %in% c("adult")),aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
   geom_bar(stat = "identity", show.legend = FALSE)+
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  #coord_cartesian(ylim = c(700,1050))+ 
-  facet_grid(.~age, labeller = labeller(age=supp.labs)) +
+  coord_cartesian(ylim = c(800, 1200))+ 
+  #facet_grid(~age, scales="free", labeller = labeller(age=supp.labs)) +
   theme_classic()+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=40,face="bold"),
-        title = element_text(size = 24),
-        strip.text.x = element_text(size=30)) +
+        title = element_text(size = 45)) +
   labs(x = "Distractor Location", y = "Response Time (ms)")+
-  labs(title = "Singleton Distractor Present")+
+  labs(subtitle = "Adults", tag = "A")+
   scale_fill_manual(values=c('#1b9e77', '#d95f02', '#66a61e')) +
   scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc","absent"="Absent"))
 
-plot_grid(a,labels = c('A'), label_size=40)
+b<-ggplot(subset(sum_stats, age %in% c("child")),aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
+  geom_bar(stat = "identity", show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(1200, 2500))+ 
+  #facet_grid(~age, scales="free", labeller = labeller(age=supp.labs)) +
+  theme_classic()+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face="bold"),
+        title = element_text(size = 45)) +
+  labs(x = "Distractor Location", y = "Response Time (ms)")+
+  labs(subtitle = "Children", tag = " ")+
+  scale_fill_manual(values=c('#1b9e77', '#d95f02', '#66a61e')) +
+  scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc","absent"="Absent"))
+
+plot_grid(a, b, align=c("hv"), label_size=40) 
   
 
 
 ```
+
 
 Run a 3x2 mixed design ANOVA with distractor location and age as independent variables and rt as the dependent variable. 
 
@@ -405,6 +419,72 @@ model_norm
 
 ```
 
+```{r reformat-kids-norm}
+
+reform <- setDT(normrt)
+reform <- dcast(reform,id...1+age~relative_hp_dist,value.var='norm')
+
+```
+
+
+```{r t-test-norm}
+
+reform %>%
+  t.test(x=reform$low_prob, y=reform$high_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
+reform%>%
+  t.test(x=reform$high_prob, y=reform$absent, alternative="greater", mu=0, paired =TRUE, conf.level = .95) 
+reform%>%
+  t.test(x=reform$low_prob, y=reform$absent, alternative="greater", mu=0, paired =TRUE, conf.level = .95)
+
+```
+
+
+Set up normalized data plot. 
+```{r set-up-data-for-norm-plot}
+
+sum_stats_norm <- normrt%>%
+  group_by(relative_hp_dist)%>%
+  summarize(mean_rts=mean(norm),
+            sd_rt=sd(norm),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+sum_stats_norm
+
+```
+
+```{r order-bars-norm}
+sum_stats_norm$relative_hp_dist <- factor(sum_stats_norm$relative_hp_dist,              # Change ordering manually
+                  levels = c("high_prob", "low_prob", "absent"))
+
+```
+
+Plot data. 
+
+```{r plot-first-norm, fig.height=11, fig.width=22}
+
+a<-ggplot(data = sum_stats_norm, aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
+  geom_bar(stat = "identity", show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(.85,1.1))+ 
+  theme_classic()+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face="bold"),
+        title = element_text(size = 40),
+        strip.text.x = element_text(size=30)) +
+  labs(x = "Distractor Location", y = "Normalized Response Time (%)")+
+  labs(title = "Singleton Distractor Present")+
+  scale_fill_manual(values=c('#1b9e77', '#d95f02', '#66a61e')) +
+  scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc","absent"="Absent"))
+
+plot_grid(a,labels = c('A'), label_size=40)
+  
+
+
+```
+
 
 ### Examine block-by-block learning of distractor location
 
@@ -455,7 +535,7 @@ space2 <- space_block %>%
   group_by(age, block_num) %>%
   summarize(rts = mean(difference, na.rm = TRUE),
             sd_rt=sd(difference, na.rm = TRUE),
-            n_rt=33,
+            n_rt=n(),
             se=sd_rt/sqrt(n_rt),
             upper_limit=rts+se,
             lower_limit=rts-se
@@ -464,17 +544,20 @@ space2
 
 ```
 
-```{r line_plot_avg, fig.height=4, fig.width=12}
-ggplot(data = space2,aes(x=block_num, y=rts))+
-  geom_line(aes(color=age))+
+```{r line_plot_avg, fig.height=11, fig.width=22}
+z<-ggplot(data = space2,aes(x=block_num, y=rts))+
+  geom_line(aes(color=age, linewidth=1))+
   geom_point()+
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  labs(title = "Singleton Distractor Present")+
+  labs(title = "Raw RTs")+
   xlab("Block number")+
   ylab(expression(atop("Suppression effect (ms)", paste("(high prob. - low prob.)"))))+
-  theme(axis.text=element_text(size=14),
-        axis.title=element_text(size=14,face="bold"),
-        title = element_text(size = 16))
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face="bold"),
+        title = element_text(size = 45),
+        legend.text=element_text(size = 30))+
+  guides(linewidth="none")
+
 
 ```
 
@@ -489,6 +572,27 @@ model4
 
 Maybe will need to separate out by age and see if suppression effect by block is significant.
 
+```{r block-adult-anova}
+
+block_adult <- space_block %>%
+  filter(age=="adult")
+
+model5 <- aov_car(difference ~ block_num + Error(id/block_num), data=block_adult)
+
+model5
+
+```
+
+```{r block-child-anova}
+
+block_child <- space_block %>%
+  filter(age=="child")
+
+model6 <- aov_car(difference ~ block_num + Error(id/block_num), data=block_child)
+
+model6
+
+```
 
 Not sure the below is important -- need to update if what to use
 
@@ -513,6 +617,43 @@ ggplot(data = normy,aes(x=block_num, y=diff_norm, group=id))+
   labs(x = "Block Number", y = "Difference in RT (ms)")
 
 ```
+
+```{r create_df_to_transform-norm}
+space_norm <- normy %>%
+  group_by(age, block_num) %>%
+  summarize(rts = mean(diff_norm, na.rm = TRUE),
+            sd_rt=sd(diff_norm, na.rm = TRUE),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=rts+se,
+            lower_limit=rts-se
+            )
+space_norm
+
+```
+
+```{r line_plot_avg-norm, fig.height=18, fig.width=22}
+y<-ggplot(data = space_norm,aes(x=block_num, y=rts))+
+  geom_line(aes(color=age, linewidth=1))+
+  geom_point()+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  labs(title="Normalized RTs")+
+  xlab("Block number")+
+  ylab(expression(atop("Suppression effect (%)", paste("(high prob. - low prob.)"))))+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face="bold"),
+        title = element_text(size = 45),
+        legend.text=element_text(size = 30))+
+  guides(linewidth="none")
+
+plot_grid(z,y,labels = c('A', 'B'), label_size=40, ncol=1)
+
+
+```
+
+
+
+
 
 ### Correlation of suppression effect and visual working memory capacity
 
