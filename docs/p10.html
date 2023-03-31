@@ -442,23 +442,38 @@ df_mod &lt;- reshape2::melt(df_mod, id.var=c(&#39;id&#39;, &#39;age&#39;), varia
 <pre class="r"><code>supp.labs &lt;- c(&quot;Adults&quot;, &quot;Children&quot;)
 names(supp.labs) &lt;- c(&quot;adult&quot;, &quot;child&quot;)
 
-a&lt;-ggplot(data = sum_stats, aes(x = relative_target, y = mean_rts, fill=relative_target)) +
+a&lt;-ggplot(subset(sum_stats, age %in% c(&quot;adult&quot;)),aes(x = relative_target, y = mean_rts, fill=relative_target)) +
   geom_bar(stat = &quot;identity&quot;, show.legend = FALSE)+
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(0,2500))+ 
-  facet_grid(.~age, labeller = labeller(age=supp.labs)) +
+  coord_cartesian(ylim = c(800, 1200))+ 
+  #facet_grid(~age, scales=&quot;free&quot;, labeller = labeller(age=supp.labs)) +
   theme_classic()+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=40,face=&quot;bold&quot;),
-        title = element_text(size = 24),
-        strip.text.x = element_text(size=30)) +
+        title = element_text(size = 45)) +
   labs(x = &quot;Target Location&quot;, y = &quot;Response Time (ms)&quot;)+
-  labs(title = &quot;Singleton Distractor Absent&quot;)+
- scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;)) +
+  labs(title = &quot;Singleton Distractor Absent&quot;, subtitle = &quot;Adults&quot;, tag = &quot;B&quot;)+
+  scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;)) +
   scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;))
 
-plot_grid(a,labels = c(&#39;B&#39;), label_size=40)</code></pre>
-<p><img src="p10_files/figure-html/plot-first-1.png" width="2112" /></p>
+b&lt;-ggplot(subset(sum_stats, age %in% c(&quot;child&quot;)),aes(x = relative_target, y = mean_rts, fill=relative_target)) +
+  geom_bar(stat = &quot;identity&quot;, show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(1200, 2500))+ 
+  #facet_grid(~age, scales=&quot;free&quot;, labeller = labeller(age=supp.labs)) +
+  theme_classic()+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face=&quot;bold&quot;),
+        title = element_text(size = 45)) +
+  labs(x = &quot;Target Location&quot;, y = &quot;Response Time (ms)&quot;)+
+  labs(title = &quot;  &quot;,subtitle = &quot;Children&quot;, tag = &quot; &quot;)+
+  scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;)) +
+  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;))
+
+
+
+plot_grid(a,b,label_size=40)</code></pre>
+<p><img src="p10_files/figure-html/plot-first-1.png" width="2304" /></p>
 <p>Run a 2x2 mixed design ANOVA with distractor location and age as
 independent variables and rt as the dependent variable.</p>
 <pre class="r"><code>model3 &lt;- aov_car(value ~ age*relative_target + Error(id/relative_target), data=df_mod)</code></pre>

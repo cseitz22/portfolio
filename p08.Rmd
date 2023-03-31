@@ -186,7 +186,7 @@ sum_stats$relative_hp_dist <- factor(sum_stats$relative_hp_dist,              # 
 
 Plot data. 
 
-```{r plot-first, fig.height=11, fig.width=22}
+```{r plot-first, fig.height=11, fig.width=24}
 
 supp.labs <- c("Adults", "Children")
 names(supp.labs) <- c("adult", "child")
@@ -201,7 +201,7 @@ a<-ggplot(subset(sum_stats, age %in% c("adult")),aes(x = relative_hp_dist, y = m
         axis.title=element_text(size=40,face="bold"),
         title = element_text(size = 45)) +
   labs(x = "Distractor Location", y = "Response Time (ms)")+
-  labs(subtitle = "Adults", tag = "A")+
+  labs(title= "Singleton Distractor Present",subtitle = "Adults", tag = "A")+
   scale_fill_manual(values=c('#1b9e77', '#d95f02', '#66a61e')) +
   scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc","absent"="Absent"))
 
@@ -215,7 +215,7 @@ b<-ggplot(subset(sum_stats, age %in% c("child")),aes(x = relative_hp_dist, y = m
         axis.title=element_text(size=40,face="bold"),
         title = element_text(size = 45)) +
   labs(x = "Distractor Location", y = "Response Time (ms)")+
-  labs(subtitle = "Children", tag = " ")+
+  labs(title = "  ", subtitle = "Children", tag = " ")+
   scale_fill_manual(values=c('#1b9e77', '#d95f02', '#66a61e')) +
   scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc","absent"="Absent"))
 
@@ -609,6 +609,26 @@ normy<- subset(normy, select=c(id, age, block_num, diff_norm))
 
 ```
 
+
+```{r anova_test_by_block_norm}
+
+aov_car(diff_norm ~ age*block_num + Error(id/block_num), data=normy)
+
+
+```
+```{r block-adult-anova_norm}
+
+aov_car(diff_norm ~ block_num + Error(id/block_num), data=normy)
+
+```
+```{r anova_distractor_rts}
+
+model = aov(diff_norm~factor(block_num)+
+                Error(factor(id)), data=normy)
+summary(model)
+
+```
+
 ```{r line_plot-norm-block}
 ggplot(data = normy,aes(x=block_num, y=diff_norm, group=id))+
   geom_line(aes(color=age))+
@@ -706,8 +726,77 @@ ggplot(data = space_block6,aes(x=block_num, y=difference, group=id))+
 ```
 
 
+```{r sum-stat-allC}
+
+spaceC <- kids6 %>%
+  filter(acc==1)%>%
+  group_by(id, relative_hp_dist) %>%
+  summarize(rts = mean(rt)
+            )
+  
+```
+
+Run ANOVA on 3 conditions first, and if significant, then run in on 5 conditions?
+
+Need to reformat the above df to have a column for each relative_hp_dist/ID so we can average across low-probability locations. 
+
+```{r reformat-allC}
+
+space_anovaC <- setDT(spaceC)
+space_anovaC <- dcast(space_anovaC,id~relative_hp_dist,value.var='rts')
+
+```
+
+```{r avg-lp-allC}
+
+space_anovaC <- space_anovaC %>%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+```
+
+Now, I want to create a smaller graph with just 3 bars: one for the high-probability rts, average of low-probability rts, and no distractor. 
+
+```{r get_info_for_smaller_figureC}
+
+df_modC <- subset(space_anovaC, select=c(id, high_prob, absent, low_prob))
+
+df_modC <- reshape2::melt(df_modC, id.var=c('id'), variable.name= "relative_hp_dist")
+
+```
+
+```{r set-up-data-for-plotC}
+
+sum_statsC <- df_modC%>%
+  group_by(relative_hp_dist)%>%
+  summarize(mean_rts=mean(value),
+            sd_rt=sd(value),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+sum_statsC
+
+```
+
+
+```{r plot-6}
+
+ggplot(sum_statsC,aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
+  geom_bar(stat = "identity", show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  #coord_cartesian(ylim = c(800, 1200))+ 
+  #facet_grid(~age, scales="free", labeller = labeller(age=supp.labs)) +
+  theme_classic()+
+  #theme(axis.text=element_text(size=30),
+        #axis.title=element_text(size=40,face="bold"),
+        #title = element_text(size = 45)) +
+  labs(x = "Distractor Location", y = "Response Time (ms)")+
+  labs(title= "Singleton Distractor Present",subtitle = "Kids aged 6-7", tag = "A")+
+  scale_fill_manual(values=c('#1b9e77', '#d95f02', '#66a61e')) +
+  scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc","absent"="Absent"))
 
 
 
-
+```
 

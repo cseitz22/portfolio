@@ -169,27 +169,42 @@ sum_stats
 
 Plot data. 
 
-```{r plot-first, fig.height=11, fig.width=22}
+```{r plot-first, fig.height=11, fig.width=24}
 
 supp.labs <- c("Adults", "Children")
 names(supp.labs) <- c("adult", "child")
 
-a<-ggplot(data = sum_stats, aes(x = relative_target, y = mean_rts, fill=relative_target)) +
+a<-ggplot(subset(sum_stats, age %in% c("adult")),aes(x = relative_target, y = mean_rts, fill=relative_target)) +
   geom_bar(stat = "identity", show.legend = FALSE)+
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(0,2500))+ 
-  facet_grid(.~age, labeller = labeller(age=supp.labs)) +
+  coord_cartesian(ylim = c(800, 1200))+ 
+  #facet_grid(~age, scales="free", labeller = labeller(age=supp.labs)) +
   theme_classic()+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=40,face="bold"),
-        title = element_text(size = 24),
-        strip.text.x = element_text(size=30)) +
+        title = element_text(size = 45)) +
   labs(x = "Target Location", y = "Response Time (ms)")+
-  labs(title = "Singleton Distractor Absent")+
- scale_fill_manual(values=c('#1b9e77', '#d95f02')) +
+  labs(title = "Singleton Distractor Absent", subtitle = "Adults", tag = "B")+
+  scale_fill_manual(values=c('#1b9e77', '#d95f02')) +
   scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc"))
 
-plot_grid(a,labels = c('B'), label_size=40)
+b<-ggplot(subset(sum_stats, age %in% c("child")),aes(x = relative_target, y = mean_rts, fill=relative_target)) +
+  geom_bar(stat = "identity", show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(1200, 2500))+ 
+  #facet_grid(~age, scales="free", labeller = labeller(age=supp.labs)) +
+  theme_classic()+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face="bold"),
+        title = element_text(size = 45)) +
+  labs(x = "Target Location", y = "Response Time (ms)")+
+  labs(title = "  ",subtitle = "Children", tag = " ")+
+  scale_fill_manual(values=c('#1b9e77', '#d95f02')) +
+  scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc"))
+
+
+
+plot_grid(a,b,label_size=40)
 
 ```
 

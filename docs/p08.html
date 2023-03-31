@@ -483,7 +483,7 @@ a&lt;-ggplot(subset(sum_stats, age %in% c(&quot;adult&quot;)),aes(x = relative_h
         axis.title=element_text(size=40,face=&quot;bold&quot;),
         title = element_text(size = 45)) +
   labs(x = &quot;Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
-  labs(subtitle = &quot;Adults&quot;, tag = &quot;A&quot;)+
+  labs(title= &quot;Singleton Distractor Present&quot;,subtitle = &quot;Adults&quot;, tag = &quot;A&quot;)+
   scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;, &#39;#66a61e&#39;)) +
   scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;,&quot;absent&quot;=&quot;Absent&quot;))
 
@@ -497,12 +497,12 @@ b&lt;-ggplot(subset(sum_stats, age %in% c(&quot;child&quot;)),aes(x = relative_h
         axis.title=element_text(size=40,face=&quot;bold&quot;),
         title = element_text(size = 45)) +
   labs(x = &quot;Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
-  labs(subtitle = &quot;Children&quot;, tag = &quot; &quot;)+
+  labs(title = &quot;  &quot;, subtitle = &quot;Children&quot;, tag = &quot; &quot;)+
   scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;, &#39;#66a61e&#39;)) +
   scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;,&quot;absent&quot;=&quot;Absent&quot;))
 
 plot_grid(a, b, align=c(&quot;hv&quot;), label_size=40) </code></pre>
-<p><img src="p08_files/figure-html/plot-first-1.png" width="2112" /></p>
+<p><img src="p08_files/figure-html/plot-first-1.png" width="2304" /></p>
 <p>Run a 3x2 mixed design ANOVA with distractor location and age as
 independent variables and rt as the dependent variable.</p>
 <pre class="r"><code>model3 &lt;- aov_car(value ~ age*relative_hp_dist + Error(id/relative_hp_dist), data=df_mod)</code></pre>
@@ -968,6 +968,42 @@ model6 &lt;- aov_car(difference ~ block_num + Error(id/block_num), data=block_ch
 <pre class="r"><code>write.csv(space_block, &quot;space_block.csv&quot;, row.names=FALSE)</code></pre>
 <pre class="r"><code>normy &lt;- read_csv(&quot;space_block_norm.csv&quot;, show_col_types = FALSE)
 normy&lt;- subset(normy, select=c(id, age, block_num, diff_norm))</code></pre>
+<pre class="r"><code>aov_car(diff_norm ~ age*block_num + Error(id/block_num), data=normy)</code></pre>
+<pre><code>## Converting to factor: age</code></pre>
+<pre><code>## Contrasts set to contr.sum for the following variables: age</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: diff_norm
+##          Effect           df  MSE      F  ges p.value
+## 1           age        1, 31 0.05 3.55 + .016    .069
+## 2     block_num 3.26, 101.10 0.09   1.32 .035    .272
+## 3 age:block_num 3.26, 101.10 0.09   1.23 .033    .302
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
+<pre class="r"><code>aov_car(diff_norm ~ block_num + Error(id/block_num), data=normy)</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: diff_norm
+##      Effect           df  MSE    F  ges p.value
+## 1 block_num 3.29, 105.33 0.09 1.27 .033    .288
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
+## 
+## Sphericity correction method: GG</code></pre>
+<pre class="r"><code>model = aov(diff_norm~factor(block_num)+
+                Error(factor(id)), data=normy)
+summary(model)</code></pre>
+<pre><code>## 
+## Error: factor(id)
+##           Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Residuals 32  1.679 0.05248               
+## 
+## Error: Within
+##                    Df Sum Sq Mean Sq F value Pr(&gt;F)
+## factor(block_num)   5  0.387 0.07749    1.27   0.28
+## Residuals         160  9.764 0.06103</code></pre>
 <pre class="r"><code>ggplot(data = normy,aes(x=block_num, y=diff_norm, group=id))+
   geom_line(aes(color=age))+
   labs(title = &quot;Difference in Response Times&quot;, subtitle = &quot;for distractor presentation at the low-probability locations and high-probability location by block&quot;)+
@@ -1065,6 +1101,58 @@ space_block6 &lt;- dcast(space_block6,id+block_num~relative_hp_dist,value.var=&#
   labs(x = &quot;Block Number&quot;, y = &quot;Difference in RT (ms)&quot;)</code></pre>
 <pre><code>## Warning: Removed 4 rows containing missing values (`geom_line()`).</code></pre>
 <p><img src="p08_files/figure-html/line_plot-kids6-1.png" width="672" /></p>
+<pre class="r"><code>spaceC &lt;- kids6 %&gt;%
+  filter(acc==1)%&gt;%
+  group_by(id, relative_hp_dist) %&gt;%
+  summarize(rts = mean(rt)
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<p>Run ANOVA on 3 conditions first, and if significant, then run in on 5
+conditions?</p>
+<p>Need to reformat the above df to have a column for each
+relative_hp_dist/ID so we can average across low-probability
+locations.</p>
+<pre class="r"><code>space_anovaC &lt;- setDT(spaceC)
+space_anovaC &lt;- dcast(space_anovaC,id~relative_hp_dist,value.var=&#39;rts&#39;)</code></pre>
+<pre class="r"><code>space_anovaC &lt;- space_anovaC %&gt;%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)</code></pre>
+<p>Now, I want to create a smaller graph with just 3 bars: one for the
+high-probability rts, average of low-probability rts, and no
+distractor.</p>
+<pre class="r"><code>df_modC &lt;- subset(space_anovaC, select=c(id, high_prob, absent, low_prob))
+
+df_modC &lt;- reshape2::melt(df_modC, id.var=c(&#39;id&#39;), variable.name= &quot;relative_hp_dist&quot;)</code></pre>
+<pre class="r"><code>sum_statsC &lt;- df_modC%&gt;%
+  group_by(relative_hp_dist)%&gt;%
+  summarize(mean_rts=mean(value),
+            sd_rt=sd(value),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+sum_statsC</code></pre>
+<pre><code>## # A tibble: 3 × 7
+##   relative_hp_dist mean_rts sd_rt  n_rt    se upper_limit lower_limit
+##   &lt;fct&gt;               &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1 high_prob           3554. 1294.     4  647.       4201.       2907.
+## 2 absent              3402. 1193.     4  597.       3998.       2805.
+## 3 low_prob            7829. 8728.     4 4364.      12193.       3464.</code></pre>
+<pre class="r"><code>ggplot(sum_statsC,aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
+  geom_bar(stat = &quot;identity&quot;, show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  #coord_cartesian(ylim = c(800, 1200))+ 
+  #facet_grid(~age, scales=&quot;free&quot;, labeller = labeller(age=supp.labs)) +
+  theme_classic()+
+  #theme(axis.text=element_text(size=30),
+        #axis.title=element_text(size=40,face=&quot;bold&quot;),
+        #title = element_text(size = 45)) +
+  labs(x = &quot;Distractor Location&quot;, y = &quot;Response Time (ms)&quot;)+
+  labs(title= &quot;Singleton Distractor Present&quot;,subtitle = &quot;Kids aged 6-7&quot;, tag = &quot;A&quot;)+
+  scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;, &#39;#66a61e&#39;)) +
+  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;,&quot;absent&quot;=&quot;Absent&quot;))</code></pre>
+<p><img src="p08_files/figure-html/plot-6-1.png" width="672" /></p>
 </div>
 
 
