@@ -287,7 +287,7 @@ modelA
 
 ```
 
-There is a different in rt when presenting the distractor in different locations, F(2,52)=27.81, p<.001. 
+There is a difference in rt when presenting the distractor in different locations, F(2,52)=57.25, p<.001. 
 
 
 The repeated measures ANOVA on just the adults was significant. 
@@ -302,6 +302,17 @@ model_dist_rtsA
 ```
 
 Run t-test to determine significant differences between conditions. 
+
+```{r BC-adults}
+
+df_modA %>%
+  pairwise_t_test(
+    value ~ relative_hp_dist, paired = TRUE,
+    p.adjust.method = "bonferroni"
+    )
+
+
+```
 
 ```{r t-test-adults}
 
@@ -374,6 +385,7 @@ model_dist_rtsK
 ```
 
 Run t-test to determine significant differences between conditions. 
+
 
 ```{r t-test-kids}
 

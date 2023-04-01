@@ -211,6 +211,7 @@ model2
 
 ```
 
+
 Test whether the high-prob location and the average across low-prob locations were significantly different. Using a paired samples t-test, I found that the response times for when the distractor was presented in the high-probability location compared to the average response time across the low-probability locations was significantly different (t(20)=4.95, p<.001). I also examined whether there were significant differences between the high-prob and distractor absent conditions and the low-prob and distractor absent conditions, using paired samples t-tests. All were significantly different with a p of <.001. 
 
 ```{r set up data for t-test for high and low conditions only}
@@ -241,6 +242,52 @@ df_mod <- reshape2::melt(df_mod, id.var=c('ID'), variable.name= "relative_hp_dis
 
 ```
 
+One last ANOVA test on this subset of data. 
+
+```{r 3_loc_anova_test}
+
+model3 <- aov_car(value ~ relative_hp_dist + Error(ID/relative_hp_dist), data=df_mod)
+
+model3
+
+
+```
+
+```{r BC-adults}
+
+df_mod %>%
+  pairwise_t_test(
+    value ~ relative_hp_dist, paired = TRUE,
+    p.adjust.method = "bonferroni"
+    )
+
+
+```
+
+```{r}
+
+r<- lsmeans(model3, ~relative_hp_dist)
+
+con1<-list(a=c(-2,1,1), b=c(0,1,-1))
+
+contrast(r, con1, adjust = "holm")
+
+```
+
+```{r}
+
+m1<-emmeans(model3, ~relative_hp_dist)
+pairs(m1)
+
+```
+
+```{r}
+
+
+
+```
+
+
 ```{r another_df_with_mean_rts}
 
 sum_stats2 <- df_mod%>%
@@ -256,107 +303,72 @@ sum_stats2
 
 ```
 
-In order to add the p-values to the graph, I needed to create data frames fo reach value and specify the position on the graph; then, use add_pvalue with ggplot. 
-
-```{r adding-p-values}
-
-result<- .001
-
-
-#Make df for adding the p-value 
-p_val1<- data.frame(
-  group_1="dist_0",
-  group_2="low_prob",
-  label=result,
-  y.position=1050
-)
-
-p_val2<- data.frame(
-  group_1="no_dist",
-  group_2="low_prob",
-  label=result,
-  y.position=1150
-)
-
-p_val3<- data.frame(
-  group_1="no_dist",
-  group_2="dist_0",
-  label=result,
-  y.position=950
-)
-
-
-```
 
 This figure displays the mean response times depending on the location of the distractor relative to the high probability location. I chose those particular colors based on Wake Forest's color scheme. 
 
 
 ```{r - graph 2 - distractor location effect on rt}
-ggplot(data = sum_stats2, aes(x = relative_hp_dist, y = mean_rts)) +
-  geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
+
+sum_stats2$relative_hp_dist <- factor(sum_stats2$relative_hp_dist,              # Change ordering manually
+                  levels = c("dist_0", "low_prob", "no_dist"))
+
+a<-ggplot(data = sum_stats2, aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(700,1200))+
+  coord_cartesian(ylim = c(700,1000))+
   theme_classic()+
-  add_pvalue(p_val1,
-             xmin = "group_1",
-             xmax = "group_2",
-             label = "p < {label}",
-             y.position = "y.position",
-             label.size = 4,
-             bracket.size = .5)+
-  add_pvalue(p_val2,
-             xmin = "group_1",
-             xmax = "group_2",
-             label = "p < {label}",
-             y.position = "y.position",
-             label.size = 4,
-             bracket.size = .5)+
-  add_pvalue(p_val3,
-             xmin = "group_1",
-             xmax = "group_2",
-             label = "p < {label}",
-             y.position = "y.position",
-             label.size = 4,
-             bracket.size = .5)+
+  scale_fill_brewer(palette="Dark2") +
   labs(x = "Distractor Location", y = "Response Time (ms)")+
-  labs(title = "Distractor Location Effect on RT")+
-  #labs(caption = "An ANOVA test shows a difference in RT depending on distractor location, F(1.97,39.33)=67.98, p<.001.")+
-    theme(axis.text=element_text(size=12),
-        axis.title=element_text(size=18,face="bold"),
-        title = element_text(size = 20))+
-  scale_x_discrete(labels= c("no_dist"="Distractor Absent","low_prob"="Low Prob Location", "dist_0"="High Prob Location"))
-  
-```
-
-One last ANOVA test on this subset of data. 
-
-```{r 3_loc_anova_test}
-
-model3 <- aov_car(value ~ relative_hp_dist + Error(ID/relative_hp_dist), data=df_mod)
-
-model3
-
+  labs(title = "Singleton Distractor Present")+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face="bold"),
+        title = element_text(size = 45))+
+  scale_x_discrete(labels= c("dist_0"="HP loc","low_prob"="LP loc","no_dist"="Absent"))
 
 ```
+
+
 
 Combine graphs of rt and accuracy for NC Cog Poster.
 
 ```{r create_accuracy_df}
 
-pilot_distacc <- pilot %>%
-  group_by(relative_hp_dist) %>%
-  summarize(accuracy = mean(acc),
-            sd_rt=sd(acc),
-            n_rt=21,
-            se=sd_rt/sqrt(n_rt),
-            upper_limit=accuracy+se,
-            lower_limit=accuracy-se
+spaceT <- pilot %>%
+  group_by(ID, relative_hp_dist)%>%
+  summarize(acc = mean(acc)
             )
 
-b<-ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy, fill=relative_hp_dist)) +
+space_anovaT <- setDT(spaceT)
+space_anovaT <- dcast(space_anovaT,ID~relative_hp_dist,value.var='acc')
+
+space_anovaT <- space_anovaT %>%
+  mutate(low_prob = (dist_1+dist_2+dist_3)/3) 
+
+df_mod_dist <- subset(space_anovaT, select=c(ID,dist_0, low_prob,no_dist))
+df_mod_dist <- reshape2::melt(df_mod_dist, id.var=c('ID'), variable.name= "relative_hp_dist")
+
+```
+```{r set-up-data-for-plot}
+
+sum_statsT <- df_mod_dist%>%
+  group_by(relative_hp_dist)%>%
+  summarize(mean_acc=mean(value),
+            sd_rt=sd(value),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_acc+se,
+            lower_limit=mean_acc-se
+  )
+sum_statsT
+
+```
+
+```{r make-plot}
+
+b<-ggplot(data = sum_statsT, aes(x = relative_hp_dist, y = mean_acc, fill=relative_hp_dist)) +
   geom_bar(stat = "identity", show.legend = FALSE) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(85,105))+
+  coord_cartesian(ylim = c(85,100))+
   theme_classic()+
   scale_fill_brewer(palette="Dark2")+
   labs(x = "Distractor Location", y = "Accuracy (%)")+
@@ -371,7 +383,7 @@ b<-ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy, fill=rel
 
 ```{r dist_2-plots, fig.height=11, fig.width=22} 
 #
-plot_grid(a,b,labels = c('A','B'), label_size=40, rel_widths = c(2,1))
+plot_grid(a,b,labels = c('A','B'), label_size=40, rel_widths = c(1.5,1))
   
 
 ```
@@ -428,7 +440,7 @@ space2 <- space_block %>%
   group_by(block_num) %>%
   summarize(rts = mean(difference, na.rm = TRUE),
             sd_rt=sd(difference, na.rm = TRUE),
-            n_rt=21,
+            n_rt=n(),
             se=sd_rt/sqrt(n_rt),
             upper_limit=rts+se,
             lower_limit=rts-se
@@ -443,7 +455,7 @@ ggplot(data = space2,aes(x=block_num, y=rts))+
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   labs(title = "Singleton Distractor Present")+
   xlab("Block number")+
-  ylab(expression(atop("Suppression effect (ms)", paste("(high prob. - low prob.)"))))+
+  ylab(expression(atop("Suppression effect (ms)", paste("(low prob.- high prob.)"))))+
   theme(axis.text=element_text(size=14),
         axis.title=element_text(size=14,face="bold"),
         title = element_text(size = 16))

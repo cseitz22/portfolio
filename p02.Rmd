@@ -277,7 +277,7 @@ sum_stats2 <- df_mod%>%
   group_by(relative_target)%>%
   summarize(mean_rts=mean(value),
             sd_rt=sd(value),
-            n_rt=21,
+            n_rt=n(),
             se=sd_rt/sqrt(n_rt),
             upper_limit=mean_rts+se,
             lower_limit=mean_rts-se
@@ -294,42 +294,28 @@ t.test(x=space_anova$high_prob, y=space_anova$low_prob, alternative="greater", m
 result<- 0.037
 ```
 
-```{r construct-p-value-df}
-#Make df for adding the p-value 
-p_val<- data.frame(
-  group_1="high_prob",
-  group_2="low_prob",
-  label="*",
-  y.position=900
-)
-
-```
 
 This figure displays the mean response times depending on the location of the target relative to the high probability location. I chose those particular colors based on Wake Forest's color scheme. 
 
 
 ```{r - graph 2 - target location effect on rt}
-ggplot(data = sum_stats2, aes(x = relative_target, y = mean_rts)) +
-  geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
+
+  
+sum_stats2$relative_target <- factor(sum_stats2$relative_target,              # Change ordering manually
+                  levels = c("high_prob", "low_prob"))
+
+c<-ggplot(data = sum_stats2, aes(x = relative_target, y = mean_rts, fill=relative_target)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   coord_cartesian(ylim = c(700,1000))+
   theme_classic()+
-  add_pvalue(p_val,
-             xmin = "group_1",
-             xmax = "group_2",
-             label = "{label}",
-             y.position = "y.position",
-             label.size = 7,
-             bracket.size = 1) +
-  #geom_signif(comparisons=list(c("dist_0","low_prob")), annotations="*")+
+  scale_fill_brewer(palette="Dark2") +
   labs(x = "Target Location", y = "Response Time (ms)")+
-  labs(title = "Target Location Effect on RT")+
-  #labs(caption = "A t-test shows a difference in RT depending on distractor location, t(20)=1.91, p=.035.")+
-  theme(axis.text=element_text(size=14),
-        axis.title=element_text(size=18,face="bold"),
-        title = element_text(size = 20))+
-  scale_x_discrete(labels= c("high_prob"="High Prob Distractor Location","low_prob"="Low Prob Distractor Location"))
-  
+  labs(title = "Singleton Distractor Absent")+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face="bold"),
+        title = element_text(size = 45))+
+  scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc"))
   
 ```
 
@@ -378,17 +364,32 @@ pilot_distacc <- pilot %>%
   group_by(relative_hp_dist) %>%
   summarize(accuracy = mean(acc),
             sd_rt=sd(acc),
-            n_rt=21,
+            n_rt=n(),
             se=sd_rt/sqrt(n_rt),
             upper_limit=accuracy+se,
             lower_limit=accuracy-se
             )
-pilot_targacc <- pilot %>%
+
+spaceT <- pilot %>%
   subset(relative_hp_dist=="no_dist")%>%
+  group_by(ID, relative_target)%>%
+  summarize(acc = mean(acc)
+            )
+
+space_anovaT <- setDT(spaceT)
+space_anovaT <- dcast(space_anovaT,ID~relative_target,value.var='acc')
+
+space_anovaT <- space_anovaT %>%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3) 
+
+df_mod_targ <- subset(space_anovaT, select=c(ID,high_prob, low_prob))
+df_mod_targ <- reshape2::melt(df_mod_targ, id.var=c('ID'), variable.name= "relative_target")
+
+pilot_targacc <- df_mod_targ %>%
   group_by(relative_target) %>%
-  summarize(accuracy = mean(acc),
-            sd_rt=sd(acc),
-            n_rt=21,
+  summarize(accuracy = mean(value),
+            sd_rt=sd(value),
+            n_rt=n(),
             se=sd_rt/sqrt(n_rt),
             upper_limit=accuracy+se,
             lower_limit=accuracy-se
@@ -398,34 +399,19 @@ pilot_targacc <- pilot %>%
 
 ```
 
-```{r - graph distractor location effects on accuracy}
-ggplot(data = pilot_distacc, aes(x = relative_hp_dist, y = accuracy)) +
-  geom_bar(stat = "identity", fill="#9E7E38", color='#000000') +
-  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(85,105))+
-  theme_classic()+
-  labs(x = "Distractor Location", y = "Accuracy (%)")+
-  #labs(title = "Distractor Location Effect on Accuracy")+
-  theme(axis.text=element_text(size=14),
-        axis.title=element_text(size=16,face="bold"),
-        title = element_text(size = 16))+
-  scale_x_discrete(labels= c("no_dist"="no-dist","dist_0"="dist-0","dist_1"="dist-1","dist_2"="dist-2","dist_3"="dist-3"))
-  
-```
 
 ```{r - graph target location effects on accuracy, fig.height=9, fig.width=6}
 d<-ggplot(data = pilot_targacc, aes(x = relative_target, y = accuracy, fill=relative_target)) +
   geom_bar(stat = "identity", show.legend = FALSE) +
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  coord_cartesian(ylim = c(85,105))+
+  coord_cartesian(ylim = c(85,100))+
   theme_classic()+
   scale_fill_brewer(palette="Dark2")+
   labs(x = "Target Location", y = "Accuracy (%)")+
-  #labs(title = "Target Location Effect on Accuracy")+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=40,face="bold"),
-        title = element_text(size = 40))+
-  scale_x_discrete(labels= c("high_prob"="HP loc","lp_1"="1","lp_2"="2","lp_3"="3"))
+        title = element_text(size = 45))+
+  scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc"))
   
 ```
 
@@ -433,7 +419,7 @@ Created the below plot for NC Cognition Poster.
 
 ```{r join-2-figures, fig.height=11, fig.width=22}
 
-plot_grid(c,d,labels = c('C','D'), label_size=40, rel_widths = c(2,1))
+plot_grid(c,d,labels = c('C','D'), label_size=40, rel_widths = c(1.5,1))
 
 
 ```
