@@ -316,3 +316,6 @@ kids6$relative_hp_dist[kids6$relative_hp_dist == 1] <- "lp_1"
 kids6$relative_hp_dist[kids6$relative_hp_dist == 2] <- "lp_2"
 kids6$relative_hp_dist[kids6$relative_hp_dist == 3] <- "lp_3"
 kids6$relative_hp_dist[kids6$relative_hp_dist == 4] <- "absent"
+
+kids6<-kids6%>%
+  filter(id!=30)

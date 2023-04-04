@@ -291,7 +291,7 @@ Determine if the difference between response times when the target is in the hig
 ```{r t-test}
 
 t.test(x=space_anova$high_prob, y=space_anova$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95)
-result<- 0.037
+
 ```
 
 
@@ -504,15 +504,8 @@ dist_t <- dcast(pilot_dist,ID~relative_hp_dist,value.var='accuracy')
 dist_t <- dist_t %>%
   mutate(low_prob = (dist_1+dist_2+dist_3)/3)
 
-dist_t %>%
-  t.test(x=dist_t$dist_0, y=dist_t$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95)
-dist_t %>%
-  t.test(x=dist_t$no_dist, y=dist_t$dist_0, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
-dist_t %>%
-  t.test(x=dist_t$no_dist, y=dist_t$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
-
-
 ```
+
 Running ANOVA on high-prob, low-prob, and distractor absent trials. 
 
 ```{r create-usable-df}
@@ -530,6 +523,16 @@ anova_dist
 
 ```
 
+```{r holm-correction}
+
+df_mod %>%
+  pairwise_t_test(
+    value ~ relative_hp_dist, paired = TRUE,
+    p.adjust.method = "holm"
+    )
+
+
+```
 
 Examining only some of the block of trials. 
 

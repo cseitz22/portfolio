@@ -258,28 +258,13 @@ model3
 df_mod %>%
   pairwise_t_test(
     value ~ relative_hp_dist, paired = TRUE,
-    p.adjust.method = "bonferroni"
+    p.adjust.method = "holm"
     )
 
 
 ```
 
-```{r}
 
-r<- lsmeans(model3, ~relative_hp_dist)
-
-con1<-list(a=c(-2,1,1), b=c(0,1,-1))
-
-contrast(r, con1, adjust = "holm")
-
-```
-
-```{r}
-
-m1<-emmeans(model3, ~relative_hp_dist)
-pairs(m1)
-
-```
 
 ```{r}
 

@@ -202,7 +202,7 @@ a<-ggplot(subset(sum_stats, age %in% c("adult")),aes(x = relative_hp_dist, y = m
         title = element_text(size = 45)) +
   labs(x = "Distractor Location", y = "Response Time (ms)")+
   labs(title= "Singleton Distractor Present",subtitle = "Adults", tag = "A")+
-  scale_fill_manual(values=c('#1b9e77', '#d95f02', '#66a61e')) +
+  scale_fill_brewer(palette="Dark2")+
   scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc","absent"="Absent"))
 
 b<-ggplot(subset(sum_stats, age %in% c("child")),aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
@@ -216,7 +216,7 @@ b<-ggplot(subset(sum_stats, age %in% c("child")),aes(x = relative_hp_dist, y = m
         title = element_text(size = 45)) +
   labs(x = "Distractor Location", y = "Response Time (ms)")+
   labs(title = "  ", subtitle = "Children", tag = " ")+
-  scale_fill_manual(values=c('#1b9e77', '#d95f02', '#66a61e')) +
+  scale_fill_brewer(palette="Dark2")+
   scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc","absent"="Absent"))
 
 plot_grid(a, b, align=c("hv"), label_size=40) 
@@ -290,17 +290,6 @@ modelA
 There is a difference in rt when presenting the distractor in different locations, F(2,52)=57.25, p<.001. 
 
 
-The repeated measures ANOVA on just the adults was significant. 
-
-```{r last_anova_test-adults}
-
-model_dist_rtsA <- aov_car(rts ~ relative_hp_dist + Error(id/relative_hp_dist), data=spaceA)
-
-model_dist_rtsA
-
-
-```
-
 Run t-test to determine significant differences between conditions. 
 
 ```{r BC-adults}
@@ -308,22 +297,12 @@ Run t-test to determine significant differences between conditions.
 df_modA %>%
   pairwise_t_test(
     value ~ relative_hp_dist, paired = TRUE,
-    p.adjust.method = "bonferroni"
+    p.adjust.method = "holm"
     )
 
 
 ```
 
-```{r t-test-adults}
-
-space_anovaA %>%
-  t.test(x=space_anovaA$low_prob, y=space_anovaA$high_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
-space_anovaA%>%
-  t.test(x=space_anovaA$high_prob, y=space_anovaA$absent, alternative="greater", mu=0, paired =TRUE, conf.level = .95) 
-space_anovaA%>%
-  t.test(x=space_anovaA$low_prob, y=space_anovaA$absent, alternative="greater", mu=0, paired =TRUE, conf.level = .95)
-
-```
 
 ### Separate ANOVA for just kids
 
@@ -373,30 +352,17 @@ modelK
 
 ```
 
-The repeated measures ANOVA on just the kids was also significant.
+```{r BC-kids}
 
-```{r last_anova_test-5kids}
-
-model_dist_rtsK <- aov_car(rts ~ relative_hp_dist + Error(id/relative_hp_dist), data=spaceK)
-
-model_dist_rtsK
+df_modK %>%
+  pairwise_t_test(
+    value ~ relative_hp_dist, paired = TRUE,
+    p.adjust.method = "holm"
+    )
 
 
 ```
 
-Run t-test to determine significant differences between conditions. 
-
-
-```{r t-test-kids}
-
-space_anovaK %>%
-  t.test(x=space_anovaK$low_prob, y=space_anovaK$high_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
-space_anovaK%>%
-  t.test(x=space_anovaK$high_prob, y=space_anovaK$absent, alternative="greater", mu=0, paired =TRUE, conf.level = .95) 
-space_anovaK%>%
-  t.test(x=space_anovaK$low_prob, y=space_anovaK$absent, alternative="greater", mu=0, paired =TRUE, conf.level = .95)
-
-```
 
 ```{r plot-2}
 ggplot(all_data, aes(relative_hp_dist, rt, fill=relative_hp_dist)) +
@@ -438,15 +404,14 @@ reform <- dcast(reform,id...1+age~relative_hp_dist,value.var='norm')
 
 ```
 
+```{r holm-correction-norm}
 
-```{r t-test-norm}
+normrt %>%
+  pairwise_t_test(
+    norm ~ relative_hp_dist, paired = TRUE,
+    p.adjust.method = "holm"
+    )
 
-reform %>%
-  t.test(x=reform$low_prob, y=reform$high_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
-reform%>%
-  t.test(x=reform$high_prob, y=reform$absent, alternative="greater", mu=0, paired =TRUE, conf.level = .95) 
-reform%>%
-  t.test(x=reform$low_prob, y=reform$absent, alternative="greater", mu=0, paired =TRUE, conf.level = .95)
 
 ```
 
@@ -488,7 +453,7 @@ a<-ggplot(data = sum_stats_norm, aes(x = relative_hp_dist, y = mean_rts, fill=re
         strip.text.x = element_text(size=30)) +
   labs(x = "Distractor Location", y = "Normalized Response Time (%)")+
   labs(title = "Singleton Distractor Present")+
-  scale_fill_manual(values=c('#1b9e77', '#d95f02', '#66a61e')) +
+  scale_fill_brewer(palette="Dark2") +
   scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc","absent"="Absent"))
 
 plot_grid(a,labels = c('A'), label_size=40)
@@ -529,6 +494,16 @@ space_block <- space_block %>%
 
 ```
 
+```{r }
+
+space_block%>%
+  group_by(id)%>%
+  summarize(supp = mean(difference),
+            )
+
+```
+
+
 
 ```{r line_plot}
 ggplot(data = space_block,aes(x=block_num, y=difference, group=id))+
@@ -557,13 +532,13 @@ space2
 ```
 
 ```{r line_plot_avg, fig.height=11, fig.width=22}
-z<-ggplot(data = space2,aes(x=block_num, y=rts))+
+ggplot(data = space2,aes(x=block_num, y=rts))+
   geom_line(aes(color=age, linewidth=1))+
   geom_point()+
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   labs(title = "Raw RTs")+
   xlab("Block number")+
-  ylab(expression(atop("Suppression effect (ms)", paste("(high prob. - low prob.)"))))+
+  ylab(expression(atop("Suppression effect (ms)", paste("(low prob. - high prob.)"))))+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=40,face="bold"),
         title = element_text(size = 45),
@@ -664,21 +639,21 @@ space_norm
 
 ```
 
-```{r line_plot_avg-norm, fig.height=18, fig.width=22}
-y<-ggplot(data = space_norm,aes(x=block_num, y=rts))+
+```{r line_plot_avg-norm, fig.height=11, fig.width=22}
+ggplot(data = space_norm,aes(x=block_num, y=rts))+
   geom_line(aes(color=age, linewidth=1))+
   geom_point()+
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
   labs(title="Normalized RTs")+
   xlab("Block number")+
-  ylab(expression(atop("Suppression effect (%)", paste("(high prob. - low prob.)"))))+
+  ylab(expression(atop("Suppression effect (%)", paste("(low prob. - high prob.)"))))+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=40,face="bold"),
         title = element_text(size = 45),
         legend.text=element_text(size = 30))+
   guides(linewidth="none")
 
-plot_grid(z,y,labels = c('A', 'B'), label_size=40, ncol=1)
+#plot_grid(z,y,labels = c('A', 'B'), label_size=40, ncol=1)
 
 
 ```
@@ -741,10 +716,11 @@ ggplot(data = space_block6,aes(x=block_num, y=difference, group=id))+
 ```{r sum-stat-allC}
 
 spaceC <- kids6 %>%
-  filter(acc==1)%>%
+  filter(trial_num<120)%>%
   group_by(id, relative_hp_dist) %>%
-  summarize(rts = mean(rt)
+  summarize(accs = mean(acc)
             )
+spaceC
   
 ```
 
@@ -755,7 +731,7 @@ Need to reformat the above df to have a column for each relative_hp_dist/ID so w
 ```{r reformat-allC}
 
 space_anovaC <- setDT(spaceC)
-space_anovaC <- dcast(space_anovaC,id~relative_hp_dist,value.var='rts')
+space_anovaC <- dcast(space_anovaC,id~relative_hp_dist,value.var='accs')
 
 ```
 
@@ -766,7 +742,7 @@ space_anovaC <- space_anovaC %>%
 
 ```
 
-Now, I want to create a smaller graph with just 3 bars: one for the high-probability rts, average of low-probability rts, and no distractor. 
+Now, I want to create a smaller graph with just 3 bars: one for the high-probability rts, average of low-probability rts, and no distractor. Not enoguh data for RTs-- look at accuracy. 
 
 ```{r get_info_for_smaller_figureC}
 
@@ -774,7 +750,10 @@ df_modC <- subset(space_anovaC, select=c(id, high_prob, absent, low_prob))
 
 df_modC <- reshape2::melt(df_modC, id.var=c('id'), variable.name= "relative_hp_dist")
 
+df_modC$value<-df_modC$value*100
+
 ```
+
 
 ```{r set-up-data-for-plotC}
 
@@ -787,28 +766,123 @@ sum_statsC <- df_modC%>%
             upper_limit=mean_rts+se,
             lower_limit=mean_rts-se
   )
+
 sum_statsC
 
 ```
 
 
 ```{r plot-6}
+sum_statsC$relative_hp_dist <- factor(sum_statsC$relative_hp_dist,              # Change ordering manually
+                  levels = c("high_prob", "low_prob", "absent"))
 
-ggplot(sum_statsC,aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
+f<-ggplot(sum_statsC,aes(x = relative_hp_dist, y = mean_rts, fill=relative_hp_dist)) +
   geom_bar(stat = "identity", show.legend = FALSE)+
   geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  #coord_cartesian(ylim = c(800, 1200))+ 
-  #facet_grid(~age, scales="free", labeller = labeller(age=supp.labs)) +
+  coord_cartesian(ylim = c(50,100))+
   theme_classic()+
-  #theme(axis.text=element_text(size=30),
-        #axis.title=element_text(size=40,face="bold"),
-        #title = element_text(size = 45)) +
-  labs(x = "Distractor Location", y = "Response Time (ms)")+
-  labs(title= "Singleton Distractor Present",subtitle = "Kids aged 6-7", tag = "A")+
-  scale_fill_manual(values=c('#1b9e77', '#d95f02', '#66a61e')) +
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face="bold"),
+        title = element_text(size = 45)) +
+  labs(x = "Distractor Location", y = "Accuracy")+
+  labs(title= "Singleton Distractor Present")+
+  scale_fill_brewer(palette="Dark2")+
   scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc","absent"="Absent"))
 
 
+```
+
+```{r ANOVA-allCd}
+
+modelCd <- aov_car(value ~ relative_hp_dist + Error(id/relative_hp_dist), data=df_modC)
+
+modelCd
+```
+
+
+```{r 6-targ}
+
+spaceCt <- kids6 %>%
+  filter(trial_num<120, relative_hp_dist=="absent")%>%
+  group_by(id, relative_target) %>%
+  summarize(accs = mean(acc)
+            )
+spaceCt
+  
+```
+
+```{r reformat-allCt}
+
+space_anovaCt <- setDT(spaceCt)
+space_anovaCt <- dcast(space_anovaCt,id~relative_target,value.var='accs')
 
 ```
+
+```{r avg-lp-allCt}
+
+space_anovaCt <- space_anovaCt %>%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)
+
+```
+
+Now, I want to create a smaller graph with just 3 bars: one for the high-probability rts, average of low-probability rts, and no distractor. Not enoguh data for RTs-- look at accuracy. 
+
+```{r get_info_for_smaller_figureCt}
+
+df_modCt <- subset(space_anovaCt, select=c(id, high_prob,low_prob))
+
+df_modCt <- reshape2::melt(df_modCt, id.var=c('id'), variable.name= "relative_target")
+
+df_modCt$value<-df_modCt$value*100
+
+```
+
+
+```{r set-up-data-for-plotCt}
+
+sum_statsCt <- df_modCt%>%
+  group_by(relative_target)%>%
+  summarize(mean_rts=mean(value),
+            sd_rt=sd(value),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )
+
+sum_statsCt
+
+```
+
+
+```{r plot-6t, fig.height=18, fig.width=22}
+
+g<-ggplot(sum_statsCt,aes(x = relative_target, y = mean_rts, fill=relative_target)) +
+  geom_bar(stat = "identity", show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(50,100))+
+  theme_classic()+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face="bold"),
+        title = element_text(size = 45)) +
+  labs(x = "Target Location", y = "Accuracy")+
+  labs(title= "Singleton Distractor Absent")+
+  scale_fill_brewer(palette="Dark2")+
+  scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc"))
+
+plot_grid(f,g,labels = c('A','B'), label_size=40, ncol = 1)
+
+```
+
+```{r ANOVA-allCt}
+
+modelCt <- aov_car(value ~ relative_target + Error(id/relative_target), data=df_modCt)
+
+modelCt
+
+```
+
+
+
+
 

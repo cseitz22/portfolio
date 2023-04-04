@@ -330,8 +330,36 @@ kids6&lt;- kids6 %&gt;%
 <pre class="r"><code>acc_data &lt;- rbind(adults, kids12)</code></pre>
 <div id="examine-accuracy-effects" class="section level3">
 <h3>Examine Accuracy Effects</h3>
-<pre class="r"><code>acc_data&lt;- acc_data%&gt;%
-  filter(id != 26)
+<pre class="r"><code>#acc_26&lt;- acc_data1%&gt;%
+#  subset(id == 26)
+
+#acc_26&lt;-acc_26%&gt;%
+#  filter(trial_num&lt;181)
+
+#acc_child&lt;- acc_data1%&gt;%
+#  subset(id != 26 &amp; age == &quot;child&quot;)
+
+#acc_child&lt;- rbind(acc_child, acc_26)</code></pre>
+<pre class="r"><code>#acc_data&lt;-acc_data%&gt;%
+  #filter(id!=26)
+
+#acc_data&lt;- rbind(acc_data1, acc_26)
+
+#acc_data&lt;-acc_data%&gt;%
+#  mutate(acc=acc*100)
+
+#acc_child&lt;-acc_child%&gt;%
+#  mutate(acc=acc*100)</code></pre>
+<p>IDK why the acc is different when summarizing goruped by age</p>
+<pre class="r"><code>#acc_child%&gt;%
+#  group_by(relative_hp_dist)%&gt;%
+#  summarize(acc=mean(acc))
+
+#acc_data%&gt;%
+#  group_by(age,relative_hp_dist)%&gt;%
+#  summarize(acc=mean(acc))</code></pre>
+<pre class="r"><code>acc_data&lt;-acc_data%&gt;%
+  subset(id!=26)
 
 acc_data&lt;-acc_data%&gt;%
   mutate(acc=acc*100)</code></pre>
@@ -400,7 +428,7 @@ a&lt;-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_acc, fill=rela
         strip.text.x = element_text(size=30)) +
   labs(x = &quot;Distractor Location&quot;, y = &quot;Accuracy (%)&quot;)+
   labs(title = &quot;Singleton Distractor Present&quot;)+
-  scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;, &#39;#66a61e&#39;)) +
+  scale_fill_brewer(palette=&quot;Dark2&quot;) +
   scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;,&quot;absent&quot;=&quot;Absent&quot;))
 
 plot_grid(a,labels = c(&#39;A&#39;), label_size=40)</code></pre>
@@ -423,6 +451,18 @@ plot_grid(a,labels = c(&#39;A&#39;), label_size=40)</code></pre>
 ## Sphericity correction method: GG</code></pre>
 <p>Main effect of age is significant – Main effect of distractor
 location is significant – interaction is not significant.</p>
+<pre class="r"><code>df_mod %&gt;%
+  pairwise_t_test(
+    value ~ relative_hp_dist, paired = TRUE,
+    p.adjust.method = &quot;holm&quot;
+    )</code></pre>
+<pre><code>## # A tibble: 3 × 10
+##   .y.   group1    group2      n1    n2 statistic    df        p p.adj p.adj.si…¹
+## * &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;    &lt;int&gt; &lt;int&gt;     &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;     
+## 1 value high_prob absent      32    32     -3.28    31 0.003    0.005 **        
+## 2 value high_prob low_prob    32    32      1.79    31 0.083    0.083 ns        
+## 3 value absent    low_prob    32    32      3.67    31 0.000914 0.003 **        
+## # … with abbreviated variable name ¹​p.adj.signif</code></pre>
 <p>Since the interaction was not significant, we’ll exclude age and test
 the distractor location effect on accuracy across the 5 conditions.</p>
 <pre class="r"><code>model4 &lt;- aov_car(acc ~ relative_hp_dist + Error(id/relative_hp_dist), data=acc_data)</code></pre>
@@ -448,48 +488,9 @@ the distractor location effect on accuracy across the 5 conditions.</p>
   coord_cartesian(ylim = c(85,105))</code></pre>
 <pre><code>## No summary function supplied, defaulting to `mean_se()`</code></pre>
 <p><img src="p09_files/figure-html/plot-first5-1.png" width="672" /></p>
-<p>For the 3 locations (HP, LP, and absent), run t-tests.</p>
-<pre class="r"><code>space_anova %&gt;%
-  t.test(x=space_anova$high_prob, y=space_anova$low_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
-<pre><code>## 
-##  Paired t-test
-## 
-## data:  space_anova$high_prob and space_anova$low_prob
-## t = 1.7892, df = 31, p-value = 0.04168
-## alternative hypothesis: true mean difference is greater than 0
-## 95 percent confidence interval:
-##  0.04780453        Inf
-## sample estimates:
-## mean difference 
-##       0.9128781</code></pre>
-<pre class="r"><code>space_anova%&gt;%
-  t.test(x=space_anova$absent, y=space_anova$high_prob, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95) </code></pre>
-<pre><code>## 
-##  Paired t-test
-## 
-## data:  space_anova$absent and space_anova$high_prob
-## t = 3.2767, df = 31, p-value = 0.001295
-## alternative hypothesis: true mean difference is greater than 0
-## 95 percent confidence interval:
-##  0.7384317       Inf
-## sample estimates:
-## mean difference 
-##        1.530258</code></pre>
-<pre class="r"><code>space_anova%&gt;%
-  t.test(x=space_anova$absent, y=space_anova$low_prob, alternative=&quot;greater&quot;, mu=0, paired =TRUE, conf.level = .95)</code></pre>
-<pre><code>## 
-##  Paired t-test
-## 
-## data:  space_anova$absent and space_anova$low_prob
-## t = 3.6668, df = 31, p-value = 0.0004568
-## alternative hypothesis: true mean difference is greater than 0
-## 95 percent confidence interval:
-##  1.313422      Inf
-## sample estimates:
-## mean difference 
-##        2.443136</code></pre>
 <p>Second, examine target location effects on accuracy.</p>
 <pre class="r"><code>spaceT &lt;- acc_data %&gt;%
+  subset(relative_hp_dist=&quot;absent&quot;)%&gt;%
   group_by(age, id, relative_target) %&gt;%
   summarize(acc = mean(acc)
             )</code></pre>
@@ -535,7 +536,7 @@ df_mod_targ &lt;- reshape2::melt(df_mod_targ, id.var=c(&#39;id&#39;, &#39;age&#3
         strip.text.x = element_text(size=30)) +
   labs(x = &quot;Target Location&quot;, y = &quot;Accuracy (%)&quot;)+
   labs(title = &quot;Singleton Distractor Absent&quot;)+
-  scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;, &#39;#66a61e&#39;)) +
+  scale_fill_brewer(palette=&quot;Dark2&quot;) +
   scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;))
 
 
@@ -559,51 +560,6 @@ plot_grid(a, b,labels = c(&#39;A&#39;,&#39;B&#39;), label_size=40, ncol=1)</code
 </div>
 <div id="children-ages-6-7-accuracy-only-3-kids" class="section level3">
 <h3>Children ages 6-7 Accuracy – Only 3 kids</h3>
-<pre class="r"><code>kids6&lt;- kids6%&gt;%
-  filter(id != 30, block_num2 != 3, block_num2 != 4, block_num2 != 5,block_num2 != 6)
-
-kids6&lt;-kids6%&gt;%
-  mutate(acc=acc*100)</code></pre>
-<pre class="r"><code>space_block6 &lt;- kids6 %&gt;%
-  group_by(id, block_num, relative_hp_dist) %&gt;%
-  summarize(accs = mean(acc),
-            )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;id&#39;, &#39;block_num&#39;. You can override using
-## the `.groups` argument.</code></pre>
-<pre class="r"><code>space_block6 &lt;- setDT(space_block6)
-space_block6 &lt;- dcast(space_block6,id+block_num~relative_hp_dist,value.var=&#39;accs&#39;)</code></pre>
-<pre class="r"><code>space_block6 &lt;- space_block6 %&gt;%
-  mutate(low_prob = rowMeans(select(space_block6, c(lp_1,lp_2,lp_3)),na.rm=TRUE)) %&gt;%
-  mutate(difference = (low_prob-high_prob))</code></pre>
-<pre class="r"><code>ggplot(data = space_block6,aes(x=block_num, y=difference, group=id))+
-  geom_line()+
-  labs(title = &quot;Difference in Accuracies&quot;, subtitle = &quot;for distractor presentation at the low-probability locations and high-probability location by block&quot;)+
-  theme_classic()+
-  labs(x = &quot;Block Number&quot;, y = &quot;Difference in Accuracy (%)&quot;)</code></pre>
-<p><img src="p09_files/figure-html/line_plot-kids6-1.png" width="672" /></p>
-<pre class="r"><code>space2 &lt;- space_block6 %&gt;%
-  group_by(block_num) %&gt;%
-  summarize(rts = mean(difference, na.rm = TRUE),
-            sd_rt=sd(difference, na.rm = TRUE),
-            n_rt=3,
-            se=sd_rt/sqrt(n_rt),
-            upper_limit=rts+se,
-            lower_limit=rts-se
-            )
-space2</code></pre>
-<pre><code>## # A tibble: 2 × 7
-##   block_num    rts sd_rt  n_rt    se upper_limit lower_limit
-##       &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
-## 1         1 -14.8   17.5     3  10.1       -4.67      -24.9 
-## 2         2   3.84  19.8     3  11.4       15.2        -7.57</code></pre>
-<pre class="r"><code>ggplot(data = space2,aes(x=block_num, y=rts))+
-  geom_line()+
-  geom_point()+
-  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  labs(title = &quot;Singleton Distractor Present&quot;)+
-  xlab(&quot;Block number&quot;)+
-  ylab(expression(atop(&quot;Suppression effect (ms)&quot;, paste(&quot;(high prob. - low prob.)&quot;))))</code></pre>
-<p><img src="p09_files/figure-html/line_plot_avg-1.png" width="672" /></p>
 </div>
 
 

@@ -61,8 +61,49 @@ acc_data <- rbind(adults, kids12)
 
 ```{r take-out}
 
-acc_data<- acc_data%>%
-  filter(id != 26)
+#acc_26<- acc_data1%>%
+#  subset(id == 26)
+
+#acc_26<-acc_26%>%
+#  filter(trial_num<181)
+
+#acc_child<- acc_data1%>%
+#  subset(id != 26 & age == "child")
+
+#acc_child<- rbind(acc_child, acc_26)
+```
+
+```{r}
+#acc_data<-acc_data%>%
+  #filter(id!=26)
+
+#acc_data<- rbind(acc_data1, acc_26)
+
+#acc_data<-acc_data%>%
+#  mutate(acc=acc*100)
+
+#acc_child<-acc_child%>%
+#  mutate(acc=acc*100)
+
+```
+
+IDK why the acc is different when summarizing goruped by age
+
+```{r test-acc}
+
+#acc_child%>%
+#  group_by(relative_hp_dist)%>%
+#  summarize(acc=mean(acc))
+
+#acc_data%>%
+#  group_by(age,relative_hp_dist)%>%
+#  summarize(acc=mean(acc))
+
+```
+```{r real-acc}
+
+acc_data<-acc_data%>%
+  subset(id!=26)
 
 acc_data<-acc_data%>%
   mutate(acc=acc*100)
@@ -84,6 +125,7 @@ distacc <- acc_data %>%
             )
 
 ```
+
 ```{r set-up-plot}
 
 space <- acc_data %>%
@@ -142,7 +184,7 @@ a<-ggplot(data = sum_stats, aes(x = relative_hp_dist, y = mean_acc, fill=relativ
         strip.text.x = element_text(size=30)) +
   labs(x = "Distractor Location", y = "Accuracy (%)")+
   labs(title = "Singleton Distractor Present")+
-  scale_fill_manual(values=c('#1b9e77', '#d95f02', '#66a61e')) +
+  scale_fill_brewer(palette="Dark2") +
   scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc","absent"="Absent"))
 
 plot_grid(a,labels = c('A'), label_size=40)
@@ -162,6 +204,17 @@ model3
 
 ```
 Main effect of age is significant -- Main effect of distractor location is significant -- interaction is not significant. 
+
+```{r holm-correction-acc-all}
+
+df_mod %>%
+  pairwise_t_test(
+    value ~ relative_hp_dist, paired = TRUE,
+    p.adjust.method = "holm"
+    )
+
+
+```
 
 Since the interaction was not significant, we'll exclude age and test the distractor location effect on accuracy across the 5 conditions. 
 
@@ -185,18 +238,7 @@ ggplot(acc_data, aes(relative_hp_dist, acc, fill=relative_hp_dist)) +
 
 ```
 
-For the 3 locations (HP, LP, and absent), run t-tests. 
 
-```{r t-test-adults}
-
-space_anova %>%
-  t.test(x=space_anova$high_prob, y=space_anova$low_prob, alternative="greater", mu=0,paired = TRUE, conf.level = .95) 
-space_anova%>%
-  t.test(x=space_anova$absent, y=space_anova$high_prob, alternative="greater", mu=0, paired =TRUE, conf.level = .95) 
-space_anova%>%
-  t.test(x=space_anova$absent, y=space_anova$low_prob, alternative="greater", mu=0, paired =TRUE, conf.level = .95)
-
-```
 
 
 
@@ -205,6 +247,7 @@ Second, examine target location effects on accuracy.
 ```{r set-up-plot-target}
 
 spaceT <- acc_data %>%
+  subset(relative_hp_dist="absent")%>%
   group_by(age, id, relative_target) %>%
   summarize(acc = mean(acc)
             )
@@ -248,7 +291,7 @@ b<-ggplot(data = sum_statsT, aes(x = relative_target, y = mean_acc, fill=relativ
         strip.text.x = element_text(size=30)) +
   labs(x = "Target Location", y = "Accuracy (%)")+
   labs(title = "Singleton Distractor Absent")+
-  scale_fill_manual(values=c('#1b9e77', '#d95f02', '#66a61e')) +
+  scale_fill_brewer(palette="Dark2") +
   scale_x_discrete(labels= c("high_prob"="HP loc","low_prob"="LP loc"))
 
 
@@ -276,7 +319,7 @@ For target location accuracy, there is only a main effect of age.
 ```{r adjust-data}
 
 kids6<- kids6%>%
-  filter(id != 30, block_num2 != 3, block_num2 != 4, block_num2 != 5,block_num2 != 6)
+  filter(id != 30, block_num2 != 3, block_num2 != 4, block_num2 != 5,block_num2 != 6, id != 30)
 
 kids6<-kids6%>%
   mutate(acc=acc*100)
