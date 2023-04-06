@@ -8,7 +8,7 @@ output:
     theme: cerulean
 ---
 
-The goal of this portfolio is to examine part of my thesis data. To recap, my thesis is examining distractor suppression in children and adults. Participants are shown a distractor in a location more frequently than other locations in a visual search array. Based on previous studies, we would expect adults to suppress their attention to the high-probability location, but we were unsure when in development children develop this ability. 
+The goal of this portfolio is to examine part of my thesis data. To recap, my thesis is examining distractor suppression in children and adults. Participants are shown a distractor in a location more frequently than other locations in a visual search array. Based on previous studies, we would expect adults to suppress their tendency to attend to a salient distractor in a high-probability location, but we were unsure when in development children develop this ability. 
 
 
 
@@ -33,6 +33,7 @@ source("load_data.R", local = knitr::knit_global())
 
 ```
 
+Load in change detection task data (visual working memory capacity measurements)
 ```{r cdt-load}
 
 cdt <- read_csv("RawDataCDT.csv", show_col_types = FALSE)
@@ -40,6 +41,8 @@ cdt <- read_csv("RawDataCDT.csv", show_col_types = FALSE)
 ```
 
 ### Data Management of Change Detection Task Data
+
+Identify cases of hits, false alarms, correct rejections, and misses depending on if the trial was accurate and if their was a change. 
 
 ```{r add-cases}
 cdt <- cdt %>%
@@ -51,6 +54,8 @@ cdt <- cdt %>%
            ))
 
 ```
+
+Group by the ppt ID and the set size to determine how many instances of each possible outcome there were. 
 
 ```{r count-cases}
 
@@ -69,7 +74,7 @@ cdt1 <- dcast(cdt1,SubID+SetSize~outcome,value.var='n')
 
 ```
 
-Get rid of participants without enough data and fill na values with zeros.
+Get rid of participants without enough data (I checked for this manual and filtered those IDs) and fill na values with zeros.
 
 ```{r delete-and-zeros}
 cdt1<- cdt1%>%
@@ -82,6 +87,8 @@ cdt1 <- cdt1 %>%
 
 ```
 
+Calculate the hit rate.
+
 ```{r calc-hit-rate}
 
 cdt1<-cdt1 %>%
@@ -89,12 +96,16 @@ cdt1<-cdt1 %>%
 
 ```
 
+Calculate the false alarm rate. 
+
 ```{r calc-false-alarm-rate}
 
 cdt1<-cdt1 %>%
   mutate(fa_rate = f_alarm/(f_alarm+cor_rej))
 
 ```
+
+Calculate the capacity for each set size
 
 ```{r calc-capacity}
 
@@ -183,6 +194,7 @@ statPrep <- trimmedC6 %>% group_by(id, relative_hp_dist) %>% summarise(measureme
 100-(nrow(trimmedC6)/nrow(kids6[kids6$acc==1, ]))*100
 ```
 
+Make the column names for block number the same for children and adults.
 
 ```{r change-column-names}
 
@@ -201,7 +213,7 @@ trimmedC6<- trimmedC6 %>%
 
 ```
 
-
+Bind adults and older children together in the same dataframe. 
  
 ```{r combine-columns}
 
@@ -209,6 +221,7 @@ all_data <- rbind(trimmedA, trimmedC12)
  
 ```
 
+Find mean response times depending on block number and distractor location. 
 
 ```{r create_new_df_to_transform}
 space_block <- all_data %>%
@@ -218,6 +231,8 @@ space_block <- all_data %>%
 
 ```
 
+Transform the df to be shaped differently. 
+
 ```{r transform_df}
 
 space_block <- setDT(space_block)
@@ -225,7 +240,7 @@ space_block <- dcast(space_block,id+age+block_num~relative_hp_dist,value.var='rt
 
 ```
 
-Below, I added the average rt for the low probability locations and the difference between the low probability and high probability locations ignoring n/a values. 
+I added the average rt for the low probability locations and the difference between the low probability and high probability locations ignoring n/a values. 
 
 ```{r add_avg_col}
 
@@ -236,6 +251,8 @@ space_block <- space_block %>%
 
 ```
 
+Create a new df for the suppression effect for each ppt. 
+
 ```{r suppression-effect}
 
 supp <- space_block %>%
@@ -245,6 +262,8 @@ supp <- space_block %>%
 supp
 
 ```
+
+Get rid of ppts who didn't complete the CDT. 
 
 ```{r delete-unwanted-ppts}
 

@@ -35,6 +35,8 @@ source("load_data.R", local = knitr::knit_global())
 
 ### Trim the Data
 
+Calculate the overall means and standard deviations for each age group to determine the cutoff for response times. 
+
 ```{r find-means}
 
 aggregate(rt ~ acc, data = adults, FUN = mean)
@@ -98,6 +100,8 @@ statPrep <- trimmedC6 %>% group_by(id, relative_hp_dist) %>% summarise(measureme
 
 ### Response Time ANOVA for 3 conditions and 2 ages
 
+Change the block number name to be the same for each age group. 
+
 ```{r change-column-names}
 
 trimmedC12<- trimmedC12 %>%
@@ -115,7 +119,7 @@ trimmedC6<- trimmedC6 %>%
 
 ```
 
-
+Combine the adults and older children to a single df. 
  
 ```{r combine-columns}
 
@@ -163,6 +167,8 @@ df_mod <- reshape2::melt(df_mod, id.var=c('id', 'age'), variable.name= "relative
 
 ```
 
+Setting up the data to plot by calculating the mean and standard error based on the number of ppts in that group. 
+
 ```{r set-up-data-for-plot}
 
 sum_stats <- df_mod%>%
@@ -177,6 +183,8 @@ sum_stats <- df_mod%>%
 sum_stats
 
 ```
+
+Use the following code to change the order of the bars manually. 
 
 ```{r order-bars}
 sum_stats$relative_hp_dist <- factor(sum_stats$relative_hp_dist,              # Change ordering manually
@@ -290,7 +298,7 @@ modelA
 There is a difference in rt when presenting the distractor in different locations, F(2,52)=57.25, p<.001. 
 
 
-Run t-test to determine significant differences between conditions. 
+Run t-tests to determine significant differences between conditions with Holm-Bonferroni correction. 
 
 ```{r BC-adults}
 
@@ -352,6 +360,8 @@ modelK
 
 ```
 
+Again, run pairwise t-tests to find differences between conditions with Holm-Bonferroni corrections. 
+
 ```{r BC-kids}
 
 df_modK %>%
@@ -376,11 +386,15 @@ ggplot(all_data, aes(relative_hp_dist, rt, fill=relative_hp_dist)) +
 
 ### Examine normalized rts
 
+Output df to create normalized df because I thought it would be easier to do in excel for now. 
+
 ```{r normalized-rts-df}
 
 write.csv(df_mod, "norm_data.csv", row.names=FALSE)
 
 ```
+
+Bring back in df with the normalized RTs for each ppt. 
 
 ```{r import-norm-data}
 
@@ -388,6 +402,8 @@ normrt <- read_csv("norm_data_new.csv", show_col_types = FALSE)
 normrt<- subset(normrt, select=c(id...1, age, relative_hp_dist, norm))
 
 ```
+
+Run an ANOVA on the normalized data. 
 
 ```{r ANOVA-norm}
 
@@ -403,6 +419,8 @@ reform <- setDT(normrt)
 reform <- dcast(reform,id...1+age~relative_hp_dist,value.var='norm')
 
 ```
+
+Run pairwise t-tests with Holm-Bonferroni correction. 
 
 ```{r holm-correction-norm}
 
@@ -548,6 +566,7 @@ ggplot(data = space2,aes(x=block_num, y=rts))+
 
 ```
 
+Run ANOVA to test whether the suppression effect changes depending on the block (i.e. increases with more trials).
 
 ```{r anova_test_by_block}
 
@@ -581,7 +600,7 @@ model6
 
 ```
 
-Not sure the below is important -- need to update if what to use
+Exmined the noramlized suppression effect by block. 
 
 ```{r normalized-block-df}
 
@@ -596,6 +615,7 @@ normy<- subset(normy, select=c(id, age, block_num, diff_norm))
 
 ```
 
+Run ANOVA test to determine if there is a difference in the suppression effect by block. 
 
 ```{r anova_test_by_block_norm}
 
@@ -603,18 +623,16 @@ aov_car(diff_norm ~ age*block_num + Error(id/block_num), data=normy)
 
 
 ```
+
+Not sure why I did this but combine adults and children for examining suppression effect by block. 
+
 ```{r block-adult-anova_norm}
 
 aov_car(diff_norm ~ block_num + Error(id/block_num), data=normy)
 
 ```
-```{r anova_distractor_rts}
 
-model = aov(diff_norm~factor(block_num)+
-                Error(factor(id)), data=normy)
-summary(model)
-
-```
+Plot the normalized response times by block. 
 
 ```{r line_plot-norm-block}
 ggplot(data = normy,aes(x=block_num, y=diff_norm, group=id))+
@@ -663,6 +681,8 @@ ggplot(data = space_norm,aes(x=block_num, y=rts))+
 
 
 ### Correlation of suppression effect and visual working memory capacity
+
+Create a df for the average suppression effect for each ppt and use this code in a different portfolio. 
 
 ```{r suppression-effect}
 

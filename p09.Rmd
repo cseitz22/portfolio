@@ -32,6 +32,7 @@ source("load_data.R", local = knitr::knit_global())
 
 ```
 
+Change columns to have the same name. 
 
 ```{r change-column-names}
 
@@ -50,6 +51,7 @@ kids6<- kids6 %>%
 
 ```
 
+ Combine dfs of adults and older children. 
  
 ```{r combine-columns}
 
@@ -58,6 +60,8 @@ acc_data <- rbind(adults, kids12)
 ```
 
 ### Examine Accuracy Effects
+
+Tried to include partial accruacy data from a child but it wasn't working correct and I'm not sure why, so I ended up just getting rid of that child. 
 
 ```{r take-out}
 
@@ -87,7 +91,7 @@ acc_data <- rbind(adults, kids12)
 
 ```
 
-IDK why the acc is different when summarizing goruped by age
+IDK why the acc is different when summarizing grouped by age
 
 ```{r test-acc}
 
@@ -100,6 +104,7 @@ IDK why the acc is different when summarizing goruped by age
 #  summarize(acc=mean(acc))
 
 ```
+
 ```{r real-acc}
 
 acc_data<-acc_data%>%
@@ -144,6 +149,7 @@ df_mod <- reshape2::melt(df_mod, id.var=c('id', 'age'), variable.name= "relative
 
 ```
 
+Set up accuracy data to plot. 
 
 ```{r set-up-sum-stats-dist}
 
@@ -225,6 +231,7 @@ model4 <- aov_car(acc ~ relative_hp_dist + Error(id/relative_hp_dist), data=acc_
 model4
 
 ```
+
 Accuracy is different across all locations. 
 
 ```{r plot-first5}
@@ -315,6 +322,8 @@ For target location accuracy, there is only a main effect of age.
 
 
 ### Children ages 6-7 Accuracy -- Only 3 kids
+
+The code below doesn't work anymore and idk why. 
 
 ```{r adjust-data}
 

@@ -300,9 +300,9 @@ $(document).ready(function () {
 recap, my thesis is examining distractor suppression in children and
 adults. Participants are shown a distractor in a location more
 frequently than other locations in a visual search array. Based on
-previous studies, we would expect adults to suppress their attention to
-the high-probability location, but we were unsure when in development
-children develop this ability.</p>
+previous studies, we would expect adults to suppress their tendency to
+attend to a salient distractor in a high-probability location, but we
+were unsure when in development children develop this ability.</p>
 <pre class="r"><code>library(tidyverse) 
 library(tidyr)
 library(rstatix)
@@ -316,10 +316,14 @@ library(magrittr)
 library(cowplot)</code></pre>
 <p>I put all the messy loading in of different data sets and adding in
 important columns to an R script instead of having it here.</p>
+<p>Load in change detection task data (visual working memory capacity
+measurements)</p>
 <pre class="r"><code>cdt &lt;- read_csv(&quot;RawDataCDT.csv&quot;, show_col_types = FALSE)</code></pre>
 <div id="data-management-of-change-detection-task-data"
 class="section level3">
 <h3>Data Management of Change Detection Task Data</h3>
+<p>Identify cases of hits, false alarms, correct rejections, and misses
+depending on if the trial was accurate and if their was a change.</p>
 <pre class="r"><code>cdt &lt;- cdt %&gt;%
   mutate(outcome=
            case_when(Accurate==1 &amp; Change==1 ~ &quot;hit&quot;,
@@ -327,14 +331,16 @@ class="section level3">
                      Accurate==0 &amp; Change==1 ~ &quot;miss&quot;,
                      Accurate==0 &amp; Change==0 ~ &quot;f_alarm&quot;,
            ))</code></pre>
+<p>Group by the ppt ID and the set size to determine how many instances
+of each possible outcome there were.</p>
 <pre class="r"><code>cdt&lt;-cdt%&gt;%
   group_by(SubID, SetSize)%&gt;%
   count(outcome)</code></pre>
 <p>Reformat to have column for each outcome</p>
 <pre class="r"><code>cdt1 &lt;- setDT(cdt)
 cdt1 &lt;- dcast(cdt1,SubID+SetSize~outcome,value.var=&#39;n&#39;)</code></pre>
-<p>Get rid of participants without enough data and fill na values with
-zeros.</p>
+<p>Get rid of participants without enough data (I checked for this
+manual and filtered those IDs) and fill na values with zeros.</p>
 <pre class="r"><code>cdt1&lt;- cdt1%&gt;%
   filter(SubID != 55, SubID != 76)
 
@@ -342,10 +348,13 @@ cdt1[is.na(cdt1)] &lt;- 0
 
 cdt1 &lt;- cdt1 %&gt;% 
   select(-c(&quot;NA&quot;))</code></pre>
+<p>Calculate the hit rate.</p>
 <pre class="r"><code>cdt1&lt;-cdt1 %&gt;%
   mutate(hit_rate = hit/(hit+miss))</code></pre>
+<p>Calculate the false alarm rate.</p>
 <pre class="r"><code>cdt1&lt;-cdt1 %&gt;%
   mutate(fa_rate = f_alarm/(f_alarm+cor_rej))</code></pre>
+<p>Calculate the capacity for each set size</p>
 <pre class="r"><code>cdt1&lt;-cdt1 %&gt;%
   mutate(K = SetSize*(hit_rate-fa_rate))</code></pre>
 <p>Need to make a new data frame with the average capacity per
@@ -378,12 +387,12 @@ backwards. Delete them?</p>
 ## 2   1 2727.995</code></pre>
 <pre class="r"><code>aggregate(rt ~ acc, data = kids6, FUN = mean)</code></pre>
 <pre><code>##   acc        rt
-## 1   0  211.3377
-## 2   1 3650.6007</code></pre>
+## 1   0  201.1421
+## 2   1 3112.2998</code></pre>
 <pre class="r"><code>aggregate(rt ~ acc, data = kids6, FUN = sd)</code></pre>
-<pre><code>##   acc       rt
-## 1   0 1255.450
-## 2   1 7639.596</code></pre>
+<pre><code>##   acc        rt
+## 1   0  951.0326
+## 2   1 3594.9864</code></pre>
 <p>Define trimming criteria according to Van Selst and Jolicoeur
 1994.</p>
 <pre class="r"><code>xsize &lt;- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
@@ -429,7 +438,9 @@ statPrep &lt;- trimmedC6 %&gt;% group_by(id, relative_hp_dist) %&gt;% summarise(
 <pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using the `.groups`
 ## argument.</code></pre>
 <pre class="r"><code>100-(nrow(trimmedC6)/nrow(kids6[kids6$acc==1, ]))*100</code></pre>
-<pre><code>## [1] 6.074766</code></pre>
+<pre><code>## [1] 5.181347</code></pre>
+<p>Make the column names for block number the same for children and
+adults.</p>
 <pre class="r"><code>trimmedC12&lt;- trimmedC12 %&gt;%
   rename(
     block_num=block_num1,
@@ -441,21 +452,26 @@ trimmedC6&lt;- trimmedC6 %&gt;%
     block_num=block_num2,
     age=age2
   )</code></pre>
+<p>Bind adults and older children together in the same dataframe.</p>
 <pre class="r"><code>all_data &lt;- rbind(trimmedA, trimmedC12)</code></pre>
+<p>Find mean response times depending on block number and distractor
+location.</p>
 <pre class="r"><code>space_block &lt;- all_data %&gt;%
   group_by(id, age, block_num, relative_hp_dist) %&gt;%
   summarize(rts = mean(rt)
   )</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;id&#39;, &#39;age&#39;, &#39;block_num&#39;. You can override
 ## using the `.groups` argument.</code></pre>
+<p>Transform the df to be shaped differently.</p>
 <pre class="r"><code>space_block &lt;- setDT(space_block)
 space_block &lt;- dcast(space_block,id+age+block_num~relative_hp_dist,value.var=&#39;rts&#39;)</code></pre>
-<p>Below, I added the average rt for the low probability locations and
-the difference between the low probability and high probability
-locations ignoring n/a values.</p>
+<p>I added the average rt for the low probability locations and the
+difference between the low probability and high probability locations
+ignoring n/a values.</p>
 <pre class="r"><code>space_block &lt;- space_block %&gt;%
   mutate(low_prob = rowMeans(select(space_block, c(lp_1,lp_2,lp_3)),na.rm=TRUE)) %&gt;%
   mutate(difference = (low_prob-high_prob))</code></pre>
+<p>Create a new df for the suppression effect for each ppt.</p>
 <pre class="r"><code>supp &lt;- space_block %&gt;%
   group_by(id)%&gt;%
   summarize(effect = mean(difference, na.rm = TRUE))
@@ -475,6 +491,7 @@ supp</code></pre>
 ##  9    23  -84.9
 ## 10    24  -76.6
 ## # … with 23 more rows</code></pre>
+<p>Get rid of ppts who didn’t complete the CDT.</p>
 <pre class="r"><code>supp &lt;- supp %&gt;%
   filter(id != 104, id != 53, id != 54, id != 55, id != 76, id != 26)</code></pre>
 </div>

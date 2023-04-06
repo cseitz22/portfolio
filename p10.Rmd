@@ -103,6 +103,7 @@ trimmedC6<- trimmedC6 %>%
 
 ```
 
+Combine adult and child dfs. 
 
 ```{r combine-columns}
 
@@ -246,6 +247,7 @@ space_anovaA <- space_anovaA %>%
 
 ```
 
+Use a t-test to compare high and low prob locations for adults. 
 
 ```{r adult-t-test}
 
@@ -281,6 +283,7 @@ space_anovaK <- space_anovaK %>%
 
 ```
 
+Use t-test to examine high and low prob location differences in children. 
 
 ```{r kids-t-test}
 
