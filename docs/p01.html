@@ -359,6 +359,34 @@ statPrep &lt;- trimmed %&gt;% group_by(ID, relative_hp_dist) %&gt;% summarise(me
 <pre><code>## [1] 2.509732</code></pre>
 <p>2.51% of trials were trimmed.</p>
 </div>
+<div id="examine-ppts-9-and-15-because-modeling-stuff"
+class="section level3">
+<h3>examine ppts 9 and 15 because modeling stuff</h3>
+<pre class="r"><code>ppt15&lt;-trimmed%&gt;%
+  filter(ID==25)
+
+ppt17&lt;-trimmed%&gt;%
+  filter(ID==27)</code></pre>
+<pre class="r"><code>ggplot(data = ppt15, aes(x = relative_hp_dist, y = RT, fill=relative_hp_dist)) +
+  #geom_point()+
+  geom_bar(stat = &quot;summary&quot;, show.legend = FALSE) +
+  #coord_cartesian(ylim = c(700,1050))+
+  theme_classic()</code></pre>
+<pre><code>## No summary function supplied, defaulting to `mean_se()`</code></pre>
+<p><img src="p01_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>ppt17%&gt;%
+  group_by(relative_hp_dist)%&gt;%
+  summarize(mean_rts=mean(RT),
+            sd_rt=sd(RT))</code></pre>
+<pre><code>## # A tibble: 5 × 3
+##   relative_hp_dist mean_rts sd_rt
+##   &lt;chr&gt;               &lt;dbl&gt; &lt;dbl&gt;
+## 1 dist_0               927.  276.
+## 2 dist_1              1064.  358.
+## 3 dist_2              1062.  246.
+## 4 dist_3               960.  243.
+## 5 no_dist              797.  207.</code></pre>
+</div>
 <div id="distractor-location-effects-on-response-times"
 class="section level3">
 <h3>Distractor Location Effects on Response Times</h3>
@@ -612,33 +640,15 @@ model3</code></pre>
 <pre class="r"><code>df_mod %&gt;%
   pairwise_t_test(
     value ~ relative_hp_dist, paired = TRUE,
-    p.adjust.method = &quot;bonferroni&quot;
+    p.adjust.method = &quot;holm&quot;
     )</code></pre>
 <pre><code>## # A tibble: 3 × 10
 ##   .y.   group1  group2      n1    n2 statistic    df        p      p.adj p.adj…¹
 ## * &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;int&gt; &lt;int&gt;     &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt; &lt;chr&gt;  
-## 1 value no_dist dist_0      21    21     -7.01    20 8.48e- 7    2.54e-6 ****   
+## 1 value no_dist dist_0      21    21     -7.01    20 8.48e- 7    1.7 e-6 ****   
 ## 2 value no_dist low_prob    21    21    -10.9     20 7.05e-10    2.12e-9 ****   
-## 3 value dist_0  low_prob    21    21     -4.95    20 7.79e- 5    2.34e-4 ***    
+## 3 value dist_0  low_prob    21    21     -4.95    20 7.79e- 5    7.79e-5 ****   
 ## # … with abbreviated variable name ¹​p.adj.signif</code></pre>
-<pre class="r"><code>r&lt;- lsmeans(model3, ~relative_hp_dist)
-
-con1&lt;-list(a=c(-2,1,1), b=c(0,1,-1))
-
-contrast(r, con1, adjust = &quot;holm&quot;)</code></pre>
-<pre><code>##  contrast estimate   SE df t.ratio p.value
-##  a           217.6 21.3 20  10.216  &lt;.0001
-##  b           -55.6 11.2 20  -4.946  0.0001
-## 
-## P value adjustment: holm method for 2 tests</code></pre>
-<pre class="r"><code>m1&lt;-emmeans(model3, ~relative_hp_dist)
-pairs(m1)</code></pre>
-<pre><code>##  contrast           estimate   SE df t.ratio p.value
-##  no_dist - dist_0      -81.0 11.6 20  -7.007  &lt;.0001
-##  no_dist - low_prob   -136.6 12.5 20 -10.921  &lt;.0001
-##  dist_0 - low_prob     -55.6 11.2 20  -4.946  0.0002
-## 
-## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre>
 <pre class="r"><code>sum_stats2 &lt;- df_mod%&gt;%
   group_by(relative_hp_dist)%&gt;%
   summarize(mean_rts=mean(value),

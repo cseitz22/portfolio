@@ -78,6 +78,35 @@ statPrep <- trimmed %>% group_by(ID, relative_hp_dist) %>% summarise(measurement
 ```
 2.51% of trials were trimmed. 
 
+### examine ppts 9 and 15 because modeling stuff
+
+```{r }
+
+ppt15<-trimmed%>%
+  filter(ID==25)
+
+ppt17<-trimmed%>%
+  filter(ID==27)
+
+
+```
+
+```{r}
+
+ggplot(data = ppt15, aes(x = relative_hp_dist, y = RT, fill=relative_hp_dist)) +
+  #geom_point()+
+  geom_bar(stat = "summary", show.legend = FALSE) +
+  #coord_cartesian(ylim = c(700,1050))+
+  theme_classic()
+
+```
+```{r}
+ppt17%>%
+  group_by(relative_hp_dist)%>%
+  summarize(mean_rts=mean(RT),
+            sd_rt=sd(RT))
+```
+
 ### Distractor Location Effects on Response Times
 
 

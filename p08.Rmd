@@ -127,6 +127,13 @@ all_data <- rbind(trimmedA, trimmedC12)
  
 ```
 
+```{r download}
+
+write.csv(all_data, "rt_dist_loc.csv", row.names=FALSE)
+
+```
+
+
 Create a new data frame with the average RT for each relative distractor location per participant, so we can do a repeated measures ANOVA -- eventually -- maybe. 
 
 ```{r sum-stat-all}

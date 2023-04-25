@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Portfolio 10</title>
+
+<script src="site_libs/header-attrs-2.19/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Portfolio</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="p01.html">Portfolio 1</a>
+</li>
+<li>
+  <a href="p02.html">Portfolio 2</a>
+</li>
+<li>
+  <a href="p03.html">Portfolio 3</a>
+</li>
+<li>
+  <a href="p04.html">Portfolio 4</a>
+</li>
+<li>
+  <a href="p05.html">Portfolio 5</a>
+</li>
+<li>
+  <a href="p06.html">Portfolio 6</a>
+</li>
+<li>
+  <a href="p07.html">Portfolio 7</a>
+</li>
+<li>
+  <a href="p08.html">Portfolio 8</a>
+</li>
+<li>
+  <a href="p09.html">Portfolio 9</a>
+</li>
+<li>
+  <a href="p10.html">Portfolio 10</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Portfolio 10</h1>
+<h4 class="date">3.21.2023</h4>
+
+</div>
+
+
+<p>The goal of this portfolio is to examine part of my thesis data. To
+recap, my thesis is examining distractor suppression in children and
+adults. Participants are shown a distractor in a location more
+frequently than other locations in a visual search array. Based on
+previous studies, we would expect adults to suppress their attention to
+the high-probability location, but we were unsure when in development
+children develop this ability.</p>
+<pre class="r"><code>library(tidyverse) 
+library(tidyr)
+library(rstatix)
+library(data.table)
+library(afex)
+library(emmeans)
+library(psych)
+library(ggprism)
+library(patchwork)
+library(magrittr)
+library(cowplot)</code></pre>
+<p>I put all the messy loading in of different data sets and adding in
+important columns to an R script instead of having it here.</p>
+<div id="trim-the-data" class="section level3">
+<h3>Trim the Data</h3>
+<p>Define trimming criteria according to Van Selst and Jolicoeur
+1994.</p>
+<pre class="r"><code>xsize &lt;- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 
+             25, 30, 35, 50, 100)
+stds &lt;- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173, 
+            2.22, 2.246, 2.274, 2.31, 2.326, 2.391, 2.41, 2.4305, 
+            2.45, 2.48, 2.5)</code></pre>
+<p>Trim the data and compute the percent trimmed</p>
+<pre class="r"><code>trimmedA &lt;- adults[adults$acc==1, ] %&gt;% group_by(id, relative_target) %&gt;%
+           mutate(sdc = ifelse(length(rt)&gt;=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %&gt;%
+           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=200 &amp; rt&lt;=2500) %&gt;% #exact upper limit =2464.175
+           select(id, age, relative_target, relative_hp_dist, rt, block_num) %&gt;%  #keep these columns in the new data frame
+           as.data.frame()
+
+
+statPrep &lt;- trimmedA %&gt;% group_by(id, relative_target) %&gt;% summarise(measurement=mean(rt)) %&gt;% as.data.frame()</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;.
+## You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>100-(nrow(trimmedA)/nrow(adults[adults$acc==1, ]))*100</code></pre>
+<pre><code>## [1] 5.058774</code></pre>
+<p>5.06% of trials were trimmed from the adult data set.</p>
+<pre class="r"><code>trimmedC12 &lt;- kids12[kids12$acc==1, ] %&gt;% group_by(id, relative_target) %&gt;%
+           mutate(sdc = ifelse(length(rt)&gt;=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %&gt;%
+           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=200 &amp; rt&lt;=7590) %&gt;%  #exact upper limit =7586.794
+           select(id, age1, relative_target, , relative_hp_dist, rt, block_num1) %&gt;%  #keep these columns in the new data frame
+           as.data.frame()
+
+
+statPrep &lt;- trimmedC12 %&gt;% group_by(id, relative_target) %&gt;% summarise(measurement=mean(rt)) %&gt;% as.data.frame()</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;.
+## You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>100-(nrow(trimmedC12)/nrow(kids12[kids12$acc==1, ]))*100</code></pre>
+<pre><code>## [1] 4.530568</code></pre>
+<p>4.53% of trials were trimmed from the older child data set.</p>
+<pre class="r"><code>trimmedC6 &lt;- kids6[kids6$acc==1, ] %&gt;% group_by(id, relative_target) %&gt;%
+           mutate(sdc = ifelse(length(rt)&gt;=100,2.5,approx(xsize,stds,xout=length(rt))$y), avg = mean(rt), stdev = sd(rt)) %&gt;%
+           filter(rt &lt;= sdc*stdev+avg &amp; rt &gt;=avg-(sdc*stdev) &amp; rt &gt;=200 &amp; rt&lt;=18950) %&gt;% #exact upper limit =18929.79
+           select(id, age2, relative_target, , relative_hp_dist, rt, block_num2) %&gt;%  #keep these columns in the new data frame
+           as.data.frame()
+
+
+statPrep &lt;- trimmedC6 %&gt;% group_by(id, relative_target) %&gt;% summarise(measurement=mean(rt)) %&gt;% as.data.frame()</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;.
+## You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>100-(nrow(trimmedC6)/nrow(kids6[kids6$acc==1, ]))*100</code></pre>
+<pre><code>## [1] 3.88601</code></pre>
+<p>4.21% of trials were trimmed from the younger child data set.</p>
+<pre class="r"><code>trimmedC12&lt;- trimmedC12 %&gt;%
+  rename(
+    block_num=block_num1,
+    age=age1
+  )
+
+trimmedC6&lt;- trimmedC6 %&gt;%
+  rename(
+    block_num=block_num2,
+    age=age2
+  )</code></pre>
+<p>Combine adult and child dfs.</p>
+<pre class="r"><code>all_data &lt;- rbind(trimmedA, trimmedC12)</code></pre>
+<pre class="r"><code>write.csv(all_data, &quot;rt_target_loc.csv&quot;, row.names=FALSE)</code></pre>
+<p>Create a new data frame with the average RT for each relative
+distractor location per participant, so we can do a repeated measures
+ANOVA – eventually – maybe.</p>
+<pre class="r"><code>space &lt;- all_data %&gt;%
+  subset(relative_hp_dist==&quot;absent&quot;)%&gt;%
+  group_by(age, id, relative_target) %&gt;%
+  summarize(rts = mean(rt)
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;,
+## &#39;id&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>space</code></pre>
+<pre><code>## # A tibble: 132 × 4
+## # Groups:   age, id [33]
+##    age      id relative_target   rts
+##    &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;           &lt;dbl&gt;
+##  1 adult    14 high_prob        836.
+##  2 adult    14 lp_1             764.
+##  3 adult    14 lp_2             719.
+##  4 adult    14 lp_3             799.
+##  5 adult    15 high_prob        827.
+##  6 adult    15 lp_1             808.
+##  7 adult    15 lp_2             741.
+##  8 adult    15 lp_3             806.
+##  9 adult    16 high_prob       1013.
+## 10 adult    16 lp_1            1098.
+## # … with 122 more rows</code></pre>
+<p>Run ANOVA on 3 conditions first, and if significant, then run in on 5
+conditions?</p>
+<p>Need to reformat the above df to have a column for each
+relative_hp_dist/ID so we can average across low-probability
+locations.</p>
+<pre class="r"><code>space_anova &lt;- setDT(space)
+space_anova &lt;- dcast(space_anova,id+age~relative_target,value.var=&#39;rts&#39;)</code></pre>
+<pre class="r"><code>space_anova &lt;- space_anova %&gt;%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)</code></pre>
+<p>Now, I want to create a smaller graph with just 3 bars: one for the
+high-probability rts, average of low-probability rts, and no
+distractor.</p>
+<pre class="r"><code>df_mod &lt;- subset(space_anova, select=c(id, age, high_prob, low_prob))
+
+df_mod &lt;- reshape2::melt(df_mod, id.var=c(&#39;id&#39;, &#39;age&#39;), variable.name= &quot;relative_target&quot;)</code></pre>
+<pre class="r"><code>sum_stats &lt;- df_mod%&gt;%
+  group_by(age, relative_target)%&gt;%
+  summarize(mean_rts=mean(value),
+            sd_rt=sd(value),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;.
+## You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>sum_stats</code></pre>
+<pre><code>## # A tibble: 4 × 8
+## # Groups:   age [2]
+##   age   relative_target mean_rts sd_rt  n_rt    se upper_limit lower_limit
+##   &lt;chr&gt; &lt;fct&gt;              &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1 adult high_prob           998.  236.    27  45.5       1044.        953.
+## 2 adult low_prob            971.  233.    27  44.9       1016.        926.
+## 3 child high_prob          1628.  550.     6 225.        1853.       1403.
+## 4 child low_prob           1658.  600.     6 245.        1903.       1413.</code></pre>
+<p>Plot data.</p>
+<pre class="r"><code>supp.labs &lt;- c(&quot;Adults&quot;, &quot;Children&quot;)
+names(supp.labs) &lt;- c(&quot;adult&quot;, &quot;child&quot;)
+
+a&lt;-ggplot(subset(sum_stats, age %in% c(&quot;adult&quot;)),aes(x = relative_target, y = mean_rts, fill=relative_target)) +
+  geom_bar(stat = &quot;identity&quot;, show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(800, 1200))+ 
+  #facet_grid(~age, scales=&quot;free&quot;, labeller = labeller(age=supp.labs)) +
+  theme_classic()+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face=&quot;bold&quot;),
+        title = element_text(size = 45)) +
+  labs(x = &quot;Target Location&quot;, y = &quot;Response Time (ms)&quot;)+
+  labs(title = &quot;Singleton Distractor Absent&quot;, subtitle = &quot;Adults&quot;, tag = &quot;B&quot;)+
+  scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;)) +
+  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;))
+
+b&lt;-ggplot(subset(sum_stats, age %in% c(&quot;child&quot;)),aes(x = relative_target, y = mean_rts, fill=relative_target)) +
+  geom_bar(stat = &quot;identity&quot;, show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  coord_cartesian(ylim = c(1200, 2500))+ 
+  #facet_grid(~age, scales=&quot;free&quot;, labeller = labeller(age=supp.labs)) +
+  theme_classic()+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face=&quot;bold&quot;),
+        title = element_text(size = 45)) +
+  labs(x = &quot;Target Location&quot;, y = &quot;Response Time (ms)&quot;)+
+  labs(title = &quot;  &quot;,subtitle = &quot;Children&quot;, tag = &quot; &quot;)+
+  scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;)) +
+  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;))
+
+
+
+plot_grid(a,b,label_size=40)</code></pre>
+<p><img src="p10_files/figure-html/plot-first-1.png" width="2304" /></p>
+<p>Run a 2x2 mixed design ANOVA with distractor location and age as
+independent variables and rt as the dependent variable.</p>
+<pre class="r"><code>model3 &lt;- aov_car(value ~ age*relative_target + Error(id/relative_target), data=df_mod)</code></pre>
+<pre><code>## Converting to factor: age</code></pre>
+<pre><code>## Contrasts set to contr.sum for the following variables: age</code></pre>
+<pre class="r"><code>model3</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: value
+##                Effect    df       MSE         F   ges p.value
+## 1                 age 1, 31 197353.86 21.55 ***  .407   &lt;.001
+## 2     relative_target 1, 31   2184.44      0.01 &lt;.001    .924
+## 3 age:relative_target 1, 31   2184.44    3.60 +  .001    .067
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Since the interaction is trending towards being significant, I will
+break apart the age groups and run a t-test for HP and LP locations.</p>
+<pre class="r"><code>spaceA &lt;- trimmedA %&gt;%
+  subset(relative_hp_dist==&quot;absent&quot;)%&gt;%
+  group_by(id, relative_target) %&gt;%
+  summarize(rts = mean(rt)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;.
+## You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>space_anovaA &lt;- setDT(spaceA)
+space_anovaA &lt;- dcast(space_anovaA,id~relative_target,value.var=&#39;rts&#39;)</code></pre>
+<pre class="r"><code>space_anovaA &lt;- space_anovaA %&gt;%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)</code></pre>
+<p>Use a t-test to compare high and low prob locations for adults.</p>
+<pre class="r"><code>space_anovaA %&gt;%
+  t.test(x=space_anovaA$high_prob, y=space_anovaA$low_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  space_anovaA$high_prob and space_anovaA$low_prob
+## t = 2.4669, df = 26, p-value = 0.01027
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  8.289888      Inf
+## sample estimates:
+## mean difference 
+##        26.86371</code></pre>
+<p>Same for the kids:</p>
+<pre class="r"><code>spaceK &lt;- trimmedC12 %&gt;%
+  subset(relative_hp_dist==&quot;absent&quot;)%&gt;%
+  group_by(id, relative_target) %&gt;%
+  summarize(rts = mean(rt)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;.
+## You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>space_anovaK &lt;- setDT(spaceK)
+space_anovaK &lt;- dcast(space_anovaK,id~relative_target,value.var=&#39;rts&#39;)</code></pre>
+<pre class="r"><code>space_anovaK &lt;- space_anovaK %&gt;%
+  mutate(low_prob = (lp_1+lp_2+lp_3)/3)</code></pre>
+<p>Use t-test to examine high and low prob location differences in
+children.</p>
+<pre class="r"><code>space_anovaK %&gt;%
+  t.test(x=space_anovaK$low_prob, y=space_anovaK$high_prob, alternative=&quot;less&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  space_anovaK$low_prob and space_anovaK$high_prob
+## t = 0.71279, df = 5, p-value = 0.7461
+## alternative hypothesis: true mean difference is less than 0
+## 95 percent confidence interval:
+##      -Inf 113.7727
+## sample estimates:
+## mean difference 
+##         29.7292</code></pre>
+</div>
+<div id="examine-normalized-rts" class="section level3">
+<h3>Examine normalized rts</h3>
+<pre class="r"><code>write.csv(df_mod, &quot;norm_data_target.csv&quot;, row.names=FALSE)</code></pre>
+<pre class="r"><code>normrt &lt;- read_csv(&quot;norm_data_target_new.csv&quot;, show_col_types = FALSE)</code></pre>
+<pre class="r"><code>model_norm &lt;- aov_car(norm ~ age*relative_target + Error(id/relative_target), data=normrt)</code></pre>
+<pre><code>## Converting to factor: age</code></pre>
+<pre><code>## Contrasts set to contr.sum for the following variables: age</code></pre>
+<pre class="r"><code>model_norm</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: norm
+##                Effect    df   MSE     F   ges p.value
+## 1                 age 1, 31 -0.00 -0.00 &lt;.001   &gt;.999
+## 2     relative_target 1, 31  0.00  0.34  .011    .561
+## 3 age:relative_target 1, 31  0.00  2.74  .081    .108
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Since the interaction is trending, I’ll explore that further.</p>
+<pre class="r"><code>norm_adults &lt;- normrt %&gt;%
+  filter(age==&quot;adult&quot;)
+
+norm_child &lt;- normrt %&gt;%
+  filter(age==&quot;child&quot;)</code></pre>
+<pre class="r"><code>aov_car(norm ~ relative_target + Error(id/relative_target), data=norm_adults)</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: norm
+##            Effect    df  MSE      F  ges p.value
+## 1 relative_target 1, 26 0.00 7.15 * .216    .013
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>aov_car(norm ~ relative_target + Error(id/relative_target), data=norm_child)</code></pre>
+<pre><code>## Anova Table (Type 3 tests)
+## 
+## Response: norm
+##            Effect   df  MSE    F  ges p.value
+## 1 relative_target 1, 5 0.00 0.29 .056    .611
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Re-running with the age group separately showed that adults have a
+significant difference between the locations and the children do
+not.</p>
+<pre class="r"><code>reform &lt;- setDT(norm_adults)
+reform &lt;- dcast(reform,id~relative_target,value.var=&#39;norm&#39;)</code></pre>
+<pre class="r"><code>reform %&gt;%
+  t.test(x=reform$high_prob, y=reform$low_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  reform$high_prob and reform$low_prob
+## t = 2.6749, df = 26, p-value = 0.006378
+## alternative hypothesis: true mean difference is greater than 0
+## 95 percent confidence interval:
+##  0.01018487        Inf
+## sample estimates:
+## mean difference 
+##      0.02810732</code></pre>
+<p>Set up normalized data plot.</p>
+<pre class="r"><code>sum_stats_norm &lt;- normrt%&gt;%
+  group_by(age,relative_target)%&gt;%
+  summarize(mean_rts=mean(norm),
+            sd_rt=sd(norm),
+            n_rt=n(),
+            se=sd_rt/sqrt(n_rt),
+            upper_limit=mean_rts+se,
+            lower_limit=mean_rts-se
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;.
+## You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>sum_stats_norm</code></pre>
+<pre><code>## # A tibble: 4 × 8
+## # Groups:   age [2]
+##   age   relative_target mean_rts  sd_rt  n_rt      se upper_limit lower_limit
+##   &lt;chr&gt; &lt;chr&gt;              &lt;dbl&gt;  &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1 adult high_prob          1.01  0.0273    27 0.00525       1.02        1.01 
+## 2 adult low_prob           0.986 0.0273    27 0.00525       0.991       0.981
+## 3 child high_prob          0.993 0.0302     6 0.0123        1.01        0.981
+## 4 child low_prob           1.01  0.0302     6 0.0123        1.02        0.994</code></pre>
+<pre class="r"><code>a&lt;-ggplot(data = sum_stats_norm, aes(x = relative_target, y = mean_rts, fill=relative_target)) +
+  geom_bar(stat = &quot;identity&quot;, show.legend = FALSE)+
+  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
+  facet_grid(.~age, labeller = labeller(age=supp.labs)) +
+  coord_cartesian(ylim = c(.85,1.1))+ 
+  theme_classic()+
+  theme(axis.text=element_text(size=30),
+        axis.title=element_text(size=40,face=&quot;bold&quot;),
+        title = element_text(size = 40),
+        strip.text.x = element_text(size=30)) +
+  labs(x = &quot;Target Location&quot;, y = &quot;Normalized Response Time (%)&quot;)+
+  labs(title = &quot;Singleton Distractor Absent&quot;)+
+  scale_fill_manual(values=c(&#39;#1b9e77&#39;, &#39;#d95f02&#39;)) +
+  scale_x_discrete(labels= c(&quot;high_prob&quot;=&quot;HP loc&quot;,&quot;low_prob&quot;=&quot;LP loc&quot;))
+
+
+  plot_grid(a,labels = c(&#39;B&#39;), label_size=40)</code></pre>
+<p><img src="p10_files/figure-html/plot-first-norm-1.png" width="2112" /></p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

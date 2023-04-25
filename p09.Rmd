@@ -59,6 +59,13 @@ acc_data <- rbind(adults, kids12)
  
 ```
 
+```{r download}
+
+write.csv(acc_data, "accuracy_data.csv", row.names=FALSE)
+
+```
+
+
 ### Examine Accuracy Effects
 
 Tried to include partial accruacy data from a child but it wasn't working correct and I'm not sure why, so I ended up just getting rid of that child. 
@@ -316,89 +323,6 @@ model3
 ```
 
 For target location accuracy, there is only a main effect of age. 
-
-
-
-
-
-### Children ages 6-7 Accuracy -- Only 3 kids
-
-The code below doesn't work anymore and idk why. 
-
-```{r adjust-data}
-
-kids6<- kids6%>%
-  filter(id != 30, block_num2 != 3, block_num2 != 4, block_num2 != 5,block_num2 != 6, id != 30)
-
-kids6<-kids6%>%
-  mutate(acc=acc*100)
-
-```
-
-```{r create_new_df_to_transform-kids6}
-space_block6 <- kids6 %>%
-  group_by(id, block_num, relative_hp_dist) %>%
-  summarize(accs = mean(acc),
-            )
-
-```
-
-```{r transform_df-kids6}
-
-space_block6 <- setDT(space_block6)
-space_block6 <- dcast(space_block6,id+block_num~relative_hp_dist,value.var='accs')
-
-```
-
-```{r add_avg_col-kids6}
-
-space_block6 <- space_block6 %>%
-  mutate(low_prob = rowMeans(select(space_block6, c(lp_1,lp_2,lp_3)),na.rm=TRUE)) %>%
-  mutate(difference = (low_prob-high_prob))
-
-
-```
-
-
-```{r line_plot-kids6}
-ggplot(data = space_block6,aes(x=block_num, y=difference, group=id))+
-  geom_line()+
-  labs(title = "Difference in Accuracies", subtitle = "for distractor presentation at the low-probability locations and high-probability location by block")+
-  theme_classic()+
-  labs(x = "Block Number", y = "Difference in Accuracy (%)")
-
-```
-
-
-```{r create_df_to_transform}
-space2 <- space_block6 %>%
-  group_by(block_num) %>%
-  summarize(rts = mean(difference, na.rm = TRUE),
-            sd_rt=sd(difference, na.rm = TRUE),
-            n_rt=3,
-            se=sd_rt/sqrt(n_rt),
-            upper_limit=rts+se,
-            lower_limit=rts-se
-            )
-space2
-
-```
-
-```{r line_plot_avg}
-ggplot(data = space2,aes(x=block_num, y=rts))+
-  geom_line()+
-  geom_point()+
-  geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.2)+
-  labs(title = "Singleton Distractor Present")+
-  xlab("Block number")+
-  ylab(expression(atop("Suppression effect (ms)", paste("(high prob. - low prob.)"))))
-
-```
-
-
-
-
-
 
 
 
