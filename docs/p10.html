@@ -334,8 +334,8 @@ stds &lt;- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173,
 
 
 statPrep &lt;- trimmedA %&gt;% group_by(id, relative_target) %&gt;% summarise(measurement=mean(rt)) %&gt;% as.data.frame()</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override
-## using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using
+## the `.groups` argument.</code></pre>
 <pre class="r"><code>100-(nrow(trimmedA)/nrow(adults[adults$acc==1, ]))*100</code></pre>
 <pre><code>## [1] 5.058774</code></pre>
 <p>5.06% of trials were trimmed from the adult data set.</p>
@@ -347,8 +347,8 @@ statPrep &lt;- trimmedA %&gt;% group_by(id, relative_target) %&gt;% summarise(me
 
 
 statPrep &lt;- trimmedC12 %&gt;% group_by(id, relative_target) %&gt;% summarise(measurement=mean(rt)) %&gt;% as.data.frame()</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override
-## using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using
+## the `.groups` argument.</code></pre>
 <pre class="r"><code>100-(nrow(trimmedC12)/nrow(kids12[kids12$acc==1, ]))*100</code></pre>
 <pre><code>## [1] 4.530568</code></pre>
 <p>4.53% of trials were trimmed from the older child data set.</p>
@@ -360,8 +360,8 @@ statPrep &lt;- trimmedC12 %&gt;% group_by(id, relative_target) %&gt;% summarise(
 
 
 statPrep &lt;- trimmedC6 %&gt;% group_by(id, relative_target) %&gt;% summarise(measurement=mean(rt)) %&gt;% as.data.frame()</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override
-## using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using
+## the `.groups` argument.</code></pre>
 <pre class="r"><code>100-(nrow(trimmedC6)/nrow(kids6[kids6$acc==1, ]))*100</code></pre>
 <pre><code>## [1] 3.88601</code></pre>
 <p>4.21% of trials were trimmed from the younger child data set.</p>
@@ -387,8 +387,8 @@ ANOVA – eventually – maybe.</p>
   group_by(age, id, relative_target) %&gt;%
   summarize(rts = mean(rt)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;age&#39;, &#39;id&#39;. You can
-## override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;, &#39;id&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>space</code></pre>
 <pre><code>## # A tibble: 132 × 4
 ## # Groups:   age, id [33]
@@ -429,8 +429,8 @@ df_mod &lt;- reshape2::melt(df_mod, id.var=c(&#39;id&#39;, &#39;age&#39;), varia
             upper_limit=mean_rts+se,
             lower_limit=mean_rts-se
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override
-## using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override using
+## the `.groups` argument.</code></pre>
 <pre class="r"><code>sum_stats</code></pre>
 <pre><code>## # A tibble: 4 × 8
 ## # Groups:   age [2]
@@ -498,8 +498,8 @@ break apart the age groups and run a t-test for HP and LP locations.</p>
   group_by(id, relative_target) %&gt;%
   summarize(rts = mean(rt)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override
-## using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using
+## the `.groups` argument.</code></pre>
 <pre class="r"><code>space_anovaA &lt;- setDT(spaceA)
 space_anovaA &lt;- dcast(space_anovaA,id~relative_target,value.var=&#39;rts&#39;)</code></pre>
 <pre class="r"><code>space_anovaA &lt;- space_anovaA %&gt;%
@@ -524,8 +524,8 @@ space_anovaA &lt;- dcast(space_anovaA,id~relative_target,value.var=&#39;rts&#39;
   group_by(id, relative_target) %&gt;%
   summarize(rts = mean(rt)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override
-## using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override using
+## the `.groups` argument.</code></pre>
 <pre class="r"><code>space_anovaK &lt;- setDT(spaceK)
 space_anovaK &lt;- dcast(space_anovaK,id~relative_target,value.var=&#39;rts&#39;)</code></pre>
 <pre class="r"><code>space_anovaK &lt;- space_anovaK %&gt;%
@@ -613,8 +613,8 @@ reform &lt;- dcast(reform,id~relative_target,value.var=&#39;norm&#39;)</code></p
             upper_limit=mean_rts+se,
             lower_limit=mean_rts-se
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override
-## using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override using
+## the `.groups` argument.</code></pre>
 <pre class="r"><code>sum_stats_norm</code></pre>
 <pre><code>## # A tibble: 4 × 8
 ## # Groups:   age [2]
