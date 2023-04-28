@@ -297,25 +297,12 @@ $(document).ready(function () {
 
 
 <p>Goal: Determine the number of participants needed for 80% power.
-Data: Pilot study on distractor suppression in adults
-Interpretation:</p>
+Data: Pilot study on distractor suppression in adults</p>
 <pre class="r"><code>library(Superpower)
 library(data.table)
 library(emmeans)
-library(tidyverse) </code></pre>
-<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
-## ✔ ggplot2 3.4.0     ✔ purrr   1.0.0
-## ✔ tibble  3.1.8     ✔ dplyr   1.1.0
-## ✔ tidyr   1.2.1     ✔ stringr 1.5.0
-## ✔ readr   2.1.3     ✔ forcats 0.5.2
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::between()   masks data.table::between()
-## ✖ dplyr::filter()    masks stats::filter()
-## ✖ dplyr::first()     masks data.table::first()
-## ✖ dplyr::lag()       masks stats::lag()
-## ✖ dplyr::last()      masks data.table::last()
-## ✖ purrr::transpose() masks data.table::transpose()</code></pre>
-<pre class="r"><code>library(tidyr)</code></pre>
+library(tidyverse) 
+library(tidyr)</code></pre>
 <p>Instructions from the package are here: <a
 href="https://cran.r-project.org/web/packages/Superpower/vignettes/intro_to_superpower.html#anova_design-function"
 class="uri">https://cran.r-project.org/web/packages/Superpower/vignettes/intro_to_superpower.html#anova_design-function</a></p>
@@ -384,16 +371,16 @@ trimmed &lt;- pilot[pilot$acc==100, ] %&gt;% group_by(ID, relative_hp_dist) %&gt
 
 
 statPrep &lt;- trimmed %&gt;% group_by(ID, relative_hp_dist) %&gt;% summarise(measurement=mean(RT)) %&gt;% as.data.frame()</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>100-(nrow(trimmed)/nrow(pilot[pilot$acc==100, ]))*100</code></pre>
 <pre><code>## [1] 2.509732</code></pre>
 <pre class="r"><code>space &lt;- trimmed %&gt;%
   group_by(ID, relative_hp_dist) %&gt;%
   summarize(rts = mean(RT)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>space_anova &lt;- setDT(space)
 space_anova &lt;- dcast(space_anova,ID~relative_hp_dist,value.var=&#39;rts&#39;)
 
@@ -474,8 +461,8 @@ trimmed &lt;- add_this[add_this$relative_hp_dist==&quot;no_dist&quot;,] %&gt;%
 
 
 statPrep &lt;- trimmed %&gt;% group_by(ID, relative_target) %&gt;% summarise(measurement=mean(RT)) %&gt;% as.data.frame()</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>100-(nrow(trimmed)/nrow(add_this[add_this$relative_hp_dist==&quot;no_dist&quot;,]))*100</code></pre>
 <pre><code>## [1] 2.694489</code></pre>
 <pre class="r"><code>space &lt;- trimmed %&gt;%
@@ -483,8 +470,8 @@ statPrep &lt;- trimmed %&gt;% group_by(ID, relative_target) %&gt;% summarise(mea
   group_by(ID, relative_target) %&gt;%
   summarize(rts = mean(RT),
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>space_anova &lt;- setDT(space)
 space_anova &lt;- dcast(space_anova,ID~relative_target,value.var=&#39;rts&#39;)
 
@@ -544,15 +531,15 @@ pilot_dist &lt;- pilot %&gt;%
   group_by(ID, relative_hp_dist) %&gt;%
   summarize(accuracy = mean(acc)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>pilot_targ &lt;- pilot %&gt;%
   subset(relative_hp_dist==&quot;no_dist&quot;)%&gt;%
   group_by(ID, relative_target) %&gt;%
   summarize(accuracy = mean(acc)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>dist_t &lt;- setDT(pilot_dist)
 dist_t &lt;- dcast(pilot_dist,ID~relative_hp_dist,value.var=&#39;accuracy&#39;)
 

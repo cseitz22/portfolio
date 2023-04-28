@@ -353,8 +353,8 @@ stds &lt;- c(1.458, 1.68, 1.841, 1.961, 2.05, 2.12, 2.173,
 
 
 statPrep &lt;- trimmed %&gt;% group_by(ID, relative_hp_dist) %&gt;% summarise(measurement=mean(RT)) %&gt;% as.data.frame()</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>100-(nrow(trimmed)/nrow(pilot[pilot$acc==100, ]))*100</code></pre>
 <pre><code>## [1] 2.509732</code></pre>
 <p>2.51% of trials were trimmed.</p>
@@ -435,8 +435,8 @@ ANOVA.</p>
   group_by(ID, relative_hp_dist) %&gt;%
   summarize(rts = mean(RT)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>space</code></pre>
 <pre><code>## # A tibble: 105 × 3
 ## # Groups:   ID [21]
@@ -467,8 +467,8 @@ space2&lt;- df2 %&gt;%
   group_by(ID, relative_hp_dist) %&gt;%
   summarize(rts = mean(RT)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>space2</code></pre>
 <pre><code>## # A tibble: 105 × 3
 ## # Groups:   ID [21]
@@ -688,8 +688,8 @@ a&lt;-ggplot(data = sum_stats2, aes(x = relative_hp_dist, y = mean_rts, fill=rel
   group_by(ID, relative_hp_dist)%&gt;%
   summarize(acc = mean(acc)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>space_anovaT &lt;- setDT(spaceT)
 space_anovaT &lt;- dcast(space_anovaT,ID~relative_hp_dist,value.var=&#39;acc&#39;)
 
@@ -743,8 +743,8 @@ learning the regularity.</p>
   group_by(ID, block_num, relative_hp_dist) %&gt;%
   summarize(rts = mean(RT),
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;, &#39;block_num&#39;. You can override using
-## the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;, &#39;block_num&#39;. You
+## can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>space_block</code></pre>
 <pre><code>## # A tibble: 837 × 4
 ## # Groups:   ID, block_num [168]

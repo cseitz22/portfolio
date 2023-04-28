@@ -403,8 +403,8 @@ trimmed &lt;- add_this[add_this$relative_hp_dist==&quot;no_dist&quot;,] %&gt;%
 
 
 statPrep &lt;- trimmed %&gt;% group_by(ID, relative_target) %&gt;% summarise(measurement=mean(RT)) %&gt;% as.data.frame()</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>100-(nrow(trimmed)/nrow(add_this[add_this$relative_hp_dist==&quot;no_dist&quot;,]))*100</code></pre>
 <pre><code>## [1] 2.694489</code></pre>
 <p>Again, trimmed 2.69% of trials.</p>
@@ -455,8 +455,8 @@ space2&lt;- df2 %&gt;%
   group_by(ID, relative_target) %&gt;%
   summarize(rts = mean(RT)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>space2</code></pre>
 <pre><code>## # A tibble: 84 × 3
 ## # Groups:   ID [21]
@@ -491,8 +491,8 @@ ANOVA.</p>
   group_by(ID, relative_target) %&gt;%
   summarize(rts = mean(RT),
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>space</code></pre>
 <pre><code>## # A tibble: 84 × 3
 ## # Groups:   ID [21]
@@ -638,7 +638,6 @@ significant.</p>
 ## sample estimates:
 ## mean difference 
 ##        19.62472</code></pre>
-<pre class="r"><code>result&lt;- 0.037</code></pre>
 <p>This figure displays the mean response times depending on the
 location of the target relative to the high probability location. I
 chose those particular colors based on Wake Forest’s color scheme.</p>
@@ -716,8 +715,8 @@ spaceT &lt;- pilot %&gt;%
   group_by(ID, relative_target)%&gt;%
   summarize(acc = mean(acc)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>space_anovaT &lt;- setDT(spaceT)
 space_anovaT &lt;- dcast(space_anovaT,ID~relative_target,value.var=&#39;acc&#39;)
 
@@ -754,8 +753,8 @@ pilot_targacc &lt;- df_mod_targ %&gt;%
   group_by(ID, relative_hp_dist) %&gt;%
   summarize(accuracy = mean(acc)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>pilot_dist</code></pre>
 <pre><code>## # A tibble: 105 × 3
 ## # Groups:   ID [21]
@@ -777,8 +776,8 @@ pilot_targacc &lt;- df_mod_targ %&gt;%
   group_by(ID, relative_target) %&gt;%
   summarize(accuracy = mean(acc)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>pilot_targ</code></pre>
 <pre><code>## # A tibble: 84 × 3
 ## # Groups:   ID [21]
@@ -869,47 +868,7 @@ targ_t %&gt;%
 dist_t &lt;- dcast(pilot_dist,ID~relative_hp_dist,value.var=&#39;accuracy&#39;)
 
 dist_t &lt;- dist_t %&gt;%
-  mutate(low_prob = (dist_1+dist_2+dist_3)/3)
-
-dist_t %&gt;%
-  t.test(x=dist_t$dist_0, y=dist_t$low_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95)</code></pre>
-<pre><code>## 
-##  Paired t-test
-## 
-## data:  dist_t$dist_0 and dist_t$low_prob
-## t = 2.1259, df = 20, p-value = 0.02308
-## alternative hypothesis: true mean difference is greater than 0
-## 95 percent confidence interval:
-##  0.2579158       Inf
-## sample estimates:
-## mean difference 
-##        1.366686</code></pre>
-<pre class="r"><code>dist_t %&gt;%
-  t.test(x=dist_t$no_dist, y=dist_t$dist_0, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
-<pre><code>## 
-##  Paired t-test
-## 
-## data:  dist_t$no_dist and dist_t$dist_0
-## t = 5.6153, df = 20, p-value = 8.501e-06
-## alternative hypothesis: true mean difference is greater than 0
-## 95 percent confidence interval:
-##  1.254909      Inf
-## sample estimates:
-## mean difference 
-##        1.811224</code></pre>
-<pre class="r"><code>dist_t %&gt;%
-  t.test(x=dist_t$no_dist, y=dist_t$low_prob, alternative=&quot;greater&quot;, mu=0,paired = TRUE, conf.level = .95) </code></pre>
-<pre><code>## 
-##  Paired t-test
-## 
-## data:  dist_t$no_dist and dist_t$low_prob
-## t = 3.8565, df = 20, p-value = 0.0004919
-## alternative hypothesis: true mean difference is greater than 0
-## 95 percent confidence interval:
-##  1.756682      Inf
-## sample estimates:
-## mean difference 
-##         3.17791</code></pre>
+  mutate(low_prob = (dist_1+dist_2+dist_3)/3)</code></pre>
 <p>Running ANOVA on high-prob, low-prob, and distractor absent
 trials.</p>
 <pre class="r"><code>df_mod &lt;- subset(dist_t, select=c(ID, no_dist, dist_0, low_prob))
@@ -930,6 +889,18 @@ anova_dist</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1
 ## 
 ## Sphericity correction method: GG</code></pre>
+<pre class="r"><code>df_mod %&gt;%
+  pairwise_t_test(
+    value ~ relative_hp_dist, paired = TRUE,
+    p.adjust.method = &quot;holm&quot;
+    )</code></pre>
+<pre><code>## # A tibble: 3 × 10
+##   .y.   group1  group2      n1    n2 statistic    df        p    p.adj p.adj.s…¹
+## * &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;int&gt; &lt;int&gt;     &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    
+## 1 value no_dist dist_0      21    21      5.62    20 0.000017 0.000051 ****     
+## 2 value no_dist low_prob    21    21      3.86    20 0.000984 0.002    **       
+## 3 value dist_0  low_prob    21    21      2.13    20 0.046    0.046    *        
+## # … with abbreviated variable name ¹​p.adj.signif</code></pre>
 <p>Examining only some of the block of trials.</p>
 <pre class="r"><code>df3 &lt;- subset(pilot,block_num!=&#39;7&#39;)
 df3 &lt;- subset(df3,block_num!=&#39;8&#39;)
@@ -939,15 +910,15 @@ df3 &lt;- subset(df3,block_num!=&#39;6&#39;)</code></pre>
   group_by(ID, relative_hp_dist) %&gt;%
   summarize(accuracy = mean(acc)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>pilot_targ3 &lt;- df3 %&gt;%
   subset(relative_hp_dist=&quot;no_dist&quot;)%&gt;%
   group_by(ID, relative_target) %&gt;%
   summarize(accuracy = mean(acc)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ID&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>aov_car(accuracy ~ relative_hp_dist + Error(ID/relative_hp_dist), data=pilot_dist3)</code></pre>
 <pre><code>## Anova Table (Type 3 tests)
 ## 

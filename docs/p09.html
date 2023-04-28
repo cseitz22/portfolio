@@ -316,6 +316,7 @@ library(magrittr)
 library(cowplot)</code></pre>
 <p>I put all the messy loading in of different data sets and adding in
 important columns to an R script instead of having it here.</p>
+<p>Change columns to have the same name.</p>
 <pre class="r"><code>kids12&lt;- kids12 %&gt;%
   rename(
     block_num=block_num1,
@@ -327,9 +328,14 @@ kids6&lt;- kids6 %&gt;%
     block_num=block_num2,
     age=age2
   )</code></pre>
+<p>Combine dfs of adults and older children.</p>
 <pre class="r"><code>acc_data &lt;- rbind(adults, kids12)</code></pre>
+<pre class="r"><code>write.csv(acc_data, &quot;accuracy_data.csv&quot;, row.names=FALSE)</code></pre>
 <div id="examine-accuracy-effects" class="section level3">
 <h3>Examine Accuracy Effects</h3>
+<p>Tried to include partial accruacy data from a child but it wasn’t
+working correct and I’m not sure why, so I ended up just getting rid of
+that child.</p>
 <pre class="r"><code>#acc_26&lt;- acc_data1%&gt;%
 #  subset(id == 26)
 
@@ -350,7 +356,7 @@ kids6&lt;- kids6 %&gt;%
 
 #acc_child&lt;-acc_child%&gt;%
 #  mutate(acc=acc*100)</code></pre>
-<p>IDK why the acc is different when summarizing goruped by age</p>
+<p>IDK why the acc is different when summarizing grouped by age</p>
 <pre class="r"><code>#acc_child%&gt;%
 #  group_by(relative_hp_dist)%&gt;%
 #  summarize(acc=mean(acc))
@@ -373,14 +379,14 @@ acc_data&lt;-acc_data%&gt;%
             upper_limit=accuracy+se,
             lower_limit=accuracy-se
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>space &lt;- acc_data %&gt;%
   group_by(age, id, relative_hp_dist) %&gt;%
   summarize(acc = mean(acc)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;age&#39;, &#39;id&#39;. You can override using the
-## `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;, &#39;id&#39;. You can
+## override using the `.groups` argument.</code></pre>
 <pre class="r"><code>space_anova &lt;- setDT(space)
 space_anova &lt;- dcast(space_anova,id+age~relative_hp_dist,value.var=&#39;acc&#39;)
 
@@ -389,6 +395,7 @@ space_anova &lt;- space_anova %&gt;%
 
 df_mod &lt;- subset(space_anova, select=c(id, age, high_prob, absent, low_prob))
 df_mod &lt;- reshape2::melt(df_mod, id.var=c(&#39;id&#39;, &#39;age&#39;), variable.name= &quot;relative_hp_dist&quot;)</code></pre>
+<p>Set up accuracy data to plot.</p>
 <pre class="r"><code>sum_stats &lt;- df_mod%&gt;%
   group_by(age, relative_hp_dist)%&gt;%
   summarize(mean_acc=mean(value),
@@ -398,8 +405,8 @@ df_mod &lt;- reshape2::melt(df_mod, id.var=c(&#39;id&#39;, &#39;age&#39;), varia
             upper_limit=mean_acc+se,
             lower_limit=mean_acc-se
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>sum_stats</code></pre>
 <pre><code>## # A tibble: 6 × 8
 ## # Groups:   age [2]
@@ -494,8 +501,8 @@ the distractor location effect on accuracy across the 5 conditions.</p>
   group_by(age, id, relative_target) %&gt;%
   summarize(acc = mean(acc)
             )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;age&#39;, &#39;id&#39;. You can override using the
-## `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;, &#39;id&#39;. You can
+## override using the `.groups` argument.</code></pre>
 <pre class="r"><code>space_anovaT &lt;- setDT(spaceT)
 space_anovaT &lt;- dcast(space_anovaT,id+age~relative_target,value.var=&#39;acc&#39;)
 
@@ -513,8 +520,8 @@ df_mod_targ &lt;- reshape2::melt(df_mod_targ, id.var=c(&#39;id&#39;, &#39;age&#3
             upper_limit=mean_acc+se,
             lower_limit=mean_acc-se
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;age&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>sum_statsT</code></pre>
 <pre><code>## # A tibble: 4 × 8
 ## # Groups:   age [2]
@@ -557,9 +564,6 @@ plot_grid(a, b,labels = c(&#39;A&#39;,&#39;B&#39;), label_size=40, ncol=1)</code
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;+&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>For target location accuracy, there is only a main effect of age.</p>
-</div>
-<div id="children-ages-6-7-accuracy-only-3-kids" class="section level3">
-<h3>Children ages 6-7 Accuracy – Only 3 kids</h3>
 </div>
 
 
